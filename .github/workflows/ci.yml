@@ -1,0 +1,351 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Smart contract: compile + test ─────────────────────────────────────
+  contract:
+    name: Contract (Hardhat)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run compile
+      - run: npm test
+      - name: Coverage threshold (Branches ≥ 88%, Statements ≥ 94%)
+        run: |
+          npx hardhat coverage --reporter json-summary 2>/dev/null || true
+          node -e "
+            const fs = require('fs');
+            const s = JSON.parse(fs.readFileSync('coverage/coverage-summary.json','utf8'));
+            const t = s.total;
+            const branch = t.branches.pct;
+            const stmt   = t.statements.pct;
+            console.log('Branches:', branch + '%  (threshold: 88%)');
+            console.log('Statements:', stmt + '% (threshold: 94%)');
+            if (branch < 88) { console.error('❌ Branch coverage below threshold'); process.exit(1); }
+            if (stmt   < 94) { console.error('❌ Statement coverage below threshold'); process.exit(1); }
+            console.log('✅ Coverage OK');
+          "
+      - name: Gas snapshot
+        run: |
+          REPORT_GAS=true GAS_REPORT_FILE=gas-report.txt npm test 2>/dev/null || true
+          if [ -f gas-report.txt ]; then
+            echo "### Gas Usage Report" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat gas-report.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Gas report generated"
+          else
+            echo "⚠️ Gas report not generated (no COINMARKETCAP_API_KEY)"
+          fi
+
+  # ── 2. React frontend: lint + build + test ────────────────────────────────
+  frontend-react:
+    name: React Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend-react
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend-react/package-lock.json
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Bundle size budget
+        run: |
+          # Fail if any chunk exceeds 700kB (gzipped threshold ~200kB)
+          MAX_KB=700
+          FAILED=0
+          for f in dist/assets/*.js; do
+            SIZE_KB=$(( $(wc -c < "$f") / 1024 ))
+            if [ "$SIZE_KB" -gt "$MAX_KB" ]; then
+              echo "❌ $(basename $f): ${SIZE_KB}kB exceeds ${MAX_KB}kB budget"
+              FAILED=1
+            else
+              echo "✅ $(basename $f): ${SIZE_KB}kB"
+            fi
+          done
+          echo ""
+          echo "Total JS: $(du -sh dist/assets/*.js | tail -1 | cut -f1)"
+          echo "Total CSS: $(du -sh dist/assets/*.css 2>/dev/null | tail -1 | cut -f1 || echo '0')"
+          exit $FAILED
+
+  # ── 2b. Shared modules + utility tests (node:test) ────────────────────────
+  shared-tests:
+    name: Shared & Utility Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run shared/vault-status + test utilities
+        run: |
+          node --test \
+            test/vault-status.test.js \
+            test/timer-logic.test.js \
+            test/i18n.test.js \
+            test/i18n-unused.test.js \
+            test/translate-utils.test.js \
+            test/canonical-fixtures.test.js \
+            test/ci-assertions.test.js
+      - name: Docs generation sync
+        run: |
+          BEFORE=$(cat docs/GENERATED-REFERENCE.md | grep -v '^Generated:')
+          node scripts/generate-docs.js
+          AFTER=$(cat docs/GENERATED-REFERENCE.md | grep -v '^Generated:')
+          if [ "$BEFORE" != "$AFTER" ]; then
+            echo "❌ GENERATED-REFERENCE.md is out of sync with WillChain.sol"
+            echo "   Run: node scripts/generate-docs.js"
+            exit 1
+          fi
+          echo "✅ Docs in sync"
+
+  # ── 3. Bot: tests ─────────────────────────────────────────────────────────
+  bot:
+    name: Bot (Node.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: bot/package-lock.json
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm test
+
+  # ── 3b. Foundry fuzz tests ────────────────────────────────────────────────
+  foundry-fuzz:
+    name: Foundry Fuzz Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: Run fuzz tests (10000 runs)
+        run: FOUNDRY_PROFILE=ci forge test --match-contract WillChainFuzz --fuzz-runs 10000 -vvv
+
+  # ── 3c. Playwright E2E smoke tests ──────────────────────────────────────
+  e2e:
+    name: E2E Smoke Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend-react
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend-react/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run E2E smoke tests
+        run: npx playwright test
+        env:
+          VITE_WALLETCONNECT_PROJECT_ID: ${{ secrets.VITE_WALLETCONNECT_PROJECT_ID }}
+
+  # ── 3d. Docker build (bot) ──────────────────────────────────────────────
+  docker:
+    name: Docker Build (Bot)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t willchain-bot:ci ./bot
+      - name: Verify image starts
+        run: |
+          docker run --rm willchain-bot:ci node -e "console.log('✅ Container OK')"
+
+  # ── 4. Slither static analysis ────────────────────────────────────────────
+  slither:
+    name: Slither (Static Analysis)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install slither-analyzer
+      - name: Run Slither
+        run: |
+          slither contracts/WillChain.sol \
+            --solc-remaps "@openzeppelin/=$(pwd)/node_modules/@openzeppelin/" \
+            --exclude-dependencies \
+            --exclude-informational \
+            --exclude-low \
+            --json slither-report.json \
+            2>&1 | tee slither-output.txt
+        continue-on-error: true
+      - name: Slither summary
+        if: always()
+        run: |
+          echo "### Slither Static Analysis" >> $GITHUB_STEP_SUMMARY
+          if [ -f slither-report.json ]; then
+            HIGH=$(python3 -c "import json; d=json.load(open('slither-report.json')); print(sum(1 for r in d.get('results',{}).get('detectors',[]) if r['impact']=='High'))")
+            MED=$(python3 -c "import json; d=json.load(open('slither-report.json')); print(sum(1 for r in d.get('results',{}).get('detectors',[]) if r['impact']=='Medium'))")
+            echo "- High: $HIGH" >> $GITHUB_STEP_SUMMARY
+            echo "- Medium: $MED" >> $GITHUB_STEP_SUMMARY
+            if [ "$HIGH" -gt 0 ]; then
+              echo "❌ Slither found High severity issues" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+            echo "✅ No High severity findings" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Slither report not generated" >> $GITHUB_STEP_SUMMARY
+            cat slither-output.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+          fi
+
+  # ── 5. Config drift check ─────────────────────────────────────────────────
+  config-drift:
+    name: Config Drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check contract address consistency
+        run: |
+          CONTRACT="0x6fAd1475B41731E3eDA21998417Cb2e18E795877"
+          # Files that must reference the correct contract address
+          FILES=(
+            "frontend-react/src/config/contract.ts"
+            "bot/.env.example"
+            "shared/contract-config.js"
+          )
+          FAILED=0
+          for f in "${FILES[@]}"; do
+            if ! grep -q "$CONTRACT" "$f"; then
+              echo "❌ Contract address missing in: $f"
+              FAILED=1
+            else
+              echo "✅ $f"
+            fi
+          done
+          exit $FAILED
+
+      - name: Check chain ID consistency (84532 = Base Sepolia)
+        run: |
+          # frontend-react config should reference 84532
+          if ! grep -q "84532" frontend-react/src/config/wagmi.ts 2>/dev/null && \
+             ! grep -q "84532" frontend-react/src/config/contract.ts 2>/dev/null; then
+            echo "❌ Chain ID 84532 not found in frontend-react config"
+            exit 1
+          fi
+          echo "✅ Chain ID OK"
+
+      - name: Check no localhost URLs in production code
+        run: |
+          FAILED=0
+          # Allow localhost in .env.example and test files — check only main source files
+          for f in frontend-react/src/config/contract.ts frontend-react/src/config/wagmi.ts bot/src/api.js; do
+            if grep -qE "localhost:[0-9]+" "$f" 2>/dev/null; then
+              # api.js legitimately binds to 127.0.0.1 — allow that
+              if [[ "$f" == "bot/src/api.js" ]]; then
+                continue
+              fi
+              echo "❌ Hardcoded localhost found in: $f"
+              FAILED=1
+            fi
+          done
+          [ $FAILED -eq 0 ] && echo "✅ No hardcoded localhost in source files"
+          exit $FAILED
+
+      - name: Check EIP-712 chain ID in eip712.js
+        run: |
+          if ! grep -q "84532" bot/src/eip712.js; then
+            echo "❌ Chain ID 84532 not found in bot/src/eip712.js"
+            exit 1
+          fi
+          echo "✅ eip712.js chain ID OK"
+
+      - name: Check timing constants match contract (GRACE=30d, CLAIM=30d, COMMIT_REVEAL=1d)
+        run: |
+          # Frontend must define same values as contract
+          node -e "
+            const fs = require('fs');
+            const fe = fs.readFileSync('frontend-react/src/config/contract.ts','utf8');
+            const checks = [
+              [/GRACE_PERIOD_SECONDS\s*=\s*(\d+)/.exec(fe), 30*24*60*60, 'GRACE_PERIOD'],
+              [/CLAIM_PERIOD_SECONDS\s*=\s*(\d+)/.exec(fe), 30*24*60*60, 'CLAIM_PERIOD'],
+              [/COMMIT_REVEAL_WINDOW\s*=\s*(\d+)/.exec(fe), 24*60*60, 'COMMIT_REVEAL_WINDOW'],
+            ];
+            let ok = true;
+            for (const [m, expected, name] of checks) {
+              if (!m || parseInt(m[1]) !== expected) {
+                console.error('❌', name, 'mismatch: got', m?.[1], 'expected', expected);
+                ok = false;
+              } else {
+                console.log('✅', name, '=', expected);
+              }
+            }
+            if (!ok) process.exit(1);
+          "
+
+      - name: Verify .env.example files exist
+        run: |
+          for f in .env.example bot/.env.example scripts/observer/.env.example; do
+            [ -f "$f" ] && echo "✅ $f" || { echo "❌ Missing: $f"; exit 1; }
+          done
+
+      - name: Docs consistency — no stale Phoenix/ALIVE branding in source
+        run: |
+          FAILED=0
+          # Check source files (not test fixtures, not docs history)
+          for f in \
+            frontend-react/src/config/contract.ts \
+            frontend-react/src/config/wagmi.ts \
+            bot/src/index.js \
+            bot/src/api.js \
+            bot/src/email.js \
+            shared/contract-config.js; do
+            if grep -qiE "phoenix.legacy|PHOENIX_LEGACY|ImAlive" "$f" 2>/dev/null; then
+              echo "❌ Stale branding found in: $f"
+              FAILED=1
+            fi
+          done
+          [ $FAILED -eq 0 ] && echo "✅ No stale branding in source files"
+          exit $FAILED
+
+      - name: PROTOCOL-TRUTH.md exists (canonical spec gate)
+        run: |
+          [ -f "docs/PROTOCOL-TRUTH.md" ] && echo "✅ PROTOCOL-TRUTH.md present" \
+            || { echo "❌ docs/PROTOCOL-TRUTH.md missing — canonical spec required"; exit 1; }
+
+      - name: README.md exists
+        run: |
+          [ -f "README.md" ] && echo "✅ README.md present" \
+            || { echo "❌ README.md missing"; exit 1; }

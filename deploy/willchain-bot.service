@@ -1,0 +1,49 @@
+# WillChain Bot — systemd service
+#
+# Usage:
+#   sudo cp deploy/willchain-bot.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now willchain-bot
+#
+# Logs:
+#   journalctl -u willchain-bot -f
+#   journalctl -u willchain-bot --since "1 hour ago"
+
+[Unit]
+Description=WillChain Telegram Bot & API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+
+# Paths — adjust if your repo is elsewhere
+WorkingDirectory=/home/ubuntu/willchain.net/bot
+ExecStart=/usr/bin/node src/index.js
+
+# Environment
+Environment=NODE_ENV=production
+EnvironmentFile=/home/ubuntu/willchain.net/bot/.env
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/willchain.net/bot/data
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=willchain-bot
+
+[Install]
+WantedBy=multi-user.target

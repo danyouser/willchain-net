@@ -1,0 +1,20 @@
+{
+  "network": "baseSepolia",
+  "chainId": "84532",
+  "deployer": "0x0fc3BB5DB656eb51B14d745620b94A6e7BE5c36A",
+  "timestamp": "2026-01-08T05:52:03.063Z",
+  "contracts": {
+    "WebAuthnVerifier": "0xdF5863D40c2C042538abB689FA3fCb8A9d7b9199",
+    "PhoenixLegacy": "0xAFB4ce33a63f6D5D7408cF26D1D66bCD658749bc",
+    "PhoenixOracle": "0x3FA1A4061832c20F7a584609Deb681F579aB0066",
+    "PhoenixAccount": "0x0dcaCd85dd4086557d6ee0261deBe44494Ef68f1"
+  },
+  "tokenInfo": {
+    "name": "Phoenix Vault Access",
+    "symbol": "RISE",
+    "totalSupply": "1000000000.0",
+    "checkInIntervalDays": 30,
+    "gracePeriodDays": 30,
+    "claimPeriodDays": 30
+  }
+}

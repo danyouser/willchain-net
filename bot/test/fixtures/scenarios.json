@@ -1,0 +1,437 @@
+[
+  {
+    "id": "wallet_link_01_valid_link",
+    "category": "wallet-link",
+    "description": "Valid wallet link: address + valid signature saves user with notifications enabled",
+    "input": {
+      "telegramId": 100001,
+      "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "nonce": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "signature": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234"
+    },
+    "expected": {
+      "success": true,
+      "userSaved": true,
+      "notificationsEnabled": true,
+      "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18"
+    }
+  },
+  {
+    "id": "wallet_link_02_invalid_signature",
+    "category": "wallet-link",
+    "description": "Invalid signature: wrong sig for the given address returns error",
+    "input": {
+      "telegramId": 100002,
+      "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "nonce": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "signature": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "expected": {
+      "success": false,
+      "error": "invalid_signature",
+      "userSaved": false
+    }
+  },
+  {
+    "id": "wallet_link_03_expired_challenge",
+    "category": "wallet-link",
+    "description": "Expired challenge: nonce older than 5 min returns expiration error",
+    "input": {
+      "telegramId": 100003,
+      "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "nonce": "0xdeadbeef00000000000000000000000000000000000000000000000000000000",
+      "challengeTtlOverride": -1
+    },
+    "expected": {
+      "success": false,
+      "error": "challenge_expired",
+      "challengeReturnsNull": true
+    }
+  },
+  {
+    "id": "wallet_link_04_relink_cooldown",
+    "category": "wallet-link",
+    "description": "Relink cooldown: user linked 12h ago cannot relink, error shows hours remaining",
+    "input": {
+      "telegramId": 100004,
+      "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "hoursAgoLinked": 12,
+      "cooldownHours": 24
+    },
+    "expected": {
+      "success": false,
+      "error": "relink_cooldown",
+      "hoursRemaining": 12
+    }
+  },
+  {
+    "id": "wallet_link_05_case_insensitive_address",
+    "category": "wallet-link",
+    "description": "Case-insensitive address: mixed-case address is normalized and user is saved correctly",
+    "input": {
+      "telegramId": 100005,
+      "walletAddress": "0xAbCdEf1234567890AbCdEf1234567890AbCdEf12",
+      "walletAddressLowercase": "0xabcdef1234567890abcdef1234567890abcdef12"
+    },
+    "expected": {
+      "success": true,
+      "lookupByLowercase": true,
+      "lookupByUppercase": true
+    }
+  },
+  {
+    "id": "event_processing_06_successor_claim_initiated",
+    "category": "event-processing",
+    "description": "SuccessorClaimInitiated event: vault owner receives alert about claim initiation",
+    "input": {
+      "eventType": "SuccessorClaimInitiated",
+      "txHash": "0xaaa1111111111111111111111111111111111111111111111111111111111111",
+      "logIndex": 0,
+      "args": {
+        "owner": "0x1111111111111111111111111111111111111111",
+        "successor": "0x2222222222222222222222222222222222222222"
+      }
+    },
+    "expected": {
+      "notifyOwner": true,
+      "notifySuccessor": false,
+      "alertLevel": "critical",
+      "eventRecorded": true
+    }
+  },
+  {
+    "id": "event_processing_07_activity_confirmed",
+    "category": "event-processing",
+    "description": "ActivityConfirmed event: user receives timer-reset notification",
+    "input": {
+      "eventType": "ActivityConfirmed",
+      "txHash": "0xbbb2222222222222222222222222222222222222222222222222222222222222",
+      "logIndex": 0,
+      "args": {
+        "node": "0x3333333333333333333333333333333333333333"
+      }
+    },
+    "expected": {
+      "notifyNode": true,
+      "alertLevel": "info",
+      "timerReset": true,
+      "eventRecorded": true
+    }
+  },
+  {
+    "id": "event_processing_08_vault_transferred",
+    "category": "event-processing",
+    "description": "VaultTransferred event: both previous owner and new owner are notified",
+    "input": {
+      "eventType": "VaultTransferred",
+      "txHash": "0xccc3333333333333333333333333333333333333333333333333333333333333",
+      "logIndex": 0,
+      "args": {
+        "previousOwner": "0x4444444444444444444444444444444444444444",
+        "newOwner": "0x5555555555555555555555555555555555555555"
+      }
+    },
+    "expected": {
+      "notifyPreviousOwner": true,
+      "notifyNewOwner": true,
+      "alertLevel": "critical",
+      "eventRecorded": true
+    }
+  },
+  {
+    "id": "event_processing_09_successor_designated",
+    "category": "event-processing",
+    "description": "SuccessorDesignated event: both owner and successor are notified",
+    "input": {
+      "eventType": "SuccessorDesignated",
+      "txHash": "0xddd4444444444444444444444444444444444444444444444444444444444444",
+      "logIndex": 0,
+      "args": {
+        "owner": "0x6666666666666666666666666666666666666666",
+        "successor": "0x7777777777777777777777777777777777777777"
+      }
+    },
+    "expected": {
+      "notifyOwner": true,
+      "notifySuccessor": true,
+      "alertLevel": "info",
+      "eventRecorded": true
+    }
+  },
+  {
+    "id": "event_processing_10_duplicate_event",
+    "category": "event-processing",
+    "description": "Duplicate event: same tx_hash + log_index is skipped (idempotent processing)",
+    "input": {
+      "eventType": "ActivityConfirmed",
+      "txHash": "0xeee5555555555555555555555555555555555555555555555555555555555555",
+      "logIndex": 3,
+      "duplicate": true
+    },
+    "expected": {
+      "skipped": true,
+      "eventRecorded": false,
+      "notificationSent": false
+    }
+  },
+  {
+    "id": "cron_alerts_11_weekly_active_30d",
+    "category": "cron-alerts",
+    "description": "Weekly alert: 30 days remaining, regular status update message",
+    "input": {
+      "alertType": "weekly",
+      "daysRemaining": 30,
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 2592000,
+      "timeUntilAbandoned": 5184000
+    },
+    "expected": {
+      "shouldAlert": true,
+      "alertLevel": "regular",
+      "messageContains": "status",
+      "isCritical": false
+    }
+  },
+  {
+    "id": "cron_alerts_12_weekly_urgent_5d",
+    "category": "cron-alerts",
+    "description": "Weekly alert: 5 days remaining, urgent alert with approaching inactivity warning",
+    "input": {
+      "alertType": "weekly",
+      "daysRemaining": 5,
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 432000,
+      "timeUntilAbandoned": 3024000
+    },
+    "expected": {
+      "shouldAlert": true,
+      "alertLevel": "urgent",
+      "approachingInactivity": true,
+      "isCritical": false
+    }
+  },
+  {
+    "id": "cron_alerts_13_weekly_warning_12d",
+    "category": "cron-alerts",
+    "description": "Weekly alert: 12 days remaining, warning level (within default 7d threshold = false)",
+    "input": {
+      "alertType": "weekly",
+      "daysRemaining": 12,
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 1036800,
+      "timeUntilAbandoned": 3628800
+    },
+    "expected": {
+      "shouldAlert": true,
+      "alertLevel": "warning",
+      "approachingInactivity": false,
+      "isCritical": false
+    }
+  },
+  {
+    "id": "cron_alerts_14_daily_grace_period",
+    "category": "cron-alerts",
+    "description": "Daily alert: user entered GRACE period, critical alert sent",
+    "input": {
+      "alertType": "daily",
+      "daysRemaining": 0,
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 0,
+      "timeUntilAbandoned": 2592000
+    },
+    "expected": {
+      "shouldAlert": true,
+      "alertLevel": "critical",
+      "isCritical": true,
+      "statusName": "GRACE"
+    }
+  },
+  {
+    "id": "cron_alerts_15_daily_abandoned",
+    "category": "cron-alerts",
+    "description": "Daily alert: user is ABANDONED, critical alert sent",
+    "input": {
+      "alertType": "daily",
+      "daysRemaining": 0,
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 0,
+      "timeUntilAbandoned": 0
+    },
+    "expected": {
+      "shouldAlert": true,
+      "alertLevel": "critical",
+      "isCritical": true,
+      "statusName": "ABANDONED"
+    }
+  },
+  {
+    "id": "status_derivation_16_unregistered",
+    "category": "status-derivation",
+    "description": "UNREGISTERED: lastActivityTimestamp=0 derives to UNREGISTERED status",
+    "input": {
+      "lastActivityTimestamp": 0,
+      "timeUntilInactive": 0,
+      "timeUntilAbandoned": 0
+    },
+    "expected": {
+      "status": 0,
+      "name": "UNREGISTERED",
+      "isUnregistered": true,
+      "isActive": false,
+      "inGrace": false,
+      "isAbandoned": false
+    }
+  },
+  {
+    "id": "status_derivation_17_active_healthy",
+    "category": "status-derivation",
+    "description": "ACTIVE (healthy): 60 days remaining, well within inactivity period",
+    "input": {
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 5184000,
+      "timeUntilAbandoned": 7776000
+    },
+    "expected": {
+      "status": 1,
+      "name": "ACTIVE",
+      "isUnregistered": false,
+      "isActive": true,
+      "inGrace": false,
+      "isAbandoned": false
+    }
+  },
+  {
+    "id": "status_derivation_18_active_approaching",
+    "category": "status-derivation",
+    "description": "ACTIVE (approaching): 3 days remaining, still ACTIVE but approaching inactivity",
+    "input": {
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 259200,
+      "timeUntilAbandoned": 2851200
+    },
+    "expected": {
+      "status": 1,
+      "name": "ACTIVE",
+      "isUnregistered": false,
+      "isActive": true,
+      "inGrace": false,
+      "isAbandoned": false
+    }
+  },
+  {
+    "id": "status_derivation_19_grace_period",
+    "category": "status-derivation",
+    "description": "GRACE: timeUntilInactive=0, timeUntilAbandoned>0 derives to GRACE status",
+    "input": {
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 0,
+      "timeUntilAbandoned": 2592000
+    },
+    "expected": {
+      "status": 2,
+      "name": "GRACE",
+      "isUnregistered": false,
+      "isActive": false,
+      "inGrace": true,
+      "isAbandoned": false
+    }
+  },
+  {
+    "id": "status_derivation_20_abandoned",
+    "category": "status-derivation",
+    "description": "ABANDONED: both timeUntilInactive=0 and timeUntilAbandoned=0 with lastActivity>0",
+    "input": {
+      "lastActivityTimestamp": 1710000000,
+      "timeUntilInactive": 0,
+      "timeUntilAbandoned": 0
+    },
+    "expected": {
+      "status": 4,
+      "name": "ABANDONED",
+      "isUnregistered": false,
+      "isActive": false,
+      "inGrace": false,
+      "isAbandoned": true
+    }
+  },
+  {
+    "id": "recycle_21_fresh_abandoned",
+    "category": "recycle",
+    "description": "Fresh abandoned node (< 24h): commit-reveal MEV protection required",
+    "input": {
+      "abandonedNode": "0x8888888888888888888888888888888888888888",
+      "hoursAbandoned": 12,
+      "balance": "1000000000000000000",
+      "commitRevealThresholdHours": 24
+    },
+    "expected": {
+      "requiresCommitReveal": true,
+      "canDirectRecycle": false,
+      "shouldSkip": false
+    }
+  },
+  {
+    "id": "recycle_22_stale_abandoned",
+    "category": "recycle",
+    "description": "Stale abandoned node (> 24h): direct recycle without commit-reveal",
+    "input": {
+      "abandonedNode": "0x9999999999999999999999999999999999999999",
+      "hoursAbandoned": 48,
+      "balance": "500000000000000000",
+      "commitRevealThresholdHours": 24
+    },
+    "expected": {
+      "requiresCommitReveal": false,
+      "canDirectRecycle": true,
+      "shouldSkip": false
+    }
+  },
+  {
+    "id": "recycle_23_already_recycled",
+    "category": "recycle",
+    "description": "Already recycled node: balance=0, should be skipped",
+    "input": {
+      "abandonedNode": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "hoursAbandoned": 100,
+      "balance": "0",
+      "commitRevealThresholdHours": 24
+    },
+    "expected": {
+      "requiresCommitReveal": false,
+      "canDirectRecycle": false,
+      "shouldSkip": true
+    }
+  },
+  {
+    "id": "error_handling_24_rpc_timeout",
+    "category": "error-handling",
+    "description": "RPC timeout: provider.getBlockNumber() fails, graceful error handling",
+    "input": {
+      "providerMethod": "getBlockNumber",
+      "errorType": "TIMEOUT",
+      "errorMessage": "request timeout"
+    },
+    "expected": {
+      "gracefulError": true,
+      "shouldRetry": true,
+      "notificationSent": false,
+      "serviceAvailable": false
+    }
+  },
+  {
+    "id": "error_handling_25_rate_limit_exceeded",
+    "category": "error-handling",
+    "description": "Rate limit exceeded: 31 requests/min from same user, request is blocked",
+    "input": {
+      "userId": 200001,
+      "requestCount": 31,
+      "maxRequestsPerMinute": 30,
+      "windowSeconds": 60
+    },
+    "expected": {
+      "blocked": true,
+      "error": "rate_limit_exceeded",
+      "retryAfterSeconds": 60
+    }
+  }
+]

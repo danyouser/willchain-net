@@ -1,0 +1,41 @@
+{
+  "name": "willchain",
+  "version": "1.0.0",
+  "description": "WillChain - Decentralized crypto inheritance platform on Base",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:base": "hardhat run scripts/deploy.js --network base",
+    "node": "hardhat node",
+    "verify": "hardhat verify --network base",
+    "clean": "hardhat clean",
+    "translate": "node -r dotenv/config scripts/translate-langs.mjs",
+    "qa": "node scripts/qa.mjs",
+    "qa:quick": "node scripts/qa.mjs --quick"
+  },
+  "devDependencies": {
+    "@google/genai": "^1.43.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.1",
+    "forge-std": "github:foundry-rs/forge-std",
+    "hardhat": "^2.19.4",
+    "solidity-coverage": "^0.8.5"
+  },
+  "dependencies": {
+    "@walletconnect/ethereum-provider": "^2.23.7",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "erc20",
+    "dead-mans-switch",
+    "proof-of-activity",
+    "digital-vault",
+    "base"
+  ],
+  "license": "MIT"
+}

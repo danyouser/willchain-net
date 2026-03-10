@@ -1,0 +1,347 @@
+{
+  "_meta": {
+    "description": "Canonical vault state fixtures for WillChain. Used by contract tests, frontend tests, bot tests, and CI assertions.",
+    "source": "Mirrors WillChain.sol getNodeState() + getVaultStatus() output",
+    "constants": {
+      "DAY": 86400,
+      "PERIOD_30_DAYS": 2592000,
+      "PERIOD_90_DAYS": 7776000,
+      "PERIOD_180_DAYS": 15552000,
+      "PERIOD_365_DAYS": 31536000,
+      "DEFAULT_INACTIVITY_PERIOD": 7776000,
+      "GRACE_PERIOD": 2592000,
+      "CLAIM_PERIOD": 2592000,
+      "COMMIT_REVEAL_WINDOW": 86400,
+      "TOTAL_TIMEOUT_DEFAULT": 12960000,
+      "TREASURY_CHANGE_DELAY": 172800,
+      "MAINTAINER_REWARD_BPS": 100,
+      "PROTOCOL_FEE_BPS": 500,
+      "BURN_BPS": 4700,
+      "RECYCLE_BPS": 4700
+    },
+    "addresses": {
+      "ZERO": "0x0000000000000000000000000000000000000000",
+      "ALICE": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "BOB": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "CAROL": "0xcccccccccccccccccccccccccccccccccccccccc"
+    }
+  },
+
+  "states": [
+    {
+      "id": "S01_UNREGISTERED_NULL",
+      "status": 0,
+      "statusName": "UNREGISTERED",
+      "description": "Never interacted — null nodeState",
+      "nodeState": null,
+      "expectedUI": "ActivationCard only, no dashboard, no sidebar",
+      "expectedBot": "No alerts, no monitoring",
+      "transitions": ["S02_UNREGISTERED_ZERO"]
+    },
+    {
+      "id": "S02_UNREGISTERED_ZERO",
+      "status": 0,
+      "statusName": "UNREGISTERED",
+      "description": "Holds tokens but never registered (lastActivityTimestamp=0)",
+      "nodeState": {
+        "lastActivityTimestamp": 0,
+        "designatedSuccessor": "0x0000000000000000000000000000000000000000",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 0,
+        "timeUntilAbandoned": 0,
+        "inactivityPeriod": 7776000,
+        "isActive": false
+      },
+      "expectedUI": "ActivationCard only",
+      "expectedBot": "No alerts",
+      "transitions": ["S03_ACTIVE_NO_SUCCESSOR"]
+    },
+    {
+      "id": "S03_ACTIVE_NO_SUCCESSOR",
+      "status": 1,
+      "statusName": "ACTIVE",
+      "description": "Registered but no successor designated — limited dashboard",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0x0000000000000000000000000000000000000000",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 5184000,
+        "timeUntilAbandoned": 10368000,
+        "inactivityPeriod": 7776000,
+        "isActive": true,
+        "serviceTier": "NONE"
+      },
+      "expectedUI": "Dashboard with balance_label (not total_value_secured), no TimeCard/sidebar, ecosystem visible",
+      "expectedBot": "Active monitoring, no alerts yet",
+      "transitions": ["S04_ACTIVE_WITH_SUCCESSOR"]
+    },
+    {
+      "id": "S04_ACTIVE_WITH_SUCCESSOR",
+      "status": 1,
+      "statusName": "ACTIVE",
+      "description": "Fully configured — successor set, full dashboard",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 5184000,
+        "timeUntilAbandoned": 10368000,
+        "inactivityPeriod": 7776000,
+        "isActive": true,
+        "serviceTier": "BASIC"
+      },
+      "expectedUI": "Full dashboard + sidebar + TimeCard + allowance warning",
+      "expectedBot": "Active monitoring, weekly status",
+      "transitions": ["S05_ACTIVE_WARNING", "S06_GRACE"]
+    },
+    {
+      "id": "S05_ACTIVE_WARNING",
+      "status": 1,
+      "statusName": "ACTIVE",
+      "description": "Active but approaching inactivity (<7 days remaining)",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 259200,
+        "timeUntilAbandoned": 5443200,
+        "inactivityPeriod": 7776000,
+        "isActive": true,
+        "serviceTier": "BASIC"
+      },
+      "expectedUI": "status-warning badge, yellow indicator",
+      "expectedBot": "approachingInactivity=true, daily reminder",
+      "badgeClass": "status-warning",
+      "transitions": ["S04_ACTIVE_WITH_SUCCESSOR", "S06_GRACE"]
+    },
+    {
+      "id": "S06_GRACE",
+      "status": 2,
+      "statusName": "GRACE",
+      "description": "Past inactivity period — successor can initiate claim",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 0,
+        "timeUntilAbandoned": 1296000,
+        "inactivityPeriod": 7776000,
+        "isActive": false,
+        "serviceTier": "BASIC"
+      },
+      "expectedUI": "status-danger badge, critical alert banner",
+      "expectedBot": "needsCriticalAlert=true, immediate notification",
+      "badgeClass": "status-danger",
+      "transitions": ["S04_ACTIVE_WITH_SUCCESSOR", "S07_CLAIMABLE", "S09_ABANDONED"]
+    },
+    {
+      "id": "S07_CLAIMABLE",
+      "status": 3,
+      "statusName": "CLAIMABLE",
+      "description": "Successor claim initiated + veto period passed",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "successorClaimInitiated": true,
+        "claimInitiationTimestamp": 1707776000,
+        "timeUntilInactive": 0,
+        "timeUntilAbandoned": 864000,
+        "inactivityPeriod": 7776000,
+        "isActive": false,
+        "serviceTier": "BASIC"
+      },
+      "expectedUI": "Claim available for successor, veto option for owner",
+      "expectedBot": "Critical alert, transfer imminent",
+      "transitions": ["S04_ACTIVE_WITH_SUCCESSOR", "S08_TRANSFER_COMPLETE", "S09_ABANDONED"]
+    },
+    {
+      "id": "S08_TRANSFER_COMPLETE",
+      "status": 0,
+      "statusName": "UNREGISTERED",
+      "description": "After completeVaultTransfer — original node cleared, successor received tokens",
+      "nodeState": {
+        "lastActivityTimestamp": 0,
+        "designatedSuccessor": "0x0000000000000000000000000000000000000000",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 0,
+        "timeUntilAbandoned": 0,
+        "inactivityPeriod": 7776000,
+        "isActive": false
+      },
+      "expectedUI": "ActivationCard (can re-register if receives tokens again)",
+      "expectedBot": "VaultTransferred event processed, successor notified",
+      "transitions": ["S03_ACTIVE_NO_SUCCESSOR"]
+    },
+    {
+      "id": "S09_ABANDONED",
+      "status": 4,
+      "statusName": "ABANDONED",
+      "description": "Total timeout expired — anyone can recycle (stale, >24h)",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 0,
+        "timeUntilAbandoned": 0,
+        "inactivityPeriod": 7776000,
+        "isActive": false,
+        "serviceTier": "BASIC"
+      },
+      "expectedUI": "status-danger badge, recycle available (direct)",
+      "expectedBot": "needsCriticalAlert=true, recycle eligible",
+      "badgeClass": "status-danger",
+      "isFreshAbandoned": false,
+      "transitions": ["S10_RECYCLED", "S11_ABANDONED_FRESH"]
+    },
+    {
+      "id": "S10_RECYCLED",
+      "status": 0,
+      "statusName": "UNREGISTERED",
+      "description": "After recycleInactiveNode — tokens distributed (1% caller, 5% treasury, 47% burn, 47% dividends)",
+      "nodeState": null,
+      "distribution": {
+        "callerRewardBps": 100,
+        "protocolFeeBps": 500,
+        "burnBps": 4700,
+        "dividendBps": 4700
+      },
+      "expectedUI": "ActivationCard (can re-register if receives tokens again)",
+      "expectedBot": "NodeRecycled event, balance=0",
+      "transitions": ["S02_UNREGISTERED_ZERO"]
+    },
+    {
+      "id": "S11_ABANDONED_FRESH",
+      "status": 4,
+      "statusName": "ABANDONED",
+      "description": "Freshly abandoned (<24h) — requires commit-reveal for recycling",
+      "nodeState": {
+        "lastActivityTimestamp": 1700000000,
+        "designatedSuccessor": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "successorClaimInitiated": false,
+        "claimInitiationTimestamp": 0,
+        "timeUntilInactive": 0,
+        "timeUntilAbandoned": 0,
+        "inactivityPeriod": 7776000,
+        "isActive": false,
+        "serviceTier": "BASIC"
+      },
+      "isFreshAbandoned": true,
+      "expectedUI": "2-step commit-reveal UI: Commit → wait 2 blocks → Execute",
+      "expectedBot": "commitRecycle() → store salt → wait → executeRecycle()",
+      "transitions": ["S09_ABANDONED", "S10_RECYCLED"]
+    }
+  ],
+
+  "transitions": [
+    {
+      "id": "T01_REGISTER",
+      "from": "UNREGISTERED",
+      "to": "ACTIVE",
+      "trigger": "confirmActivity() or designateSuccessor() or setInactivityPeriod() or updateVaultData()",
+      "effects": ["everRegistered=true", "lastActivityTimestamp=now", "totalUnregisteredSupply -= balance", "dividendPerToken snapshot taken"],
+      "contract_function": "_performActivityConfirmation"
+    },
+    {
+      "id": "T02_DESIGNATE_SUCCESSOR",
+      "from": "ACTIVE",
+      "to": "ACTIVE",
+      "trigger": "designateSuccessor(address)",
+      "guards": ["successor != 0x0", "successor != self", "successor != contract", "no circular chain (A→B when B→A)"],
+      "effects": ["designatedSuccessor=address", "timer reset"]
+    },
+    {
+      "id": "T03_INACTIVITY_EXPIRES",
+      "from": "ACTIVE",
+      "to": "GRACE",
+      "trigger": "block.timestamp > lastActivity + inactivityPeriod (automatic, time-based)",
+      "effects": ["timeUntilInactive=0"]
+    },
+    {
+      "id": "T04_INITIATE_CLAIM",
+      "from": "GRACE",
+      "to": "GRACE",
+      "trigger": "successor calls initiateSuccessorClaim(node)",
+      "guards": ["caller == designatedSuccessor", "node not ACTIVE", "node not ABANDONED", "no claim already initiated"],
+      "effects": ["successorClaimInitiated=true", "claimInitiationTimestamp=now", "timeline shifts to claim-based"]
+    },
+    {
+      "id": "T05_VETO_EXPIRES",
+      "from": "GRACE",
+      "to": "CLAIMABLE",
+      "trigger": "block.timestamp > claimInitiationTimestamp + GRACE_PERIOD (automatic, time-based)",
+      "effects": ["completeVaultTransfer becomes available"]
+    },
+    {
+      "id": "T06_COMPLETE_TRANSFER",
+      "from": "CLAIMABLE",
+      "to": "UNREGISTERED",
+      "trigger": "successor calls completeVaultTransfer(node)",
+      "guards": ["claim initiated", "veto window passed", "within claim window", "flashloan guard"],
+      "effects": ["all tokens → successor", "unclaimed dividends → successor", "node state cleared", "everRegistered[node]=false", "totalSuccessfulTransfers++"]
+    },
+    {
+      "id": "T07_OWNER_CANCELS_CLAIM",
+      "from": "GRACE/CLAIMABLE",
+      "to": "ACTIVE",
+      "trigger": "owner calls cancelSuccessorClaim()",
+      "effects": ["successorClaimInitiated=false", "claimInitiationTimestamp=0", "timer reset (proves alive)"]
+    },
+    {
+      "id": "T08_CONFIRM_ACTIVITY",
+      "from": "ACTIVE/GRACE/CLAIMABLE",
+      "to": "ACTIVE",
+      "trigger": "owner calls confirmActivity() or makes direct transfer",
+      "effects": ["lastActivityTimestamp=now", "claim cancelled if active", "timer fully reset"]
+    },
+    {
+      "id": "T09_TOTAL_TIMEOUT",
+      "from": "GRACE/CLAIMABLE",
+      "to": "ABANDONED",
+      "trigger": "block.timestamp > all timeout windows (automatic, time-based)",
+      "effects": ["timeUntilAbandoned=0", "recycling available"]
+    },
+    {
+      "id": "T10_RECYCLE_DIRECT",
+      "from": "ABANDONED (stale, >24h)",
+      "to": "UNREGISTERED",
+      "trigger": "anyone calls recycleInactiveNode(node)",
+      "guards": ["!isFreshAbandoned", "flashloan guard"],
+      "effects": ["1% caller, 5% treasury, 47% burn, 47% dividends", "node state cleared", "everRegistered=false"]
+    },
+    {
+      "id": "T11_RECYCLE_COMMIT_REVEAL",
+      "from": "ABANDONED (fresh, <24h)",
+      "to": "UNREGISTERED",
+      "trigger": "commitRecycle(hash) → wait 2+ blocks → executeRecycle(node, salt)",
+      "guards": ["hash matches", "2 <= blockDelay <= 256", "node still ABANDONED"],
+      "effects": ["same as T10"]
+    },
+    {
+      "id": "T12_RE_REGISTER",
+      "from": "UNREGISTERED (post-recycle/transfer)",
+      "to": "ACTIVE",
+      "trigger": "receives tokens + calls confirmActivity()",
+      "effects": ["everRegistered=true again", "fresh dividend snapshot", "totalUnregisteredSupply -= balance"]
+    }
+  ],
+
+  "invariants": [
+    "INV01: sum(pendingDividends) + dividendPool <= contract token balance",
+    "INV02: totalSupply decreases only by amount burned",
+    "INV03: UNREGISTERED users never accumulate dividends",
+    "INV04: totalUnregisteredSupply == sum of balances where !everRegistered (excluding 0x0 and contract)",
+    "INV05: circular successor chains are always blocked (A→B rejects if B→A)",
+    "INV06: recycled node has everRegistered=false",
+    "INV07: re-registered user earns dividends from point of re-registration",
+    "INV08: fresh ABANDONED (<24h) blocks direct recycleInactiveNode",
+    "INV09: commit-reveal hash = keccak256(node, salt, committer)",
+    "INV10: only direct transfers (msg.sender == from) reset inactivity timer"
+  ]
+}

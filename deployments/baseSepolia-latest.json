@@ -1,0 +1,14 @@
+{
+  "network": "baseSepolia",
+  "chainId": "84532",
+  "deployer": "0x0fc3BB5DB656eb51B14d745620b94A6e7BE5c36A",
+  "timestamp": "2026-02-27T12:02:38.634Z",
+  "contracts": {
+    "PhoenixLegacy": "0xe88C5513C34DD10a125E862dEE51010E1548B5C5"
+  },
+  "tokenInfo": {
+    "name": "ImAlive Proof of Activity",
+    "symbol": "ALIVE",
+    "totalSupply": "1000000000.0"
+  }
+}

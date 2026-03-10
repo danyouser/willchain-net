@@ -1,0 +1,51 @@
+# Environment variables (API keys, secrets)
+.env
+.env.*
+!.env.example
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+frontend/dist/
+frontend-react/dist/
+artifacts/
+cache/
+typechain-types/
+
+# Hardhat
+.openzeppelin/
+
+# Foundry
+out/
+cache_forge/
+
+# SQLite databases
+*.db
+*.db-journal
+
+# Coverage
+coverage/
+coverage.json
+
+# Python virtualenv (Slither)
+.venv/
+
+# Claude internal
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+
+# Internal AI context (not for public repo)
+docs/CLAUDE-CONTEXT.md

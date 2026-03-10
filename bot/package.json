@@ -1,0 +1,23 @@
+{
+  "name": "willchain-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for WillChain activity reminders",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.9.0",
+    "grammy": "^1.21.1",
+    "node-cron": "^3.0.3",
+    "resend": "^6.9.3"
+  },
+  "devDependencies": {
+    "node-test-utils": "^1.0.1",
+    "nodemon": "^3.0.2"
+  }
+}

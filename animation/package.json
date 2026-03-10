@@ -1,0 +1,21 @@
+{
+  "name": "animation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "preview": "remotion preview src/Root.jsx",
+    "render": "remotion render src/index.jsx HeroAnimation --codec=vp8 --transparent --output=../frontend/assets/hero-animation.webm"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@remotion/cli": "^4.0.431",
+    "@remotion/renderer": "^4.0.431",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.431"
+  }
+}

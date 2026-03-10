@@ -1,0 +1,14 @@
+{
+  "network": "baseSepolia",
+  "chainId": "84532",
+  "deployer": "0x0fc3BB5DB656eb51B14d745620b94A6e7BE5c36A",
+  "timestamp": "2026-02-27T12:02:38.634Z",
+  "contracts": {
+    "PhoenixLegacy": "0x1B7D4A34Bb7eafaE6AAA7472f8393F2C06dFdc7b"
+  },
+  "tokenInfo": {
+    "name": "Phoenix Vault Access",
+    "symbol": "RISE",
+    "totalSupply": "1000000000.0"
+  }
+}
