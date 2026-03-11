@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Blok Zinciri Üzerinde Dijital Vasiyet",
-    "description": "WillChain — otomatik bir dijital vasiyet platformudur. Kripto varlıklarınız avukatlar ve noterler olmadan otomatik olarak mirasçınıza geçer.",
-    "og_title": "WillChain — Blok Zinciri Üzerinde Dijital Vasiyet",
+    "title": "WillChain – Blok Zinciri Üzerinde Dijital Vasiyet",
+    "description": "WillChain – otomatik bir dijital vasiyet platformudur. Kripto varlıklarınız avukatlar ve noterler olmadan otomatik olarak mirasçınıza geçer.",
+    "og_title": "WillChain – Blok Zinciri Üzerinde Dijital Vasiyet",
     "og_description": "Kripto varlıklarınız mirasçınıza otomatik olarak geçer. Avukatsız. Bürokrasisiz. Sonsuza dek blok zincirinde."
   },
   "languages": {
@@ -27,7 +27,7 @@
   },
   "hero": {
     "badge": "Blok Zinciri Üzerinde Dijital Vasiyet",
-    "title": "Siz Olmadığınızda — Varlıklarınız, Belirlediğiniz Mirasçıya Kalır",
+    "title": "Siz Olmadığınızda – Varlıklarınız, Belirlediğiniz Mirasçıya Kalır",
     "subtitle": "Her yıl binlerce insan kripto paraları için bir mirasçı belirlemeden vefat ediyor. Aile üyeleri paranın var olduğunu biliyor ama alamıyor. <strong>WillChain bunu otomatik olarak çözer.</strong>",
     "cta_connect": "Cüzdanı Bağla",
     "cta_how": "Nasıl Çalışır",
@@ -120,16 +120,16 @@
     "owner_label": "Cüzdan Sahibi Adresi",
     "confirm_wallet": "Cüzdanda Onayla...",
     "loading": "Kontrol ediliyor...",
-    "status_active": "Aktif — henüz terk edilmedi",
-    "status_inactive": "Aktif Değil — talep başlatılabilir",
-    "status_abandoned": "Terk Edildi — talep mümkün değil",
+    "status_active": "Aktif – henüz terk edilmedi",
+    "status_inactive": "Aktif Değil – talep başlatılabilir",
+    "status_abandoned": "Terk Edildi – talep mümkün değil",
     "status_never_registered": "Cüzdan kayıtlı değil",
     "claim_started": "Talep Başlatıldı! 30 Gün Geri Sayım Başladı.",
     "claim_in_progress_title": "Talep Devam Ediyor",
     "claim_in_progress_hint": "Sahip, iptal penceresi süresince talebi iptal edebilir.",
     "veto_closes": "İptal Penceresi Kapanıyor:",
     "veto_expired_msg": "İptal penceresi kapandı. Aktarımı tamamlayabilirsiniz.",
-    "im_alive_cancel": "Buradayım — İptal Et"
+    "im_alive_cancel": "Buradayım – İptal Et"
   },
   "recycle": {
     "label": "Fonları Tekrar Dolaşıma Sok",
@@ -142,9 +142,9 @@
     "owner_label": "Terk Edilmiş Cüzdan Adresi",
     "confirm_wallet": "Cüzdanda Onayla...",
     "loading": "Kontrol ediliyor...",
-    "status_active": "Aktif — geri dönüştürülemez",
-    "status_inactive": "Aktif Değil — henüz terk edilmedi (toplam süre dolmadı)",
-    "status_abandoned": "Terk Edildi — geri dönüştürülebilir",
+    "status_active": "Aktif – geri dönüştürülemez",
+    "status_inactive": "Aktif Değil – henüz terk edilmedi (toplam süre dolmadı)",
+    "status_abandoned": "Terk Edildi – geri dönüştürülebilir",
     "status_never_registered": "Kayıtlı değil",
     "status_already_recycled": "Zaten Geri Dönüştürüldü",
     "status_claim_in_progress": "Mirasçı Talebi Devam Ediyor",

@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Cyfrowy testament na blockchainie",
-    "description": "WillChain — automatyczny cyfrowy testament na blockchainie. Twoje aktywa kryptograficzne automatycznie trafią do spadkobiercy bez prawników i notariuszy.",
-    "og_title": "WillChain — Cyfrowy testament na blockchainie",
+    "title": "WillChain – Cyfrowy testament na blockchainie",
+    "description": "WillChain – automatyczny cyfrowy testament na blockchainie. Twoje aktywa kryptograficzne automatycznie trafią do spadkobiercy bez prawników i notariuszy.",
+    "og_title": "WillChain – Cyfrowy testament na blockchainie",
     "og_description": "Twoje aktywa kryptograficzne automatycznie trafią do spadkobiercy. Bez prawników. Bez biurokracji. Na zawsze na blockchainie."
   },
   "languages": {
@@ -120,16 +120,16 @@
     "owner_label": "Adres właściciela portfela",
     "confirm_wallet": "Potwierdź w portfelu...",
     "loading": "Sprawdzam...",
-    "status_active": "Aktywny — jeszcze nie porzucony",
-    "status_inactive": "Nieaktywny — można złożyć wniosek",
-    "status_abandoned": "Porzucony — wniosek niemożliwy",
+    "status_active": "Aktywny – jeszcze nie porzucony",
+    "status_inactive": "Nieaktywny – można złożyć wniosek",
+    "status_abandoned": "Porzucony – wniosek niemożliwy",
     "status_never_registered": "Portfel nie jest zarejestrowany",
     "claim_started": "Złożono wniosek! Odliczanie 30 dni.",
     "claim_in_progress_title": "Wniosek w trakcie realizacji",
     "claim_in_progress_hint": "Właściciel może anulować wniosek w oknie anulowania.",
     "veto_closes": "Okno anulowania zamyka się:",
     "veto_expired_msg": "Okno anulowania zostało zamknięte. Można zakończyć przekazanie.",
-    "im_alive_cancel": "Jestem żywy — anuluj"
+    "im_alive_cancel": "Jestem żywy – anuluj"
   },
   "recycle": {
     "label": "Zwróć środki do obiegu",
@@ -142,9 +142,9 @@
     "owner_label": "Adres porzuconego portfela",
     "confirm_wallet": "Potwierdź w portfelu...",
     "loading": "Sprawdzam...",
-    "status_active": "Aktywny — nie podlega recyklingowi",
-    "status_inactive": "Nieaktywny — jeszcze nie porzucony (ogólny czasomierz nie wyczerpany)",
-    "status_abandoned": "Porzucony — można poddać recyklingowi",
+    "status_active": "Aktywny – nie podlega recyklingowi",
+    "status_inactive": "Nieaktywny – jeszcze nie porzucony (ogólny czasomierz nie wyczerpany)",
+    "status_abandoned": "Porzucony – można poddać recyklingowi",
     "status_never_registered": "Nie zarejestrowano",
     "status_already_recycled": "Już przetworzono",
     "status_claim_in_progress": "Wniosek spadkobiercy w trakcie realizacji",
@@ -211,7 +211,7 @@
     "q7": "Czy automatyczne resetowanie czasomierza działa z portfelami multi-sig?",
     "a7": "Jeśli używasz zwykłego portfela (MetaMask, Trust Wallet), czasomierz jest resetowany przy każdym przelewie. Ale jeśli korzystasz z portfeli Smart lub Multisig (np. Safe), gdzie transakcję wykonuje przekaźnik, musisz potwierdzać swoją aktywność ręcznie przyciskiem na stronie.",
     "q8": "Czy zatwierdzenie DEX lub dApp może wpłynąć na moje dziedziczenie?",
-    "a8": "Nie. Pozwolenia na tokeny (allowances) nie wpływają na Twój czasomierz dziedziczenia. Tylko Twoje bezpośrednie działania — przelew, confirmActivity lub konfiguracja sejfu — liczą się jako potwierdzenie obecności. Strona trzecia używająca transferFrom() nie może zresetować Twojego czasomierza. Twoje dziedziczenie zadziała nawet przy aktywnych zezwoleniach DEX."
+    "a8": "Nie. Pozwolenia na tokeny (allowances) nie wpływają na Twój czasomierz dziedziczenia. Tylko Twoje bezpośrednie działania – przelew, confirmActivity lub konfiguracja sejfu – liczą się jako potwierdzenie obecności. Strona trzecia używająca transferFrom() nie może zresetować Twojego czasomierza. Twoje dziedziczenie zadziała nawet przy aktywnych zezwoleniach DEX."
   },
   "security": {
     "allowance_title": "Model aktywności",
@@ -259,7 +259,7 @@
     "cancel_btn": "Anuluj",
     "send_btn": "Wyślij",
     "sending": "Wysyłam...",
-    "activity_reset_hint": "Bezpośrednia wysyłka WILL resetuje Twój czasomierz aktywności. Zamiany DEX przez allowance nie resetują — użyj confirmActivity() do potwierdzenia obecności."
+    "activity_reset_hint": "Bezpośrednia wysyłka WILL resetuje Twój czasomierz aktywności. Zamiany DEX przez allowance nie resetują – użyj confirmActivity() do potwierdzenia obecności."
   },
   "notifications": {
     "checkin_success_title": "Potwierdzono!",

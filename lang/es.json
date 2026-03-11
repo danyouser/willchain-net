@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Testamento digital en la blockchain",
+    "title": "WillChain – Testamento digital en la blockchain",
     "description": "WillChain: tu testamento digital automático en la blockchain. Tus criptoactivos pasarán automáticamente a tu heredero, sin abogados ni notarios.",
-    "og_title": "WillChain — Testamento digital en la blockchain",
+    "og_title": "WillChain – Testamento digital en la blockchain",
     "og_description": "Tus criptoactivos pasarán automáticamente a tu heredero. Sin abogados. Sin burocracia. Para siempre en la blockchain."
   },
   "languages": {
@@ -120,16 +120,16 @@
     "owner_label": "Dirección del monedero del propietario",
     "confirm_wallet": "Confirma en tu monedero...",
     "loading": "Comprobando...",
-    "status_active": "Activo — aún no abandonado",
-    "status_inactive": "Inactivo — solicitud posible",
-    "status_abandoned": "Abandonado — solicitud imposible",
+    "status_active": "Activo – aún no abandonado",
+    "status_inactive": "Inactivo – solicitud posible",
+    "status_abandoned": "Abandonado – solicitud imposible",
     "status_never_registered": "Monedero no registrado",
     "claim_started": "¡Solicitud iniciada! Cuenta atrás de 30 días.",
     "claim_in_progress_title": "Solicitud en curso",
     "claim_in_progress_hint": "El propietario puede cancelar la solicitud durante la ventana de cancelación.",
     "veto_closes": "La ventana de veto cierra:",
     "veto_expired_msg": "La ventana de veto ha expirado. Puedes completar la transferencia.",
-    "im_alive_cancel": "¡Estoy vivo! — Cancelar"
+    "im_alive_cancel": "¡Estoy vivo! – Cancelar"
   },
   "recycle": {
     "label": "Reciclar fondos",
@@ -142,9 +142,9 @@
     "owner_label": "Dirección del monedero abandonado",
     "confirm_wallet": "Confirma en tu monedero...",
     "loading": "Comprobando...",
-    "status_active": "Activo — no apto para reciclaje",
-    "status_inactive": "Inactivo — aún no abandonado (temporizador general no expirado)",
-    "status_abandoned": "Abandonado — reciclaje posible",
+    "status_active": "Activo – no apto para reciclaje",
+    "status_inactive": "Inactivo – aún no abandonado (temporizador general no expirado)",
+    "status_abandoned": "Abandonado – reciclaje posible",
     "status_never_registered": "No registrado",
     "status_already_recycled": "Ya reciclado",
     "status_claim_in_progress": "Solicitud de heredero en curso",

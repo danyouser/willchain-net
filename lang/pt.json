@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Testamento digital na blockchain",
-    "description": "WillChain — seu testamento digital automático na blockchain. Seus criptoativos serão transferidos automaticamente para o herdeiro, sem advogados ou notários.",
-    "og_title": "WillChain — Testamento digital na blockchain",
+    "title": "WillChain – Testamento digital na blockchain",
+    "description": "WillChain – seu testamento digital automático na blockchain. Seus criptoativos serão transferidos automaticamente para o herdeiro, sem advogados ou notários.",
+    "og_title": "WillChain – Testamento digital na blockchain",
     "og_description": "Seus criptoativos serão transferidos automaticamente para o herdeiro. Sem advogados. Sem burocracia. Para sempre na blockchain."
   },
   "languages": {
@@ -27,7 +27,7 @@
   },
   "hero": {
     "badge": "Testamento digital na blockchain",
-    "title": "Quando você se for — seus ativos irão para quem você designou como herdeiro",
+    "title": "Quando você se for – seus ativos irão para quem você designou como herdeiro",
     "subtitle": "Todos os anos, milhares de pessoas morrem sem deixar um herdeiro para sua criptomoeda. Os familiares sabem que o dinheiro existe – mas obtê-lo é impossível. <strong>WillChain resolve isso automaticamente.</strong>",
     "cta_connect": "Conectar carteira",
     "cta_how": "Como funciona",
@@ -120,16 +120,16 @@
     "owner_label": "Endereço da carteira do proprietário",
     "confirm_wallet": "Confirme na sua carteira...",
     "loading": "Verificando...",
-    "status_active": "Ativo — ainda não abandonado",
-    "status_inactive": "Inativo — reivindicação pode ser iniciada",
-    "status_abandoned": "Abandonado — reivindicação não é possível",
+    "status_active": "Ativo – ainda não abandonado",
+    "status_inactive": "Inativo – reivindicação pode ser iniciada",
+    "status_abandoned": "Abandonado – reivindicação não é possível",
     "status_never_registered": "Carteira não registrada",
     "claim_started": "Reivindicação iniciada! Contagem regressiva de 30 dias.",
     "claim_in_progress_title": "Reivindicação em andamento",
     "claim_in_progress_hint": "O proprietário pode cancelar a reivindicação durante a janela de cancelamento.",
     "veto_closes": "Janela de cancelamento fecha em:",
     "veto_expired_msg": "Janela de cancelamento fechada. A transferência pode ser concluída.",
-    "im_alive_cancel": "Estou vivo — cancelar"
+    "im_alive_cancel": "Estou vivo – cancelar"
   },
   "recycle": {
     "label": "Reciclar fundos",
@@ -142,9 +142,9 @@
     "owner_label": "Endereço da carteira abandonada",
     "confirm_wallet": "Confirme na sua carteira...",
     "loading": "Verificando...",
-    "status_active": "Ativo — não elegível para reciclagem",
-    "status_inactive": "Inativo — ainda não abandonado (tempo limite total não expirado)",
-    "status_abandoned": "Abandonado — elegível para reciclagem",
+    "status_active": "Ativo – não elegível para reciclagem",
+    "status_inactive": "Inativo – ainda não abandonado (tempo limite total não expirado)",
+    "status_abandoned": "Abandonado – elegível para reciclagem",
     "status_never_registered": "Não registrado",
     "status_already_recycled": "Já reciclado",
     "status_claim_in_progress": "Reivindicação de herdeiro em andamento",

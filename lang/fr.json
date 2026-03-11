@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Testament numérique sur la blockchain",
-    "description": "WillChain — Le testament numérique automatisé sur la blockchain. Vos crypto-actifs seront transférés automatiquement à votre héritier, sans avocats ni notaires.",
-    "og_title": "WillChain — Testament numérique sur la blockchain",
+    "title": "WillChain – Testament numérique sur la blockchain",
+    "description": "WillChain – Le testament numérique automatisé sur la blockchain. Vos crypto-actifs seront transférés automatiquement à votre héritier, sans avocats ni notaires.",
+    "og_title": "WillChain – Testament numérique sur la blockchain",
     "og_description": "Vos crypto-actifs seront transférés automatiquement à votre héritier. Sans avocats. Sans bureaucratie. Pour toujours sur la blockchain."
   },
   "languages": {
@@ -27,7 +27,7 @@
   },
   "hero": {
     "badge": "Testament numérique sur la blockchain",
-    "title": "Quand vous ne serez plus là — vos actifs iront à la personne que vous avez désignée comme héritier",
+    "title": "Quand vous ne serez plus là – vos actifs iront à la personne que vous avez désignée comme héritier",
     "subtitle": "Chaque année, des milliers de personnes décèdent sans laisser d'héritier pour leur cryptomonnaie. Leurs proches savent que l'argent existe – mais il est impossible de l'obtenir. <strong>WillChain résout cela automatiquement.</strong>",
     "cta_connect": "Connecter le portefeuille",
     "cta_how": "Comment ça marche",
@@ -120,16 +120,16 @@
     "owner_label": "Adresse du portefeuille du propriétaire",
     "confirm_wallet": "Confirmez dans votre portefeuille...",
     "loading": "Vérification en cours...",
-    "status_active": "Actif — pas encore abandonné",
-    "status_inactive": "Inactif — demande possible",
-    "status_abandoned": "Abandonné — demande impossible",
+    "status_active": "Actif – pas encore abandonné",
+    "status_inactive": "Inactif – demande possible",
+    "status_abandoned": "Abandonné – demande impossible",
     "status_never_registered": "Portefeuille non enregistré",
     "claim_started": "Demande soumise ! Compte à rebours de 30 jours.",
     "claim_in_progress_title": "Demande en cours",
     "claim_in_progress_hint": "Le propriétaire peut annuler la demande pendant la fenêtre d'annulation.",
     "veto_closes": "La fenêtre d'annulation se ferme :",
     "veto_expired_msg": "La fenêtre d'annulation est fermée. Le transfert peut être complété.",
-    "im_alive_cancel": "Je suis là — annuler"
+    "im_alive_cancel": "Je suis là – annuler"
   },
   "recycle": {
     "label": "Remettre des fonds en circulation",
@@ -142,9 +142,9 @@
     "owner_label": "Adresse du portefeuille abandonné",
     "confirm_wallet": "Confirmez dans votre portefeuille...",
     "loading": "Vérification en cours...",
-    "status_active": "Actif — non éligible à la remise en circulation",
-    "status_inactive": "Inactif — pas encore abandonné (délais généraux non écoulés)",
-    "status_abandoned": "Abandonné — peut être remis en circulation",
+    "status_active": "Actif – non éligible à la remise en circulation",
+    "status_inactive": "Inactif – pas encore abandonné (délais généraux non écoulés)",
+    "status_abandoned": "Abandonné – peut être remis en circulation",
     "status_never_registered": "Non enregistré",
     "status_already_recycled": "Déjà remis en circulation",
     "status_claim_in_progress": "Demande d'héritage en cours",

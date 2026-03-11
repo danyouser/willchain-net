@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Digitale erfenis op de blockchain",
-    "description": "WillChain — een automatische digitale erfenis op de blockchain. Uw crypto-activa gaan automatisch naar uw erfgenaam, zonder juristen of notarissen.",
-    "og_title": "WillChain — Digitale erfenis op de blockchain",
+    "title": "WillChain – Digitale erfenis op de blockchain",
+    "description": "WillChain – een automatische digitale erfenis op de blockchain. Uw crypto-activa gaan automatisch naar uw erfgenaam, zonder juristen of notarissen.",
+    "og_title": "WillChain – Digitale erfenis op de blockchain",
     "og_description": "Uw crypto-activa gaan automatisch naar uw erfgenaam. Geen juristen. Geen bureaucratie. Voor altijd op de blockchain."
   },
   "languages": {
@@ -27,7 +27,7 @@
   },
   "hero": {
     "badge": "Digitale erfenis op de blockchain",
-    "title": "Wanneer u er niet meer bent — uw activa gaan naar degene die u als erfgenaam aanwijst",
+    "title": "Wanneer u er niet meer bent – uw activa gaan naar degene die u als erfgenaam aanwijst",
     "subtitle": "Elk jaar sterven duizenden mensen zonder een erfgenaam voor hun cryptovaluta achter te laten. Familieleden weten dat het geld er is – maar kunnen het niet verkrijgen. <strong>WillChain lost dit automatisch op.</strong>",
     "cta_connect": "Portemonnee verbinden",
     "cta_how": "Hoe het werkt",
@@ -120,16 +120,16 @@
     "owner_label": "Adres van de portemonnee-eigenaar",
     "confirm_wallet": "Bevestigen in portemonnee...",
     "loading": "Controleren...",
-    "status_active": "Actief — nog niet verlaten",
-    "status_inactive": "Inactief — claim kan geïnitieerd worden",
-    "status_abandoned": "Verlaten — claim niet mogelijk",
+    "status_active": "Actief – nog niet verlaten",
+    "status_inactive": "Inactief – claim kan geïnitieerd worden",
+    "status_abandoned": "Verlaten – claim niet mogelijk",
     "status_never_registered": "Portemonnee niet geregistreerd",
     "claim_started": "Claim ingediend! 30 dagen aftellen.",
     "claim_in_progress_title": "Claim in behandeling",
     "claim_in_progress_hint": "De eigenaar kan de claim annuleren binnen het annuleringsvenster.",
     "veto_closes": "Annuleringsvenster sluit:",
     "veto_expired_msg": "Annuleringsvenster gesloten. U kunt de overdracht voltooien.",
-    "im_alive_cancel": "Ik leef — annuleren"
+    "im_alive_cancel": "Ik leef – annuleren"
   },
   "recycle": {
     "label": "Fondsen terug in omloop brengen",
@@ -142,9 +142,9 @@
     "owner_label": "Adres van de verlaten portemonnee",
     "confirm_wallet": "Bevestigen in portemonnee...",
     "loading": "Controleren...",
-    "status_active": "Actief — niet recyclebaar",
-    "status_inactive": "Inactief — nog niet verlaten (algemene timeout niet overschreden)",
-    "status_abandoned": "Verlaten — recyclebaar",
+    "status_active": "Actief – niet recyclebaar",
+    "status_inactive": "Inactief – nog niet verlaten (algemene timeout niet overschreden)",
+    "status_abandoned": "Verlaten – recyclebaar",
     "status_never_registered": "Niet geregistreerd",
     "status_already_recycled": "Al gerecycled",
     "status_claim_in_progress": "Erfgenaam-claim in behandeling",
@@ -171,7 +171,7 @@
   },
   "how_it_works": {
     "label": "4 stappen",
-    "subtitle": "Vier eenvoudige stappen — en uw crypto is beschermd",
+    "subtitle": "Vier eenvoudige stappen – en uw crypto is beschermd",
     "title": "Hoe het werkt",
     "step1_title": "Verkrijg WILL",
     "step1_desc": "Koop WILL-tokens op een exchange of ontvang ze van een andere houder. Uw digitale testament wordt geactiveerd zodra u een willekeurige hoeveelheid WILL bezit.",

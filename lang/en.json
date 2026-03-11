@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "WillChain — Blockchain Digital Will",
+    "title": "WillChain – Blockchain Digital Will",
     "description": "WillChain is an automated digital will on the blockchain. Your crypto assets will automatically transfer to your heir without lawyers or notaries.",
-    "og_title": "WillChain — Blockchain Digital Will",
+    "og_title": "WillChain – Blockchain Digital Will",
     "og_description": "Your crypto assets will automatically transfer to your heir. No lawyers. No bureaucracy. Forever on the blockchain."
   },
   "languages": {
@@ -27,7 +27,7 @@
   },
   "hero": {
     "badge": "Blockchain Digital Will",
-    "title": "When you're gone — your assets will go to whomever you designate as your heir",
+    "title": "When you're gone – your assets will go to whomever you designate as your heir",
     "subtitle": "Every year, thousands of people pass away without leaving instructions for their cryptocurrency. Loved ones know the funds exist but can't access them. <strong>WillChain solves this automatically.</strong>",
     "cta_connect": "Connect Wallet",
     "cta_how": "How it Works",
@@ -120,16 +120,16 @@
     "owner_label": "Wallet Owner's Address",
     "confirm_wallet": "Confirm in wallet...",
     "loading": "Checking...",
-    "status_active": "Active — Not yet abandoned",
-    "status_inactive": "Inactive — Claim can be initiated",
-    "status_abandoned": "Abandoned — Claim not possible",
+    "status_active": "Active – Not yet abandoned",
+    "status_inactive": "Inactive – Claim can be initiated",
+    "status_abandoned": "Abandoned – Claim not possible",
     "status_never_registered": "Wallet not registered",
     "claim_started": "Claim initiated! 30-day countdown begins.",
     "claim_in_progress_title": "Claim in Progress",
     "claim_in_progress_hint": "The owner can cancel the claim during the cancellation window.",
     "veto_closes": "Cancellation Window Closes:",
     "veto_expired_msg": "Cancellation window closed. Transfer can be completed.",
-    "im_alive_cancel": "I'm Here — Cancel"
+    "im_alive_cancel": "I'm Here – Cancel"
   },
   "recycle": {
     "label": "Recycle Funds",
@@ -142,9 +142,9 @@
     "owner_label": "Abandoned Wallet Address",
     "confirm_wallet": "Confirm in wallet...",
     "loading": "Checking...",
-    "status_active": "Active — Not eligible for recycling",
-    "status_inactive": "Inactive — Not yet abandoned (total timeout not expired)",
-    "status_abandoned": "Abandoned — Eligible for recycling",
+    "status_active": "Active – Not eligible for recycling",
+    "status_inactive": "Inactive – Not yet abandoned (total timeout not expired)",
+    "status_abandoned": "Abandoned – Eligible for recycling",
     "status_never_registered": "Not Registered",
     "status_already_recycled": "Already Recycled",
     "status_claim_in_progress": "Heir claim in progress",
@@ -259,7 +259,7 @@
     "cancel_btn": "Cancel",
     "send_btn": "Send",
     "sending": "Sending...",
-    "activity_reset_hint": "Directly sending WILL resets your activity timer. DEX swaps via allowance do not reset it — use confirmActivity() to confirm presence."
+    "activity_reset_hint": "Directly sending WILL resets your activity timer. DEX swaps via allowance do not reset it – use confirmActivity() to confirm presence."
   },
   "notifications": {
     "checkin_success_title": "Confirmed!",
