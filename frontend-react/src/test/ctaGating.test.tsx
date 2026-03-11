@@ -216,11 +216,11 @@ describe('Dashboard — CTA gating by vault status', () => {
     expect(screen.getByText('dashboard.heir_section')).toBeDefined()
   })
 
-  it('UNREGISTERED user does NOT see heir_section', () => {
+  it('UNREGISTERED user sees heir_section', () => {
     setNodeState(null)
 
     render(<Dashboard />)
-    expect(screen.queryByText('dashboard.heir_section')).toBeNull()
+    expect(screen.getByText('dashboard.heir_section')).toBeDefined()
   })
 
   // ── Ecosystem section gating ────────────────────────────────────
@@ -361,10 +361,10 @@ describe('Dashboard — CTA gating by vault status', () => {
     expect(screen.getByText('dashboard.dividends_label')).toBeDefined()
   })
 
-  it('dividends section NOT visible for UNREGISTERED', () => {
+  it('UNREGISTERED user sees dividends section', () => {
     setNodeState(null)
 
     render(<Dashboard />)
-    expect(screen.queryByText('dashboard.dividends_label')).toBeNull()
+    expect(screen.getByText('dashboard.dividends_label')).toBeDefined()
   })
 })

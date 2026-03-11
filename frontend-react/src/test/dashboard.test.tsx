@@ -200,19 +200,17 @@ describe('Dashboard — status gating', () => {
     expect(skeletons.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('UNREGISTERED (null nodeState) shows ActivationCard only', () => {
+  it('UNREGISTERED (null nodeState) shows ActivationCard + all sections', () => {
     setNodeState(null)
 
     render(<Dashboard />)
-    // ActivationCard uses dashboard.activate_title key
     expect(screen.getByText('dashboard.activate_title')).toBeDefined()
-
-    // Full dashboard elements should NOT be rendered
-    expect(screen.queryByText('dashboard.total_value_secured')).toBeNull()
-    expect(screen.queryByText('dashboard.ecosystem_section')).toBeNull()
+    expect(screen.getByText('dashboard.balance_label')).toBeDefined()
+    expect(screen.getByText('dashboard.heir_section')).toBeDefined()
+    expect(screen.getByText('dashboard.ecosystem_section')).toBeDefined()
   })
 
-  it('UNREGISTERED (lastActivityTimestamp=0) shows ActivationCard only', () => {
+  it('UNREGISTERED (lastActivityTimestamp=0) shows ActivationCard + all sections', () => {
     setNodeState({
       lastActivityTimestamp: 0,
       designatedSuccessor: '0x0000000000000000000000000000000000000000',
@@ -223,7 +221,8 @@ describe('Dashboard — status gating', () => {
 
     render(<Dashboard />)
     expect(screen.getByText('dashboard.activate_title')).toBeDefined()
-    expect(screen.queryByText('dashboard.ecosystem_section')).toBeNull()
+    expect(screen.getByText('dashboard.ecosystem_section')).toBeDefined()
+    expect(screen.getByText('dashboard.heir_section')).toBeDefined()
   })
 
   it('ACTIVE with successor shows full dashboard + sidebar', () => {

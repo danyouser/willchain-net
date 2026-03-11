@@ -95,6 +95,7 @@
     "incoming_inheritances": "Вхідні спадщини",
     "activate_title": "Активувати заповіт",
     "activate_subtitle": "Підтвердіть свою активність, щоб почати захист коштів.",
+    "activate_no_balance": "Для активації потрібні токени WILL. Отримайте їх через бот вище.",
     "activate_successor_label": "Спадкоємець (необов'язково)",
     "activate_successor_placeholder": "0x... адреса вашого спадкоємця",
     "activate_success_title": "Заповіт активовано!",

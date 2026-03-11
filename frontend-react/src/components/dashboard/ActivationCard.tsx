@@ -10,15 +10,18 @@ import { useSimulatedWrite } from '../../hooks/useSimulatedWrite'
 
 interface ActivationCardProps {
   onSuccess?: () => void
+  balance?: bigint
 }
 
-export function ActivationCard({ onSuccess }: ActivationCardProps) {
+export function ActivationCard({ onSuccess, balance }: ActivationCardProps) {
   const { t } = useTranslation()
   const { address } = useAccount()
   const { showNotification } = useNotification()
   const { assertCorrectChain, isCorrectChain } = useChainGuard()
 
   const [successorInput, setSuccessorInput] = useState('')
+
+  const hasNoBalance = balance !== undefined && balance === 0n
 
   const trimmed = successorInput.trim()
   const validAddress = isAddress(trimmed)
@@ -84,6 +87,17 @@ export function ActivationCard({ onSuccess }: ActivationCardProps) {
       <div className="card-body">
         <p className="card-hint">{t('dashboard.activate_subtitle')}</p>
 
+        {hasNoBalance && (
+          <div className="activation-no-balance">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {t('dashboard.activate_no_balance')}
+          </div>
+        )}
+
         <span className="activation-field-label">{t('dashboard.activate_successor_label')}</span>
         <input
           className={`input activation-input${addressError || (validAddress && simulationError) ? ' input-error' : ''}`}
@@ -91,7 +105,7 @@ export function ActivationCard({ onSuccess }: ActivationCardProps) {
           placeholder={t('dashboard.activate_successor_placeholder')}
           value={successorInput}
           onChange={e => setSuccessorInput(e.target.value)}
-          disabled={isPending || isConfirming || !isCorrectChain}
+          disabled={isPending || isConfirming || !isCorrectChain || hasNoBalance}
           spellCheck={false}
           autoComplete="off"
           aria-label={t('dashboard.activate_successor_label')}
@@ -108,7 +122,7 @@ export function ActivationCard({ onSuccess }: ActivationCardProps) {
           className="btn btn-primary btn-full"
           style={{ marginTop: '20px' }}
           onClick={handleActivate}
-          disabled={isPending || isConfirming || !successorInput || (validAddress && !canWrite)}
+          disabled={isPending || isConfirming || !successorInput || (validAddress && !canWrite) || hasNoBalance}
         >
           {isPending || isConfirming
             ? t('dashboard.activate_confirming')
