@@ -302,7 +302,6 @@
     "missing_fields_msg": "Будь ласка, заповніть всі обов'язкові поля.",
     "insufficient_balance_title": "Недостатньо коштів",
     "insufficient_balance_msg": "На балансі недостатньо WILL для цієї операції.",
-    "successor_tip": "Призначте спадкоємця, якщо ще не зробили це.",
     "period_success_tip": "Таймер активності також скинуто."
   },
   "footer": {
