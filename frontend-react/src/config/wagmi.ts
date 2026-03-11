@@ -1,14 +1,45 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit'
+import { connectorsForWallets } from '@rainbow-me/rainbowkit'
+import {
+  metaMaskWallet,
+  walletConnectWallet,
+  braveWallet,
+  coinbaseWallet,
+  rainbowWallet,
+  ledgerWallet,
+} from '@rainbow-me/rainbowkit/wallets'
+import { createConfig, http } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 
 export { CONTRACT_ADDRESS } from './contract'
 
 const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string
 
-export const config = getDefaultConfig({
-  appName: 'WillChain.net - Dead Man\'s Switch on Base',
-  projectId: WALLETCONNECT_PROJECT_ID,
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Popular',
+      wallets: [
+        metaMaskWallet,
+        braveWallet,
+        coinbaseWallet,
+        ledgerWallet,
+        rainbowWallet,
+        walletConnectWallet,
+      ],
+    },
+  ],
+  {
+    appName: 'WillChain.net - Dead Man\'s Switch on Base',
+    projectId: WALLETCONNECT_PROJECT_ID,
+  }
+)
+
+export const config = createConfig({
+  connectors,
   chains: [baseSepolia],
+  transports: {
+    [baseSepolia.id]: http(),
+  },
   ssr: false,
 })
 
