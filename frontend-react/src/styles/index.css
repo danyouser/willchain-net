@@ -194,7 +194,7 @@ body {
   gap: 8px; font-weight: 600; font-size: 0.875rem;
   -webkit-appearance: none; appearance: none;
   border: 1px solid transparent; outline: none; cursor: pointer; text-decoration: none;
-  border-radius: var(--r2); padding: 0 20px; height: 40px;
+  border-radius: var(--r2); padding: 0 10px; height: 40px;
   box-sizing: border-box;
   transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
   white-space: nowrap; flex-shrink: 0;
