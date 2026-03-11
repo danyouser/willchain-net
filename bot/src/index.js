@@ -117,8 +117,8 @@ async function main() {
   // Catch up on missed events before real-time listeners
   await events.catchUpMissedEvents();
 
-  // Real-time blockchain listeners
-  events.setupEventListeners();
+  // Real-time blockchain event polling
+  events.startEventPolling();
 
   // Scheduled jobs
   cron.startAll();
@@ -140,11 +140,8 @@ async function gracefulShutdown(signal) {
   // 1. Stop accepting new Telegram updates
   try { bot.stop(); } catch { /* already stopped */ }
 
-  // 2. Remove blockchain event listeners
-  if (contract) {
-    try { contract.removeAllListeners(); } catch { /* ignore */ }
-    log('INFO', 'Blockchain listeners removed');
-  }
+  // 2. Stop blockchain event polling
+  events.stopEventPolling();
 
   // 3. Close HTTP API server
   const { server } = require('./api');
