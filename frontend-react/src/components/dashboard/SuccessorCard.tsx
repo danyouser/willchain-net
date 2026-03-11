@@ -21,11 +21,12 @@ interface SuccessorCardProps {
   onSuccess?: () => void
   variant?: 'default' | 'hero'
   timeline?: TimelineData
+  balance?: bigint
 }
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default', timeline }: SuccessorCardProps) {
+export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default', timeline, balance }: SuccessorCardProps) {
   const [newSuccessor, setNewSuccessor] = useState('')
   const { showNotification } = useNotification()
   const { assertCorrectChain, isCorrectChain } = useChainGuard()
@@ -86,6 +87,7 @@ export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default'
 
   const hasSuccessor = currentSuccessor && currentSuccessor !== ZERO_ADDRESS
   const isHero = variant === 'hero'
+  const hasNoBalance = balance !== undefined && balance === 0n
 
   return (
     <div className={isHero ? 'successor-card-hero' : 'card'}>
@@ -121,6 +123,16 @@ export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default'
           {`${currentSuccessor.slice(0, 10)}...${currentSuccessor.slice(-8)}`}
         </div>
       )}
+      {hasNoBalance && (
+        <div className="activation-no-balance">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {t('dashboard.activate_no_balance')}
+        </div>
+      )}
       <input
         type="text"
         className="input"
@@ -132,11 +144,12 @@ export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default'
         aria-invalid={!!addressError}
         spellCheck={false}
         autoComplete="off"
+        disabled={hasNoBalance}
       />
       <button
         className="btn btn-primary btn-full"
         onClick={handleDesignate}
-        disabled={isPending || isConfirming || !!addressError || (validAddress && !canWrite)}
+        disabled={isPending || isConfirming || !!addressError || (validAddress && !canWrite) || hasNoBalance}
       >
         {isPending || isConfirming
           ? '...'

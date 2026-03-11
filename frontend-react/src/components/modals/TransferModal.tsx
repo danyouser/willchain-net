@@ -13,9 +13,10 @@ interface TransferModalProps {
   onClose: () => void
   balance: bigint
   isRegistered?: boolean
+  onSuccess?: () => void
 }
 
-export function TransferModal({ isOpen, onClose, balance, isRegistered }: TransferModalProps) {
+export function TransferModal({ isOpen, onClose, balance, isRegistered, onSuccess }: TransferModalProps) {
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState('')
   const { showNotification } = useNotification()
@@ -73,6 +74,7 @@ export function TransferModal({ isOpen, onClose, balance, isRegistered }: Transf
       })
       reset()
       onClose()
+      onSuccess?.()
       setTimeout(() => { setRecipient(''); setAmount('') }, 0)
     }
   }, [isSuccess]) // eslint-disable-line react-hooks/exhaustive-deps

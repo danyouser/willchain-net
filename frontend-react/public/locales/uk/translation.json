@@ -59,8 +59,6 @@
     "timer_hours": "годин",
     "checkin_btn": "Скинути таймер",
     "checkin_confirming": "Підтверджую...",
-    "activate_btn": "Активувати заповіт",
-    "activate_confirming": "Активую...",
     "send_btn": "Відправити WILL",
     "get_test_will": "Отримати тестові WILL",
     "smart_wallet_warning": "⚠️ Виявлено Smart-гаманець (MultiSig/Safe). Автоматичне скидання таймера при взаємодії з DApps обмежене. Для надійності натискайте «Я тут!» вручну перед кожним плановим терміном.",
@@ -93,13 +91,7 @@
     "dividends_hint": "Нараховуються з коштів повернутих покинутих гаманців.",
     "dividends_claim_btn": "Отримати дивіденди",
     "incoming_inheritances": "Вхідні спадщини",
-    "activate_title": "Активувати заповіт",
-    "activate_subtitle": "Підтвердіть свою активність, щоб почати захист коштів.",
-    "activate_no_balance": "Для активації потрібні токени WILL. Отримайте їх через бот вище.",
-    "activate_successor_label": "Спадкоємець (необов'язково)",
-    "activate_successor_placeholder": "0x... адреса вашого спадкоємця",
-    "activate_success_title": "Заповіт активовано!",
-    "activate_success_msg": "Ваш таймер активності запущено. Спадкоємця призначено."
+    "activate_no_balance": "Для призначення спадкоємця потрібні токени WILL. Отримайте їх через бот вище."
   },
   "claim_vault": {
     "incoming_loading": "Пошук гаманців...",

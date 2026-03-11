@@ -200,17 +200,17 @@ describe('Dashboard — status gating', () => {
     expect(skeletons.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('UNREGISTERED (null nodeState) shows ActivationCard + all sections', () => {
+  it('UNREGISTERED (null nodeState) shows SuccessorCard + all sections', () => {
     setNodeState(null)
 
     render(<Dashboard />)
-    expect(screen.getByText('dashboard.activate_title')).toBeDefined()
+    expect(screen.getByText('dashboard.successor_label')).toBeDefined()
     expect(screen.getByText('dashboard.balance_label')).toBeDefined()
     expect(screen.getByText('dashboard.heir_section')).toBeDefined()
     expect(screen.getByText('dashboard.ecosystem_section')).toBeDefined()
   })
 
-  it('UNREGISTERED (lastActivityTimestamp=0) shows ActivationCard + all sections', () => {
+  it('UNREGISTERED (lastActivityTimestamp=0) shows SuccessorCard + all sections', () => {
     setNodeState({
       lastActivityTimestamp: 0,
       designatedSuccessor: '0x0000000000000000000000000000000000000000',
@@ -220,7 +220,7 @@ describe('Dashboard — status gating', () => {
     })
 
     render(<Dashboard />)
-    expect(screen.getByText('dashboard.activate_title')).toBeDefined()
+    expect(screen.getByText('dashboard.successor_label')).toBeDefined()
     expect(screen.getByText('dashboard.ecosystem_section')).toBeDefined()
     expect(screen.getByText('dashboard.heir_section')).toBeDefined()
   })

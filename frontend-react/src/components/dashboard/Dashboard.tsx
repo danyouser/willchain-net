@@ -11,7 +11,6 @@ import { ClaimVaultCard } from './ClaimVaultCard'
 import { RecycleNodeCard } from './RecycleNodeCard'
 import { DividendsCard } from './DividendsCard'
 import { VaultDataCard } from './VaultDataCard'
-import { ActivationCard } from './ActivationCard'
 import { IncomingInheritancesCard } from './IncomingInheritancesCard'
 import { InactivityPeriodCard } from './InactivityPeriodCard'
 import { TransferModal } from '../modals/TransferModal'
@@ -223,15 +222,12 @@ export function Dashboard() {
                 onSuccess={handleRefresh}
               />
             </div>
-          ) : isUnregistered ? (
-            <div className="dash-grid-1">
-              <ActivationCard onSuccess={handleRefresh} balance={balance} />
-            </div>
           ) : (
             <div className="dash-grid-1">
               <SuccessorCard
                 currentSuccessor={nodeState?.designatedSuccessor || ''}
                 onSuccess={handleRefresh}
+                balance={balance}
               />
             </div>
           )}
@@ -268,6 +264,7 @@ export function Dashboard() {
         onClose={() => setShowTransfer(false)}
         balance={balance}
         isRegistered={!isUnregistered}
+        onSuccess={handleRefresh}
       />
     </section>
   )

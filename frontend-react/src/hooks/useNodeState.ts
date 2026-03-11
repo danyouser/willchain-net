@@ -12,8 +12,6 @@ export function useNodeState(address: `0x${string}` | undefined) {
     query: {
       enabled: !!address,
       refetchInterval: 30_000, // poll every 30 seconds so UI stays fresh without page reload
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      placeholderData: (prev: any) => prev,
     },
   })
 
