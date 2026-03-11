@@ -12,9 +12,10 @@ interface TransferModalProps {
   isOpen: boolean
   onClose: () => void
   balance: bigint
+  isRegistered?: boolean
 }
 
-export function TransferModal({ isOpen, onClose, balance }: TransferModalProps) {
+export function TransferModal({ isOpen, onClose, balance, isRegistered }: TransferModalProps) {
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState('')
   const { showNotification } = useNotification()
@@ -68,7 +69,7 @@ export function TransferModal({ isOpen, onClose, balance }: TransferModalProps) 
         type: 'success',
         title: t('notifications.transfer_success_title'),
         message: `${t('notifications.transfer_success_msg')} ${recipient.slice(0, 6)}...${recipient.slice(-4)}`,
-        tip: t('notifications.transfer_success_tip'),
+        tip: isRegistered ? t('notifications.transfer_success_tip') : undefined,
       })
       reset()
       onClose()
@@ -92,18 +93,20 @@ export function TransferModal({ isOpen, onClose, balance }: TransferModalProps) 
           <p className="modal-subtitle">{t('transfer_modal.subtitle')}</p>
         </div>
         <div className="modal-body">
-          <div className="info-banner" style={{
-            background: 'rgba(59,130,246,0.08)',
-            border: '1px solid rgba(59,130,246,0.25)',
-            borderRadius: '8px',
-            padding: '10px 14px',
-            marginBottom: '16px',
-            fontSize: '0.82rem',
-            color: 'var(--t2)',
-            lineHeight: 1.5,
-          }}>
-            ℹ️ {t('transfer_modal.activity_reset_hint')}
-          </div>
+          {isRegistered && (
+            <div className="info-banner" style={{
+              background: 'rgba(59,130,246,0.08)',
+              border: '1px solid rgba(59,130,246,0.25)',
+              borderRadius: '8px',
+              padding: '10px 14px',
+              marginBottom: '16px',
+              fontSize: '0.82rem',
+              color: 'var(--t2)',
+              lineHeight: 1.5,
+            }}>
+              ℹ️ {t('transfer_modal.activity_reset_hint')}
+            </div>
+          )}
           <div className="form-group">
             <label>{t('transfer_modal.to_label')}</label>
             <input

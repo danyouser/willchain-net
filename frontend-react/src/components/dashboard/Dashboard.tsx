@@ -267,6 +267,7 @@ export function Dashboard() {
         isOpen={showTransfer}
         onClose={() => setShowTransfer(false)}
         balance={balance}
+        isRegistered={!isUnregistered}
       />
     </section>
   )
