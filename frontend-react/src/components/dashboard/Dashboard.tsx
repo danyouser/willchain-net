@@ -80,13 +80,69 @@ export function Dashboard() {
   const statusClass = getStatusClass(nodeState)
   const statusText = t(getStatusKey(nodeState))
 
-  // ── UNREGISTERED: Show activation flow only ────────────────
+  // ── UNREGISTERED: Show balance + activation flow ──────────
   if (isUnregistered) {
     return (
       <section className="dashboard">
         <div className="dash-flow">
+          <div className="dash-tvl-card">
+            <div className="dash-tvl-top">
+              <div className="dash-tvl-left">
+                <span className="dash-tvl-label">{t('dashboard.balance_label')}</span>
+                <div className="dash-tvl-balance">{formatTokenAmount(balance)} <span className="currency">WILL</span></div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'stretch', minWidth: '160px' }}>
+                {balance > 0n ? (
+                  <button
+                    className="dash-send-btn-compact"
+                    onClick={() => setShowTransfer(true)}
+                    title={t('dashboard.send_btn')}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="7" y1="17" x2="17" y2="7" />
+                      <polyline points="7 7 17 7 17 17" />
+                    </svg>
+                    {t('dashboard.send_btn')}
+                  </button>
+                ) : (
+                  <a
+                    className="dash-send-btn-compact"
+                    href="https://t.me/WillChainBot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none', textAlign: 'center' }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    {t('dashboard.get_test_will')}
+                  </a>
+                )}
+                <button
+                  className="dash-send-btn-compact"
+                  onClick={handleAddToken}
+                  title={t('dashboard.add_token_btn')}
+                  style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontSize: '0.72rem' }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                  {t('dashboard.add_token_btn')}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <ActivationCard onSuccess={handleRefresh} />
         </div>
+
+        <TransferModal
+          isOpen={showTransfer}
+          onClose={() => setShowTransfer(false)}
+          balance={balance}
+        />
       </section>
     )
   }
