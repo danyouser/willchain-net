@@ -2,11 +2,17 @@
  * WillChain Bot - Email Notifications via Resend
  */
 
-const { Resend } = require('resend');
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.EMAIL_FROM || 'WillChain <notifications@willchain.net>';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://willchain.net';
+
+let _resend;
+function getResend() {
+  if (!_resend) {
+    const { Resend } = require('resend');
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
 
 function isConfigured() {
   return !!process.env.RESEND_API_KEY;
@@ -15,7 +21,7 @@ function isConfigured() {
 async function send(to, subject, html) {
   if (!isConfigured()) return;
   try {
-    await resend.emails.send({ from: FROM, to, subject, html });
+    await getResend().emails.send({ from: FROM, to, subject, html });
   } catch (error) {
     console.error(`[EMAIL] Failed to send to ${to}:`, error.message);
   }
