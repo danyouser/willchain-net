@@ -2710,6 +2710,7 @@ body.preloading {
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
+  text-decoration: none;
   box-shadow: 0 6px 20px rgba(59,130,246,0.3);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
