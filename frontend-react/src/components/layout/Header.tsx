@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useDisclaimer } from '../../context/DisclaimerContext'
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../../i18n'
@@ -18,7 +19,9 @@ const LANG_NAMES: Record<string, string> = {
 export function Header() {
   const { requireDisclaimer } = useDisclaimer()
   const { t, i18n } = useTranslation()
+  const { isConnected } = useAccount()
   const [langOpen, setLangOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const currentLang = i18n.language.split('-')[0] as SupportedLanguage
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -32,20 +35,49 @@ export function Header() {
     return () => document.removeEventListener('mousedown', handler)
   }, [langOpen])
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   return (
     <header className="header">
       <div className="header-inner">
+        <button
+          className={`burger${menuOpen ? ' burger-open' : ''}`}
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label="Menu"
+          aria-expanded={menuOpen}
+        >
+          <span /><span /><span />
+        </button>
+
         <a href="/" className="logo">
           <img src="/assets/logo.svg" alt="WillChain" className="logo-icon-img" />
           <span className="logo-text">WillChain</span>
         </a>
 
-        <nav className="nav">
-          <div className="nav-scrollbar"><div className="nav-scrollbar-thumb" /></div>
-          <a href="#how-it-works">{t('nav.how_it_works')}</a>
-          <a href="#faq">{t('nav.faq')}</a>
-          <a href="#disclaimer">{t('nav.legal')}</a>
+        <nav className={`nav${menuOpen ? ' nav-open' : ''}`}>
+          {isConnected ? (
+            <>
+              <a href="https://sepolia.basescan.org/address/0x6fAd1475B41731E3eDA21998417Cb2e18E795877#code" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>
+                {t('footer.contract')}
+              </a>
+              <a href="https://t.me/WillChainBot" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>
+                {t('footer.bot')}
+              </a>
+            </>
+          ) : (
+            <>
+              <a href="#how-it-works" onClick={() => setMenuOpen(false)}>{t('nav.how_it_works')}</a>
+              <a href="#faq" onClick={() => setMenuOpen(false)}>{t('nav.faq')}</a>
+              <a href="#disclaimer" onClick={() => setMenuOpen(false)}>{t('nav.legal')}</a>
+            </>
+          )}
         </nav>
+
+        {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
 
         <div className="wallet-buttons">
           {/* Language dropdown */}
@@ -96,7 +128,7 @@ export function Header() {
                         {chain.hasIcon && chain.iconUrl && (
                           <img alt={chain.name ?? ''} src={chain.iconUrl} style={{ width: 16, height: 16, borderRadius: '50%' }} />
                         )}
-                        {chain.name}
+                        <span className="chain-name">{chain.name}</span>
                       </button>
                       <button className="btn btn-primary" onClick={openAccountModal}>
                         {account.displayName}

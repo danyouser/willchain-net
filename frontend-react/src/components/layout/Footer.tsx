@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
+import { useAccount } from 'wagmi'
 
 export function Footer() {
   const { t } = useTranslation()
+  const { isConnected } = useAccount()
 
   return (
     <footer className="footer">
@@ -13,7 +15,7 @@ export function Footer() {
               <span className="logo-text">WillChain</span>
             </a>
             <div className="footer-links">
-              <a href="#disclaimer">{t('footer.legal')}</a>
+              {!isConnected && <a href="#disclaimer">{t('footer.legal')}</a>}
               <a href="https://sepolia.basescan.org/address/0x6fAd1475B41731E3eDA21998417Cb2e18E795877#code" target="_blank" rel="noopener noreferrer">
                 {t('footer.contract')}
               </a>
