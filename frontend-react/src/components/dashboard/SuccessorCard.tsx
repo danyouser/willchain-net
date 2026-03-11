@@ -77,7 +77,6 @@ export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default'
         type: 'success',
         title: t('notifications.successor_success_title'),
         message: `${newSuccessor.slice(0, 6)}...${newSuccessor.slice(-4)} ${t('notifications.successor_success_msg')}`,
-        tip: t('notifications.successor_tip'),
       })
       reset()
       onSuccess?.()

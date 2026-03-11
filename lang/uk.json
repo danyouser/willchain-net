@@ -99,7 +99,7 @@
     "activate_successor_label": "Спадкоємець (необов'язково)",
     "activate_successor_placeholder": "0x... адреса вашого спадкоємця",
     "activate_success_title": "Заповіт активовано!",
-    "activate_success_msg": "Ваш таймер активності запущено. Призначте спадкоємця, щоб завершити налаштування."
+    "activate_success_msg": "Ваш таймер активності запущено. Спадкоємця призначено."
   },
   "claim_vault": {
     "incoming_loading": "Пошук гаманців...",

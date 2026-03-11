@@ -207,7 +207,7 @@ export function Dashboard() {
 
           <div className="dash-section-label" style={{ marginTop: '8px' }}>{t('dashboard.will_configuration')}</div>
           {hasSuccessor ? (
-            <div className="dash-grid-2">
+            <div className="dash-grid-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <SuccessorCard
                 currentSuccessor={nodeState?.designatedSuccessor || ''}
                 onSuccess={handleRefresh}
