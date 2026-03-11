@@ -101,6 +101,18 @@ We follow **responsible disclosure**:
 - We will credit you in the fix announcement (unless you prefer anonymity)
 - We aim to fix critical issues within **14 days**, high severity within **30 days**
 
+## Safe Harbor
+
+We consider security research conducted in good faith to be authorized if it:
+
+- Does not access, modify, or delete data belonging to other users
+- Does not degrade the service for other users (no DoS, spam, or load testing)
+- Is limited to the **in-scope** targets listed above
+- Does not exploit any vulnerability beyond the minimum needed to demonstrate it
+- Is reported to us before any public disclosure
+
+We will not pursue legal action against researchers who follow these guidelines. If you are unsure whether your research complies, contact us at **security@willchain.net** before proceeding.
+
 ## Bug Bounty
 
 There is currently no formal bug bounty program. Significant findings may be rewarded at our discretion. We will announce a formal program before mainnet launch.

@@ -118,11 +118,19 @@ Please try these scenarios and let us know if anything is confusing or broken:
 - **Bot issues?** — If the bot doesn't respond or sends wrong information, let us know
 - **Loading problems?** — If pages are slow or don't load, note which page
 
+### Successor Flow (coordinate with another tester)
+- [ ] Tester A designates Tester B as successor
+- [ ] Tester A stops confirming activity and waits for grace period
+- [ ] Tester B initiates successor claim
+- [ ] Tester A vetoes by confirming activity (or lets claim complete)
+
 ### Advanced (if you have time)
-- [ ] Try switching languages (bottom of page)
+- [ ] Try switching languages (header menu)
 - [ ] Try on mobile (MetaMask mobile browser)
-- [ ] Try transferring WILL tokens to another address
+- [ ] Try transferring WILL tokens to another address (should reset timer)
 - [ ] Check your vault status after some time passes
+- [ ] Claim dividends (if available)
+- [ ] Disconnect and reconnect wallet
 
 ---
 
@@ -139,6 +147,22 @@ Send reports to the project owner via Telegram or your preferred channel.
 
 ---
 
+## Bot Commands Reference
+
+| Command | What it does |
+|---------|-------------|
+| `/start` | Welcome menu with quick actions |
+| `/link <address>` | Link your wallet (EIP-712 signature) |
+| `/status` | Check vault status, timers, successor |
+| `/stats` | Network statistics (supply, burned, recycled) |
+| `/notifications` | Toggle alert notifications on/off |
+| `/email <addr>` | Set email for additional alerts |
+| `/email remove` | Remove email notifications |
+| `/unlink` | Remove wallet link |
+| `/help` | Full workflow guide |
+
+---
+
 ## FAQ
 
 **Q: Can I lose real money?**
@@ -147,8 +171,20 @@ A: No. Everything is on a test network. Tokens have no value.
 **Q: What if I mess something up?**
 A: Nothing bad happens. We can always send you more test tokens.
 
-**Q: Do I need to keep checking in?**
-A: During beta testing, you don't need to worry about the inactivity timer. Just test the features and tell us what's confusing.
+**Q: Do I need to log in daily?**
+A: No. Your timer resets automatically when you send WILL tokens. Use "Confirm Activity" only if you haven't made any transfers in a while.
+
+**Q: Does a DEX swap count as activity?**
+A: No. Only direct transfers from your wallet count. Approvals and swaps via protocols don't reset the timer — this is a security feature.
+
+**Q: What happens when the timer expires?**
+A: 30-day grace period (you can still confirm activity) → 30-day claim window (successor can claim) → vault becomes abandoned (anyone can recycle).
+
+**Q: Can someone change my successor without me?**
+A: No. Only your private key can designate or change a successor.
+
+**Q: What are the vault tiers?**
+A: Basic (1,000 WILL), Family (10,000 WILL), Legacy (100,000 WILL). Tiers affect service levels but the core mechanism is the same.
 
 **Q: How long does beta testing last?**
 A: A few weeks. We'll let you know when it's done.

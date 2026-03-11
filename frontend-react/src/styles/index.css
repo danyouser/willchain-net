@@ -379,8 +379,9 @@ body.preloading {
 
 .modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .modal-content {
@@ -391,6 +392,7 @@ body.preloading {
   width: 100%; max-width: 680px;
   max-height: calc(100vh - 104px);
   display: flex; flex-direction: column;
+  overflow: hidden;
   box-shadow: var(--s3);
   animation: modalIn .25s var(--ease) both;
 }
@@ -426,9 +428,11 @@ body.preloading {
 .disclaimer-section p  { color: var(--t2); font-size: 0.72rem; line-height: 1.5; }
 
 .modal-footer {
-  padding: 10px 20px 16px;
-  border-top: 1px solid var(--b);
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--b2);
+  background: rgba(0,0,0,0.3);
   display: flex; flex-direction: column; gap: 16px;
+  flex-shrink: 0;
 }
 
 /* Telegram Wallet Link Modal */
@@ -446,7 +450,7 @@ body.preloading {
 .tg-link-hint { color: var(--t3); font-size: 0.8rem; line-height: 1.5; margin-bottom: 16px; }
 .tg-link-success { color: var(--success, #4ade80); font-size: 0.9rem; padding: 12px 0; }
 .tg-link-error { color: var(--danger, #f87171); font-size: 0.85rem; margin-bottom: 12px; }
-.modal-footer { flex-direction: row; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--b); padding-top: 16px; }
+.modal-box .modal-footer { flex-direction: row; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--b); padding-top: 16px; }
 
 .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
 
@@ -2548,8 +2552,8 @@ body.preloading {
   .footer-copyright { max-width: 100%; text-align: center; }
 
   .disclaimer-inner { padding: 28px 20px; }
-  .modal-content { max-width: calc(100vw - 32px); max-height: calc(100vh - 90px); }
-  .modal { padding: 68px 8px 16px; }
+  .modal-content { max-width: calc(100vw - 16px); max-height: calc(100dvh - 24px); }
+  .modal { padding: 12px 8px; }
 }
 
 /* ══════════════════════════════════════════════════════════════
