@@ -97,6 +97,57 @@ systemctl restart willchain-bot
 ### Frontend Down
 Check Cloudflare Pages dashboard → Deployments. Usually auto-recovers.
 
+## VPS Monitor Script (`scripts/monitor.sh`)
+
+Self-hosted cron script that checks 8 health indicators every 5 minutes and sends Telegram alerts on state changes (OK↔FAIL). No external dependencies — uses only bash, curl, and coreutils.
+
+### Checks
+
+| # | Check | Trigger |
+|---|-------|---------|
+| 1 | Bot systemd service | not `active` |
+| 2 | API `/health` endpoint | HTTP fail or `ok !== true` |
+| 3 | RPC provider | `rpc: false` in health JSON |
+| 4 | Event listener lag | `blockLagAlert: true` (>10 min) |
+| 5 | Disk usage | >90% |
+| 6 | RAM usage | >90% |
+| 7 | nginx service | not `active` |
+| 8 | SSL certificate | <7 days until expiry |
+
+### Setup
+
+```bash
+# Copy to VPS
+scp scripts/monitor.sh root@5.45.66.229:/opt/willchain-net/scripts/
+
+# Create env file on VPS (not in git)
+cat > /opt/willchain-net/scripts/monitor.env << 'EOF'
+MONITOR_TG_TOKEN=<bot token>
+MONITOR_TG_CHAT=<chat_id>
+EOF
+chmod 600 /opt/willchain-net/scripts/monitor.env
+
+# Add cron
+crontab -e
+*/5 * * * * /opt/willchain-net/scripts/monitor.sh 2>&1 | logger -t willchain-monitor
+```
+
+### How it works
+
+- State file: `/tmp/willchain-monitor-state` — stores last known status per check
+- 🔴 alert sent only when status changes OK→FAIL
+- 🟢 recovery sent only when status changes FAIL→OK
+- First run: only FAIL checks trigger alerts (no spam on fresh start)
+- Logs: `journalctl -t willchain-monitor`
+
+### Get your chat_id
+
+1. Send any message to @WillChainBot
+2. Run: `curl https://api.telegram.org/bot<TOKEN>/getUpdates | jq '.result[-1].message.chat.id'`
+3. Use that number as `MONITOR_TG_CHAT`
+
+---
+
 ### SSL/Certificate Issues
 Cloudflare manages frontend SSL. For API:
 ```bash

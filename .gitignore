@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+scripts/monitor.env
 
 # Node modules
 node_modules/
