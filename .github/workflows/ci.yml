@@ -254,7 +254,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check contract address consistency
         run: |
-          CONTRACT="0x6fAd1475B41731E3eDA21998417Cb2e18E795877"
+          CONTRACT="0x5f89852D3a2457a5C4FDA64b783DF1e040D696F8"
           # Files that must reference the correct contract address
           FILES=(
             "frontend-react/src/config/contract.ts"

@@ -30,6 +30,7 @@ export function TimeCard({ timeUntilInactive, inactivityPeriod, onSuccess }: Tim
 
   // Live countdown: tick every second
   const [remaining, setRemaining] = useState(timeUntilInactive)
+  // eslint-disable-next-line react-hooks/purity
   const snapshotRef = useRef(Date.now())
 
   useEffect(() => {
