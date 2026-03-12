@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useBalance as useNativeBalance, useGasPrice } from 'wagmi'
 import { useTranslation } from 'react-i18next'
 import { CONTRACT_ADDRESS } from '../../config/contract'
 import { useBalance, formatTokenAmount } from '../../hooks/useBalance'
@@ -20,6 +20,8 @@ export function Dashboard() {
   const { address, isConnected } = useAccount()
   const { t } = useTranslation()
   const { balance, refetch: refetchBalance } = useBalance(address)
+  const { data: nativeBalance } = useNativeBalance({ address })
+  const { data: gasPrice } = useGasPrice()
   const { nodeState, isLoading: isNodeLoading, refetch: refetchNode } = useNodeState(address)
   const isSmartWallet = useIsSmartWallet(address)
   const [showTransfer, setShowTransfer] = useState(false)
@@ -46,6 +48,8 @@ export function Dashboard() {
   const handleRefresh = () => {
     refetchBalance()
     refetchNode()
+    // RPC may return stale data right after tx confirmation; refetch again after short delay
+    setTimeout(() => { refetchBalance(); refetchNode() }, 2000)
   }
 
   const handleAddToken = async () => {
@@ -71,6 +75,11 @@ export function Dashboard() {
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
   const isUnregistered = !nodeState || nodeState.lastActivityTimestamp === 0
   const hasSuccessor = !!nodeState?.designatedSuccessor && nodeState.designatedSuccessor !== ZERO_ADDRESS
+  const ethBalance = nativeBalance?.value ?? 0n
+  const hasNoGas = ethBalance === 0n
+  const estimatedTxs = gasPrice && ethBalance > 0n
+    ? Math.floor(Number(ethBalance / (gasPrice * 150_000n)))
+    : 0
 
   const lastActivityLabel = isUnregistered
     ? t('timeline.never')
@@ -143,6 +152,13 @@ export function Dashboard() {
               <div className="dash-tvl-left">
                 <span className="dash-tvl-label">{hasSuccessor ? t('dashboard.total_value_secured') : t('dashboard.balance_label')}</span>
                 <div className="dash-tvl-balance">{formatTokenAmount(balance)} <span className="currency">WILL</span></div>
+                <span style={{ fontSize: '0.78rem', color: hasNoGas ? 'var(--red)' : 'var(--text-secondary)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                    <path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" /><path d="M15 10h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 4" /><path d="M3 22h12" /><path d="M7 8h4" />
+                  </svg>
+                  {t('dashboard.gas_label')}: {(Number(ethBalance) / 1e18).toFixed(4)} ETH
+                  {estimatedTxs > 0 && <span style={{ opacity: 0.6 }}>(~ {estimatedTxs} {t('dashboard.gas_txs')})</span>}
+                </span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'stretch', minWidth: '160px' }}>
                 {balance > 0n ? (
@@ -203,6 +219,21 @@ export function Dashboard() {
               </div>
             )}
           </div>
+
+          {hasNoGas && (
+            <div className="activity-info-banner" style={{ marginTop: '8px', borderColor: 'rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)' }}>
+              <div className="activity-info-icon-wrapper" style={{ color: 'var(--red)' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+              <div className="activity-info-content">
+                <strong className="activity-info-title" style={{ color: 'var(--red)' }}>{t('dashboard.no_gas_title')}</strong>
+                <p className="activity-info-text">{t('dashboard.no_gas_text')}</p>
+              </div>
+            </div>
+          )}
 
           <div className="dash-section-label" style={{ marginTop: '8px' }}>{t('dashboard.will_configuration')}</div>
           {hasSuccessor ? (

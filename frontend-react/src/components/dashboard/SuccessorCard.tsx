@@ -133,19 +133,44 @@ export function SuccessorCard({ currentSuccessor, onSuccess, variant = 'default'
           {t('dashboard.activate_no_balance')}
         </div>
       )}
-      <input
-        type="text"
-        className="input"
-        style={{ width: '100%', boxSizing: 'border-box' }}
-        placeholder={t('dashboard.successor_placeholder')}
-        value={newSuccessor}
-        onChange={(e) => setNewSuccessor(e.target.value)}
-        aria-label={t('dashboard.successor_placeholder')}
-        aria-invalid={!!addressError}
-        spellCheck={false}
-        autoComplete="off"
-        disabled={hasNoBalance}
-      />
+      <div style={{ position: 'relative', width: '100%' }}>
+        <input
+          type="text"
+          className="input"
+          style={{ width: '100%', boxSizing: 'border-box', paddingRight: '36px' }}
+          placeholder={t('dashboard.successor_placeholder')}
+          value={newSuccessor}
+          onChange={(e) => setNewSuccessor(e.target.value)}
+          aria-label={t('dashboard.successor_placeholder')}
+          aria-invalid={!!addressError}
+          spellCheck={false}
+          autoComplete="off"
+          disabled={hasNoBalance}
+        />
+        {newSuccessor && (
+          <button
+            type="button"
+            onClick={() => setNewSuccessor('')}
+            aria-label="Clear"
+            style={{
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '2px',
+              color: 'var(--text-secondary)',
+              lineHeight: 1,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
+      </div>
       <button
         className="btn btn-primary btn-full"
         onClick={handleDesignate}

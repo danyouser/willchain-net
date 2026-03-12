@@ -63,6 +63,8 @@ vi.mock('wagmi', () => ({
     data: undefined,
     isLoading: false,
   })),
+  useBalance: vi.fn(() => ({ data: { value: 100000000000000n } })),
+  useGasPrice: vi.fn(() => ({ data: 1000000n })),
   useChainId: vi.fn(() => 84532),
   usePublicClient: vi.fn(() => ({
     getBlockNumber: vi.fn().mockResolvedValue(BigInt(100)),
