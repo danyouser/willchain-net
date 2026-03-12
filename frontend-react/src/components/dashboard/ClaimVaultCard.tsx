@@ -263,16 +263,31 @@ export function ClaimVaultCard({
 
       <div className="form-group">
         <label>{t('claim_vault.owner_label')}</label>
-        <input
-          type="text"
-          className="input"
-          placeholder="0x..."
-          value={targetAddress}
-          onChange={e => setTargetAddress(e.target.value)}
-          aria-label={t('claim_vault.owner_label')}
-          spellCheck={false}
-          autoComplete="off"
-        />
+        <div style={{ position: 'relative', width: '100%' }}>
+          <input
+            type="text"
+            className="input"
+            style={{ width: '100%', boxSizing: 'border-box', paddingRight: '36px' }}
+            placeholder="0x..."
+            value={targetAddress}
+            onChange={e => setTargetAddress(e.target.value)}
+            aria-label={t('claim_vault.owner_label')}
+            spellCheck={false}
+            autoComplete="off"
+          />
+          {targetAddress && (
+            <button
+              type="button"
+              onClick={() => setTargetAddress('')}
+              aria-label="Clear"
+              style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: 'var(--text-secondary)', lineHeight: 1 }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {validTarget && isTargetLoading && (

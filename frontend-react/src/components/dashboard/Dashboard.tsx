@@ -264,7 +264,7 @@ export function Dashboard() {
           )}
 
           <div className="dash-section-label" style={{ marginTop: '12px' }}>{t('dashboard.heir_section')}</div>
-          <div className="dash-grid-2">
+          <div className="dash-grid-1">
             <IncomingInheritancesCard />
             <ClaimVaultCard
               mySuccessorClaimInitiated={nodeState?.successorClaimInitiated ?? false}
