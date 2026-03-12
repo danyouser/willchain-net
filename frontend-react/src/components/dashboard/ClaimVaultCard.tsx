@@ -14,12 +14,14 @@ interface ClaimVaultCardProps {
   mySuccessorClaimInitiated: boolean
   myClaimInitiationTimestamp: number
   onSuccess?: () => void
+  disabled?: boolean
 }
 
 export function ClaimVaultCard({
   mySuccessorClaimInitiated,
   myClaimInitiationTimestamp,
   onSuccess,
+  disabled,
 }: ClaimVaultCardProps) {
   const { showNotification } = useNotification()
   const { assertCorrectChain, isCorrectChain } = useChainGuard()
@@ -247,7 +249,7 @@ export function ClaimVaultCard({
   const isClaimConfirming = isInitiateConfirming || isCompleteConfirming
 
   return (
-    <div className="card">
+    <div className="card" style={disabled ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
       <div className="card-header">
         <span className="card-label">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

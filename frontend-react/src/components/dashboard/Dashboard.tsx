@@ -13,6 +13,7 @@ import { DividendsCard } from './DividendsCard'
 import { VaultDataCard } from './VaultDataCard'
 import { IncomingInheritancesCard } from './IncomingInheritancesCard'
 import { InactivityPeriodCard } from './InactivityPeriodCard'
+import { DashboardAlerts } from './DashboardAlerts'
 import { TransferModal } from '../modals/TransferModal'
 import { getStatusClass, getStatusKey } from '../../utils/vaultStatus'
 
@@ -25,6 +26,7 @@ export function Dashboard() {
   const { nodeState, isLoading: isNodeLoading, refetch: refetchNode } = useNodeState(address)
   const isSmartWallet = useIsSmartWallet(address)
   const [showTransfer, setShowTransfer] = useState(false)
+  const [incomingData, setIncomingData] = useState({ count: 0, hasClaimable: false })
   const [allowanceWarningDismissed, setAllowanceWarningDismissed] = useState(() =>
     localStorage.getItem('allowance-warning-dismissed') === '1'
   )
@@ -92,6 +94,21 @@ export function Dashboard() {
   return (
     <section className="dashboard">
       <div className="dash-layout">
+        <DashboardAlerts
+          ethBalance={ethBalance}
+          claimInProgress={nodeState?.successorClaimInitiated ?? false}
+          timeUntilInactive={nodeState?.timeUntilInactive ?? 0}
+          inactivityPeriod={nodeState?.inactivityPeriod ?? 0}
+          hasSuccessor={hasSuccessor}
+          isRegistered={!isUnregistered}
+          vaultStatus={
+            isUnregistered ? 0
+              : (nodeState?.timeUntilInactive ?? 0) > 0 ? 1
+              : (nodeState?.timeUntilAbandoned ?? 0) > 0 ? 2
+              : 4
+          }
+          onIncomingData={(count, claimable) => setIncomingData({ count, hasClaimable: claimable })}
+        />
 
         {/* ── SIDEBAR (Core Status & Action) ────────────────────── */}
         {hasSuccessor && (
@@ -220,21 +237,6 @@ export function Dashboard() {
             )}
           </div>
 
-          {hasNoGas && (
-            <div className="activity-info-banner" style={{ marginTop: '8px', borderColor: 'rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)' }}>
-              <div className="activity-info-icon-wrapper" style={{ color: 'var(--red)' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                  <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-              </div>
-              <div className="activity-info-content">
-                <strong className="activity-info-title" style={{ color: 'var(--red)' }}>{t('dashboard.no_gas_title')}</strong>
-                <p className="activity-info-text">{t('dashboard.no_gas_text')}</p>
-              </div>
-            </div>
-          )}
-
           <div className="dash-section-label" style={{ marginTop: '8px' }}>{t('dashboard.will_configuration')}</div>
           {hasSuccessor ? (
             <div className="dash-grid-1" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -270,6 +272,7 @@ export function Dashboard() {
               mySuccessorClaimInitiated={nodeState?.successorClaimInitiated ?? false}
               myClaimInitiationTimestamp={nodeState?.claimInitiationTimestamp ?? 0}
               onSuccess={handleRefresh}
+              disabled={incomingData.count > 0 && !incomingData.hasClaimable}
             />
           </div>
 

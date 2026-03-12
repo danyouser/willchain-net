@@ -888,7 +888,7 @@ body.preloading {
 /* ══════════════════════════════════════════════════════════════
    DASHBOARD (after wallet connect)
    ══════════════════════════════════════════════════════════════ */
-.dashboard { padding: 48px 0 80px; }
+.dashboard { padding: 20px 80px; }
 
 .dashboard-shell {
   display: flex;
@@ -1673,6 +1673,69 @@ body.preloading {
 
 .claim-buttons { display: flex; gap: 10px; }
 
+/* Dashboard alerts — collapsible notification bar */
+.dashboard-alerts-bar { grid-column: 1 / -1; margin: -24px 0 0; position: relative; }
+.dashboard-alert-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border-radius: var(--r2);
+  font-size: 0.85rem; font-weight: 500;
+  cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.dashboard-alert-row.info    { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); color: var(--blue); }
+.dashboard-alert-row.success { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+.dashboard-alert-row.warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); color: var(--amber); }
+.dashboard-alert-row.danger  { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+.dashboard-alert-icon { flex-shrink: 0; }
+.dashboard-alert-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-alert-count {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; border-radius: 10px;
+  color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0 5px;
+}
+.dashboard-alert-chevron {
+  flex-shrink: 0; transition: transform 0.2s; opacity: 0.6;
+}
+.dashboard-alert-chevron.expanded { transform: rotate(180deg); }
+
+.dashboard-alert-dropdown-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+.dashboard-alert-dropdown-wrap.open {
+  grid-template-rows: 1fr;
+}
+.dashboard-alert-dropdown {
+  display: flex; flex-direction: column; gap: 4px;
+  overflow: hidden;
+  margin-top: 4px; padding: 0 6px;
+  background: var(--panel); border: 1px solid transparent;
+  border-radius: var(--r2); box-shadow: none;
+  transition: padding 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.dashboard-alert-dropdown-wrap.open .dashboard-alert-dropdown {
+  padding: 6px;
+  border-color: var(--b);
+  box-shadow: var(--s2);
+}
+.dashboard-alert-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--r1);
+  font-size: 0.82rem; font-weight: 500;
+}
+.dashboard-alert-item.info    { color: var(--blue); }
+.dashboard-alert-item.success { color: var(--green); }
+.dashboard-alert-item.warning { color: var(--amber); }
+.dashboard-alert-item.danger  { color: var(--red); }
+.dashboard-alert-close {
+  flex-shrink: 0; background: none; border: none; cursor: pointer;
+  color: inherit; opacity: 0.4; padding: 4px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.15s;
+}
+.dashboard-alert-close:hover { opacity: 1; }
+
 /* Incoming inheritances panel */
 .incoming-inheritances { margin-bottom: 20px; }
 .incoming-inheritances-title {
@@ -1680,6 +1743,31 @@ body.preloading {
   color: var(--t2); margin-bottom: 10px;
 }
 .incoming-inheritances-list { display: flex; flex-direction: column; gap: 8px; }
+
+.incoming-highlight {
+  border: 1px solid rgba(59,130,246,0.4);
+  box-shadow: 0 0 16px rgba(59,130,246,0.12);
+}
+.incoming-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; border-radius: 9px;
+  background: var(--blue); color: #fff;
+  font-size: 0.68rem; font-weight: 700;
+  margin-left: 6px; padding: 0 5px;
+}
+.incoming-alert {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; margin-bottom: 10px;
+  border-radius: var(--r2);
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.25);
+  color: var(--blue); font-size: 0.85rem; font-weight: 500;
+}
+.incoming-alert.claimable {
+  background: rgba(34,197,94,0.08);
+  border-color: rgba(34,197,94,0.3);
+  color: var(--green);
+}
 
 .incoming-empty-state {
   display: grid;
@@ -1715,6 +1803,10 @@ body.preloading {
 .inheritance-addr {
   font-family: 'Courier New', monospace; font-size: 0.85rem;
   color: var(--t1); flex: 1;
+}
+.inheritance-time-hint {
+  font-size: 0.75rem; color: var(--t3); font-weight: 400;
+  white-space: nowrap;
 }
 .inheritance-status-label {
   font-size: 0.72rem; font-weight: 600; padding: 2px 8px;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount } from 'wagmi'
 import { CONTRACT_ADDRESS, WILLCHAIN_ABI } from '../../config/contract'
@@ -28,10 +28,35 @@ export function TimeCard({ timeUntilInactive, inactivityPeriod, onSuccess }: Tim
       enabled: isCorrectChain && !!address,
     })
 
+  // Live countdown: tick every second
+  const [remaining, setRemaining] = useState(timeUntilInactive)
+  const snapshotRef = useRef(Date.now())
+
+  useEffect(() => {
+    snapshotRef.current = Date.now()
+    setRemaining(timeUntilInactive)
+  }, [timeUntilInactive])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - snapshotRef.current) / 1000)
+      setRemaining(Math.max(0, timeUntilInactive - elapsed))
+    }, 1000)
+    return () => clearInterval(id)
+  }, [timeUntilInactive])
+
   const formatDays = (seconds: number) => Math.floor(seconds / 86400)
-  const daysRemaining = formatDays(timeUntilInactive)
+  const daysRemaining = formatDays(remaining)
   const totalDays = formatDays(inactivityPeriod)
-  const percentage = totalDays > 0 ? Math.min(1, Math.max(0, daysRemaining / totalDays)) : 0
+  const percentage = totalDays > 0 ? Math.min(1, Math.max(0, remaining / inactivityPeriod)) : 0
+
+  const countdownText = (() => {
+    const d = Math.floor(remaining / 86400)
+    const h = Math.floor((remaining % 86400) / 3600)
+    const m = Math.floor((remaining % 3600) / 60)
+    const s = remaining % 60
+    return `${d}${t('dashboard.timer_d')} ${h}${t('dashboard.timer_h')} ${String(m).padStart(2, '0')}${t('dashboard.timer_m')} ${String(s).padStart(2, '0')}${t('dashboard.timer_s')}`
+  })()
 
   // Heartbeat state: calm → warning → critical
   const isCritical = percentage < 0.15
@@ -122,7 +147,7 @@ export function TimeCard({ timeUntilInactive, inactivityPeriod, onSuccess }: Tim
       </div>
 
       <div className="heartbeat-footer">
-        <span className="heartbeat-subtitle">{t('dashboard.next_ping')}:<br /><strong>{daysRemaining} {t('dashboard.timer_days')} {Math.floor((timeUntilInactive % 86400) / 3600)} {t('dashboard.timer_hours')}</strong></span>
+        <span className="heartbeat-subtitle">{t('dashboard.next_ping')}:<br /><strong>{countdownText}</strong></span>
       </div>
 
       {simulationError && (

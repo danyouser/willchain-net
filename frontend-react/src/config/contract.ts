@@ -1,6 +1,16 @@
-export const CONTRACT_ADDRESS = '0x6fAd1475B41731E3eDA21998417Cb2e18E795877' as const
+export const CONTRACT_ADDRESS = '0x5f89852D3a2457a5C4FDA64b783DF1e040D696F8' as const
 
 export const WILLCHAIN_ABI = [
+  // Events
+  {
+    type: 'event',
+    name: 'Transfer',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true },
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+  },
   // Read functions
   {
     inputs: [{ name: 'account', type: 'address' }],
