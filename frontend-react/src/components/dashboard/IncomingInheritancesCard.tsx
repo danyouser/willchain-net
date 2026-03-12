@@ -97,10 +97,10 @@ export function IncomingInheritancesCard() {
       if (result?.status !== 'success') continue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const nodeState = result.result as any
-      const designatedSuccessor: string = nodeState?.[1] ?? nodeState?.designatedSuccessor ?? ''
+      const designatedSuccessor: string = nodeState?.[4] ?? nodeState?.designatedSuccessor ?? ''
       if (designatedSuccessor.toLowerCase() !== address.toLowerCase()) continue
       const lastActivityTimestamp = Number(nodeState?.[0] ?? 0)
-      const inactivityPeriod = Number(nodeState?.[5] ?? 0) || 90 * 24 * 60 * 60
+      const inactivityPeriod = Number(nodeState?.[2] ?? 0) || 90 * 24 * 60 * 60
       items.push({
         addr: owners[i],
         vaultStatus: deriveStatus(lastActivityTimestamp, inactivityPeriod),

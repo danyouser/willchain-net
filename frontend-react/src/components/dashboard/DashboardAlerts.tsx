@@ -84,7 +84,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       if (contractData[i]?.status !== 'success') return false
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const ns = contractData[i].result as any
-      const successor: string = ns?.[1] ?? ''
+      const successor: string = ns?.[4] ?? ''
       return successor.toLowerCase() === address.toLowerCase()
     }).length
   }, [contractData, owners, address])
@@ -96,11 +96,11 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       if (contractData[i]?.status !== 'success') return false
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const ns = contractData[i].result as any
-      const successor: string = ns?.[1] ?? ''
+      const successor: string = ns?.[4] ?? ''
       if (successor.toLowerCase() !== address.toLowerCase()) return false
       const lastActivity = Number(ns?.[0] ?? 0)
       if (lastActivity === 0) return false
-      const inactPeriod = Number(ns?.[5] ?? 0) || 90 * 24 * 60 * 60
+      const inactPeriod = Number(ns?.[2] ?? 0) || 90 * 24 * 60 * 60
       const graceEnd = lastActivity + inactPeriod + GRACE_PERIOD_SECONDS
       const claimEnd = graceEnd + CLAIM_PERIOD_SECONDS
       return now >= graceEnd && now < claimEnd
