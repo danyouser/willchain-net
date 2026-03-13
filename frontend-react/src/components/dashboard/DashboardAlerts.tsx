@@ -14,6 +14,7 @@ interface DashboardAlertsProps {
   timeUntilInactive: number
   inactivityPeriod: number
   hasSuccessor: boolean
+  successorAddress: string
   isRegistered: boolean
   vaultStatus: number
   onIncomingData?: (count: number, hasClaimable: boolean) => void
@@ -40,11 +41,10 @@ function saveDismissed(addr: string | undefined, set: Set<string>) {
   sessionStorage.setItem(storageKey(addr), JSON.stringify([...set]))
 }
 
-export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive, hasSuccessor, isRegistered, vaultStatus, onIncomingData }: DashboardAlertsProps) {
+export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive, hasSuccessor, successorAddress, isRegistered, vaultStatus, onIncomingData }: DashboardAlertsProps) {
   const { t } = useTranslation()
   const { address } = useAccount()
   const [dismissed, setDismissed] = useState(() => loadDismissed(address))
-  const [expanded, setExpanded] = useState(false)
 
   // Load dismissed set for the current wallet address
   useEffect(() => {
@@ -343,7 +343,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   }
 
   if (isRegistered && hasSuccessor && vaultStatus === VAULT_STATUS.ACTIVE) {
-    alerts.push({ id: 'will-active', type: 'success', text: t('dashboard.alert_will_active') })
+    alerts.push({ id: `will-active:${successorAddress.toLowerCase().slice(0, 10)}`, type: 'success', text: t('dashboard.alert_will_active') })
   }
 
   if (fetched && hasClaimable) {
@@ -373,66 +373,26 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
     }
   }
 
-  // Auto-close dropdown when only 1 alert remains
-  useEffect(() => {
-    if (visible.length <= 1) setExpanded(false)
-  }, [visible.length])
-
   if (visible.length === 0) return null
-
-  const current = visible[0]
-  const typeColor = {
-    danger: 'var(--red)',
-    warning: 'var(--amber)',
-    success: 'var(--green)',
-    info: 'var(--blue)',
-  }[current.type]
 
   return (
     <div className="dashboard-alerts-bar">
-      {/* Collapsed: single line with first alert preview + count badge */}
-      <div
-        className={`dashboard-alert-row ${current.type}`}
-        onClick={() => setExpanded(!expanded)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setExpanded(!expanded) }}
-      >
-        <AlertIcon type={current.type} />
-        <span className="dashboard-alert-text">{current.text}</span>
-        <span className="dashboard-alert-count" style={{ background: typeColor }}>
-          {visible.length}
-        </span>
-        <svg
-          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-          className={`dashboard-alert-chevron${expanded ? ' expanded' : ''}`}
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </div>
-
-      {/* Expanded: all alerts with dismiss buttons */}
-      <div className={`dashboard-alert-dropdown-wrap${expanded ? ' open' : ''}`}>
-        <div className="dashboard-alert-dropdown">
-          {visible.map(alert => (
-            <div key={alert.id} className={`dashboard-alert-item ${alert.type}`}>
-              <AlertIcon type={alert.type} />
-              <span className="dashboard-alert-text">{alert.text}</span>
-              <button
-                type="button"
-                className="dashboard-alert-close"
-                onClick={e => { e.stopPropagation(); handleDismiss(alert.id) }}
-                aria-label="Close"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-          ))}
+      {visible.map(alert => (
+        <div key={alert.id} className={`dashboard-alert-row ${alert.type}`}>
+          <AlertIcon type={alert.type} />
+          <span className="dashboard-alert-text">{alert.text}</span>
+          <button
+            type="button"
+            className="dashboard-alert-close"
+            onClick={() => handleDismiss(alert.id)}
+            aria-label="Close"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
-      </div>
+      ))}
     </div>
   )
 }

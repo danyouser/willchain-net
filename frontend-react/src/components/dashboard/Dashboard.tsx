@@ -100,6 +100,7 @@ export function Dashboard() {
           timeUntilInactive={nodeState?.timeUntilInactive ?? 0}
           inactivityPeriod={nodeState?.inactivityPeriod ?? 0}
           hasSuccessor={hasSuccessor}
+          successorAddress={nodeState?.designatedSuccessor ?? ''}
           isRegistered={!isUnregistered}
           vaultStatus={
             isUnregistered ? 0
