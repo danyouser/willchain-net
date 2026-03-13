@@ -42,6 +42,12 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   const [dismissed, setDismissed] = useState(loadDismissed)
   const [expanded, setExpanded] = useState(false)
 
+  // Clear dismissed alerts when wallet changes
+  useEffect(() => {
+    setDismissed(new Set())
+    saveDismissed(new Set())
+  }, [address])
+
   // --- Incoming inheritances (same logic as IncomingInheritancesCard) ---
   const [owners, setOwners] = useState<string[]>([])
   const [fetched, setFetched] = useState(false)
@@ -338,9 +344,9 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   }
 
   if (fetched && hasClaimable) {
-    alerts.push({ id: 'claimable-vault', type: 'success', text: t('dashboard.alert_claimable') })
+    alerts.push({ id: `claimable-vault:${incomingCount}`, type: 'success', text: t('dashboard.alert_claimable') })
   } else if (fetched && incomingCount > 0) {
-    alerts.push({ id: 'incoming-inheritance', type: 'info', text: t('dashboard.alert_incoming', { count: incomingCount }) })
+    alerts.push({ id: `incoming-inheritance:${incomingCount}`, type: 'info', text: t('dashboard.alert_incoming', { count: incomingCount }) })
   }
 
   if (pendingDividends > 0n) {
