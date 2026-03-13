@@ -7,7 +7,7 @@ import {
   rainbowWallet,
   ledgerWallet,
 } from '@rainbow-me/rainbowkit/wallets'
-import { createConfig, http } from 'wagmi'
+import { createConfig, createStorage, http } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 
 export { CONTRACT_ADDRESS } from './contract'
@@ -40,6 +40,7 @@ export const config = createConfig({
   transports: {
     [baseSepolia.id]: http(),
   },
+  storage: createStorage({ storage: localStorage }),
   ssr: false,
 })
 
