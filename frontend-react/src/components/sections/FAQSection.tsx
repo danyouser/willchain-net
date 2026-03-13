@@ -10,7 +10,7 @@ export function FAQSection() {
     setOpen(prev => prev === n ? null : n)
   }, [])
 
-  const faqs = [1, 2, 3, 4, 5, 6, 7, 8].map(n => ({
+  const faqs = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => ({
     n,
     question: t(`faq.q${n}`),
     answer:   t(`faq.a${n}`),

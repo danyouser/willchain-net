@@ -41,11 +41,15 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   const { address } = useAccount()
   const [dismissed, setDismissed] = useState(loadDismissed)
   const [expanded, setExpanded] = useState(false)
+  const prevAddressRef = useRef(address)
 
-  // Clear dismissed alerts when wallet changes
+  // Clear dismissed alerts only when wallet actually changes (not on mount)
   useEffect(() => {
-    setDismissed(new Set())
-    saveDismissed(new Set())
+    if (prevAddressRef.current !== undefined && prevAddressRef.current !== address) {
+      setDismissed(new Set())
+      saveDismissed(new Set())
+    }
+    prevAddressRef.current = address
   }, [address])
 
   // --- Incoming inheritances (same logic as IncomingInheritancesCard) ---
