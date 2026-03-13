@@ -25,31 +25,30 @@ interface AlertItem {
   text: string
 }
 
-function loadDismissed(): Set<string> {
+function storageKey(addr: string | undefined) {
+  return `dashboard-dismissed-alerts:${addr?.toLowerCase() ?? 'none'}`
+}
+
+function loadDismissed(addr: string | undefined): Set<string> {
   try {
-    const raw = sessionStorage.getItem('dashboard-dismissed-alerts')
+    const raw = sessionStorage.getItem(storageKey(addr))
     return raw ? new Set(JSON.parse(raw)) : new Set()
   } catch { return new Set() }
 }
 
-function saveDismissed(set: Set<string>) {
-  sessionStorage.setItem('dashboard-dismissed-alerts', JSON.stringify([...set]))
+function saveDismissed(addr: string | undefined, set: Set<string>) {
+  sessionStorage.setItem(storageKey(addr), JSON.stringify([...set]))
 }
 
 export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive, hasSuccessor, isRegistered, vaultStatus, onIncomingData }: DashboardAlertsProps) {
   const { t } = useTranslation()
   const { address } = useAccount()
-  const [dismissed, setDismissed] = useState(loadDismissed)
+  const [dismissed, setDismissed] = useState(() => loadDismissed(address))
   const [expanded, setExpanded] = useState(false)
-  const prevAddressRef = useRef(address)
 
-  // Clear dismissed alerts only when wallet actually changes (not on mount)
+  // Load dismissed set for the current wallet address
   useEffect(() => {
-    if (prevAddressRef.current !== undefined && prevAddressRef.current !== address) {
-      setDismissed(new Set())
-      saveDismissed(new Set())
-    }
-    prevAddressRef.current = address
+    setDismissed(loadDismissed(address))
   }, [address])
 
   // --- Incoming inheritances (same logic as IncomingInheritancesCard) ---
@@ -368,7 +367,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       setDismissed(prev => {
         const next = new Set(prev)
         next.add(id)
-        saveDismissed(next)
+        saveDismissed(address, next)
         return next
       })
     }
