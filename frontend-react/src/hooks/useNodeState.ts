@@ -1,11 +1,8 @@
 import { useReadContract } from 'wagmi'
 import { CONTRACT_ADDRESS, WILLCHAIN_ABI } from '../config/contract'
 import { CHAIN_ID } from '../config/wagmi'
-import { mockNodeState } from '../utils/devMock'
 
 export function useNodeState(address: `0x${string}` | undefined) {
-  const mock = mockNodeState(address)
-
   const { data, isLoading, isError, error, refetch } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: WILLCHAIN_ABI,
@@ -17,10 +14,6 @@ export function useNodeState(address: `0x${string}` | undefined) {
       refetchInterval: 30_000, // poll every 30 seconds so UI stays fresh without page reload
     },
   })
-
-  if (mock) {
-    return { nodeState: mock, isLoading: false, isError: false, error: null, refetch }
-  }
 
   if (!data) {
     return {

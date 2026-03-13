@@ -5,8 +5,6 @@ import { CONTRACT_ADDRESS, WILLCHAIN_ABI, GRACE_PERIOD_SECONDS, CLAIM_PERIOD_SEC
 import { CHAIN_ID } from '../../config/wagmi'
 import { VAULT_STATUS } from '../../utils/vaultStatus'
 import { formatTokenAmount } from '../../hooks/useBalance'
-import { mockNodeStatesResult } from '../../utils/devMock'
-
 const BOT_API_URL = (import.meta.env.VITE_BOT_API_URL as string | undefined) ?? '/api'
 
 interface DashboardAlertsProps {
@@ -88,32 +86,24 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
     query: { enabled: owners.length > 0 },
   })
 
-  // Helper: get nodeStates data for owner (with mock override)
-  const getNs = (i: number) => {
-    const mock = mockNodeStatesResult(owners[i])
-    if (mock) return mock
-    if (contractData?.[i]?.status !== 'success') return null
-    return contractData[i].result
-  }
-
   const incomingCount = useMemo(() => {
-    if ((!contractData && owners.every(o => !mockNodeStatesResult(o))) || !address) return 0
+    if (!contractData || !address) return 0
     return owners.filter((_, i) => {
+      if (contractData[i]?.status !== 'success') return false
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ns = getNs(i) as any
-      if (!ns) return false
+      const ns = contractData[i].result as any
       const successor: string = ns?.[4] ?? ''
       return successor.toLowerCase() === address.toLowerCase()
     }).length
-  }, [contractData, owners, address]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [contractData, owners, address])
 
   const hasClaimable = useMemo(() => {
-    if ((!contractData && owners.every(o => !mockNodeStatesResult(o))) || !address) return false
+    if (!contractData || !address) return false
     const now = Math.floor(Date.now() / 1000)
     return owners.some((_, i) => {
+      if (contractData[i]?.status !== 'success') return false
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ns = getNs(i) as any
-      if (!ns) return false
+      const ns = contractData[i].result as any
       const successor: string = ns?.[4] ?? ''
       if (successor.toLowerCase() !== address.toLowerCase()) return false
       const lastActivity = Number(ns?.[0] ?? 0)
@@ -123,7 +113,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       const claimEnd = graceEnd + CLAIM_PERIOD_SECONDS
       return now >= graceEnd && now < claimEnd
     })
-  }, [contractData, owners, address]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [contractData, owners, address])
 
   // Notify parent about incoming inheritance data
   useEffect(() => {
