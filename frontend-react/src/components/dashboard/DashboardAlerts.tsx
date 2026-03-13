@@ -168,6 +168,145 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
     setTxAlerts(prev => prev.filter(a => a.id !== id))
   }
 
+  // --- Successor change event watcher ---
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS,
+    abi: WILLCHAIN_ABI,
+    eventName: 'SuccessorDesignated',
+    onLogs(logs) {
+      if (!address) return
+      const addrLower = address.toLowerCase()
+      for (const log of logs) {
+        const { node, successor } = log.args as { node: string; successor: string }
+        if (!node || !successor) continue
+        const id = `tx-${++txIdCounter.current}`
+
+        if (node.toLowerCase() === addrLower) {
+          const shortSuccessor = `${successor.slice(0, 6)}...${successor.slice(-4)}`
+          setTxAlerts(prev => [...prev, {
+            id,
+            type: 'success',
+            text: t('dashboard.alert_successor_changed', { successor: shortSuccessor }),
+          }])
+        } else if (successor.toLowerCase() === addrLower) {
+          const shortNode = `${node.slice(0, 6)}...${node.slice(-4)}`
+          setTxAlerts(prev => [...prev, {
+            id,
+            type: 'info',
+            text: t('dashboard.alert_designated_as_successor', { node: shortNode }),
+          }])
+        }
+      }
+    },
+    poll: true,
+    pollingInterval: 4_000,
+    enabled: !!address,
+  })
+
+  // --- Claim initiated / cancelled / transferred / recycled / dividends / activity ---
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'SuccessorClaimInitiated',
+    onLogs(logs) {
+      if (!address) return
+      const addrLower = address.toLowerCase()
+      for (const log of logs) {
+        const { node, successor } = log.args as { node: string; successor: string }
+        if (!node || !successor) continue
+        const id = `tx-${++txIdCounter.current}`
+        if (node.toLowerCase() === addrLower) {
+          const short = `${successor.slice(0, 6)}...${successor.slice(-4)}`
+          setTxAlerts(prev => [...prev, { id, type: 'danger', text: t('dashboard.alert_claim_initiated_owner', { successor: short }) }])
+        } else if (successor.toLowerCase() === addrLower) {
+          const short = `${node.slice(0, 6)}...${node.slice(-4)}`
+          setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_claim_initiated_heir', { node: short }) }])
+        }
+      }
+    },
+    poll: true, pollingInterval: 4_000, enabled: !!address,
+  })
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'SuccessorClaimCancelled',
+    onLogs(logs) {
+      if (!address) return
+      for (const log of logs) {
+        const { node } = log.args as { node: string }
+        if (node?.toLowerCase() === address.toLowerCase()) {
+          const id = `tx-${++txIdCounter.current}`
+          setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_claim_cancelled') }])
+        }
+      }
+    },
+    poll: true, pollingInterval: 4_000, enabled: !!address,
+  })
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'VaultAccessTransferred',
+    onLogs(logs) {
+      if (!address) return
+      const addrLower = address.toLowerCase()
+      for (const log of logs) {
+        const { fromNode, toNode, amount } = log.args as { fromNode: string; toNode: string; amount: bigint }
+        if (!fromNode || !toNode) continue
+        const id = `tx-${++txIdCounter.current}`
+        const amt = formatTokenAmount(amount)
+        if (toNode.toLowerCase() === addrLower) {
+          const short = `${fromNode.slice(0, 6)}...${fromNode.slice(-4)}`
+          setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_vault_received', { amount: amt, from: short }) }])
+        } else if (fromNode.toLowerCase() === addrLower) {
+          const short = `${toNode.slice(0, 6)}...${toNode.slice(-4)}`
+          setTxAlerts(prev => [...prev, { id, type: 'danger', text: t('dashboard.alert_vault_transferred', { amount: amt, to: short }) }])
+        }
+      }
+    },
+    poll: true, pollingInterval: 4_000, enabled: !!address,
+  })
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'InactiveNodeRecycled',
+    onLogs(logs) {
+      if (!address) return
+      for (const log of logs) {
+        const { node } = log.args as { node: string }
+        if (node?.toLowerCase() === address.toLowerCase()) {
+          const id = `tx-${++txIdCounter.current}`
+          setTxAlerts(prev => [...prev, { id, type: 'danger', text: t('dashboard.alert_recycled') }])
+        }
+      }
+    },
+    poll: true, pollingInterval: 4_000, enabled: !!address,
+  })
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'DividendsClaimed',
+    onLogs(logs) {
+      if (!address) return
+      for (const log of logs) {
+        const { node, amount } = log.args as { node: string; amount: bigint }
+        if (node?.toLowerCase() === address.toLowerCase()) {
+          const id = `tx-${++txIdCounter.current}`
+          setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_dividends_claimed', { amount: formatTokenAmount(amount) }) }])
+        }
+      }
+    },
+    poll: true, pollingInterval: 4_000, enabled: !!address,
+  })
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'ActivityConfirmed',
+    onLogs(logs) {
+      if (!address) return
+      for (const log of logs) {
+        const { node } = log.args as { node: string }
+        if (node?.toLowerCase() === address.toLowerCase()) {
+          const id = `tx-${++txIdCounter.current}`
+          setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_activity_confirmed') }])
+        }
+      }
+    },
+    poll: true, pollingInterval: 4_000, enabled: !!address,
+  })
+
   // --- Build alerts ---
   const alerts: AlertItem[] = []
 

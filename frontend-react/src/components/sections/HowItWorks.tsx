@@ -17,14 +17,23 @@ export function HowItWorks() {
       </div>
       <h2 className="section-title">{t('how_it_works.title')}</h2>
       <p className="section-subtitle">{t('how_it_works.subtitle')}</p>
-      <div className="hiw-grid">
-        {steps.map(s => (
-          <div key={s.n} className="hiw-card">
-            <div className="hiw-step-num">{String(s.n).padStart(2, '0')}</div>
-            <h3>{s.title}</h3>
-            <p>{s.desc}</p>
-          </div>
-        ))}
+      <div className="hiw-scene">
+        <img
+          src="/assets/hiw-bg.webp"
+          alt=""
+          className="hiw-scene-bg"
+          loading="lazy"
+          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+        />
+        <div className="hiw-grid">
+          {steps.map(s => (
+            <div key={s.n} className="hiw-card">
+              <div className="hiw-step-num">{String(s.n).padStart(2, '0')}</div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )

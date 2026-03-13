@@ -76,34 +76,22 @@ export function HeroSection() {
         <div className="hero-trust">
           <div className="trust-item">
             <svg className="trust-icon" viewBox="0 0 24 24" fill="none"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            <div>
-              <strong>{t('trust.opensource_title')}</strong>
-              <span>{t('trust.opensource_desc')}</span>
-            </div>
+            <span className="trust-label">{t('trust.opensource_title')}</span>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">
             <svg className="trust-icon" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            <div>
-              <strong>{t('trust.verified_title')}</strong>
-              <span>{t('trust.verified_desc')}</span>
-            </div>
+            <span className="trust-label">{t('trust.verified_title')}</span>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">
             <svg className="trust-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.8"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
-            <div>
-              <strong>{t('trust.noncustodial_title')}</strong>
-              <span>{t('trust.noncustodial_desc')}</span>
-            </div>
+            <span className="trust-label">{t('trust.noncustodial_title')}</span>
           </div>
           <div className="trust-divider" />
           <div className="trust-item">
             <svg className="trust-icon" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            <div>
-              <strong>{t('trust.base_title')}</strong>
-              <span>{t('trust.base_desc')}</span>
-            </div>
+            <span className="trust-label">{t('trust.base_title')}</span>
           </div>
         </div>
       </div>

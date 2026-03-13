@@ -4,7 +4,7 @@
  */
 
 import { GoogleGenAI } from "@google/genai";
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -151,7 +151,23 @@ async function main() {
 
   console.log("\n─── Summary ─────────────────────────────");
   results.forEach((r) => console.log(`  ${r.ok ? "✅" : "❌"}  ${r.code}${r.err ? " — " + r.err : ""}`));
-  console.log(`\n  Done: ${results.filter((r) => r.ok).length}/${results.length}\n`);
+  console.log(`\n  Done: ${results.filter((r) => r.ok).length}/${results.length}`);
+
+  // Sync lang/*.json → frontend-react/public/locales/*/translation.json
+  const LOCALES_DIR = path.join(ROOT, "frontend-react", "public", "locales");
+  const allLangs = ["uk", ...Object.keys(TARGETS)];
+  let synced = 0;
+  for (const code of allLangs) {
+    const src = path.join(LANG_DIR, `${code}.json`);
+    const dest = path.join(LOCALES_DIR, code, "translation.json");
+    try {
+      const content = await readFile(src, "utf-8");
+      await mkdir(path.join(LOCALES_DIR, code), { recursive: true });
+      await writeFile(dest, content, "utf-8");
+      synced++;
+    } catch { /* skip if lang file missing */ }
+  }
+  console.log(`  Synced ${synced} locale(s) → frontend-react/public/locales/\n`);
 }
 
 main().catch((err) => { console.error("Fatal:", err); process.exit(1); });

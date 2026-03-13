@@ -11,6 +11,65 @@ export const WILLCHAIN_ABI = [
       { name: 'value', type: 'uint256', indexed: false },
     ],
   },
+  {
+    type: 'event',
+    name: 'SuccessorDesignated',
+    inputs: [
+      { name: 'node', type: 'address', indexed: true },
+      { name: 'successor', type: 'address', indexed: true },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SuccessorClaimInitiated',
+    inputs: [
+      { name: 'node', type: 'address', indexed: true },
+      { name: 'successor', type: 'address', indexed: true },
+      { name: 'timestamp', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SuccessorClaimCancelled',
+    inputs: [
+      { name: 'node', type: 'address', indexed: true },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'VaultAccessTransferred',
+    inputs: [
+      { name: 'fromNode', type: 'address', indexed: true },
+      { name: 'toNode', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'InactiveNodeRecycled',
+    inputs: [
+      { name: 'node', type: 'address', indexed: true },
+      { name: 'recycledBy', type: 'address', indexed: true },
+      { name: 'recyclerReward', type: 'uint256', indexed: false },
+      { name: 'dividendAmount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'DividendsClaimed',
+    inputs: [
+      { name: 'node', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'ActivityConfirmed',
+    inputs: [
+      { name: 'node', type: 'address', indexed: true },
+      { name: 'timestamp', type: 'uint256', indexed: false },
+    ],
+  },
   // Read functions
   {
     inputs: [{ name: 'account', type: 'address' }],

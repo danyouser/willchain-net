@@ -13,6 +13,7 @@ const HeroSection = lazy(() => import('./components/sections/HeroSection').then(
 const AboutSection = lazy(() => import('./components/sections/AboutSection').then(m => ({ default: m.AboutSection })))
 const HowItWorks = lazy(() => import('./components/sections/HowItWorks').then(m => ({ default: m.HowItWorks })))
 const DemoSection = lazy(() => import('./components/sections/DemoSection').then(m => ({ default: m.DemoSection })))
+const CreditsSection = lazy(() => import('./components/sections/CreditsSection').then(m => ({ default: m.CreditsSection })))
 const FAQSection = lazy(() => import('./components/sections/FAQSection').then(m => ({ default: m.FAQSection })))
 const DisclaimerSection = lazy(() => import('./components/sections/DisclaimerSection').then(m => ({ default: m.DisclaimerSection })))
 const DisclaimerModal = lazy(() => import('./components/modals/DisclaimerModal').then(m => ({ default: m.DisclaimerModal })))
@@ -35,6 +36,7 @@ function AppContent() {
             <AboutSection />
             <HowItWorks />
             <DemoSection />
+            <CreditsSection />
             <FAQSection />
             <DisclaimerSection />
           </>

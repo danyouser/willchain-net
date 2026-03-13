@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const ASSETS = path.join(ROOT, "frontend", "assets");
+const ASSETS = path.join(ROOT, "frontend-react", "public", "assets");
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -48,18 +48,19 @@ async function generate(prompt, outputPath) {
 }
 
 const prompt = `
-Ultra-premium cinematic digital illustration for a blockchain crypto inheritance platform.
+Ultra-premium cinematic digital illustration for WillChain — a blockchain digital inheritance platform with its own WILL token.
 Wide panoramic scene, 16:9 ratio, dark space aesthetic.
 
-SCENE CONCEPT: "You → WillChain → Heir" — a trust and protection system for crypto assets.
+SCENE CONCEPT: "You → WillChain → Heir" — a trust and protection system for WILL tokens.
 
 COMPOSITION (horizontal, left to right):
 
 LEFT THIRD — "You (the wallet owner)":
 - A calm translucent human figure made of soft blue-white light particles (#3b82f6).
-- They hold a glowing hardware wallet / smartphone with crypto symbols on screen.
-- Warm aura around them. Small orbit of blockchain hexagons.
-- Subtle inscription floating near them: no text, just a soft blue halo.
+- They hold a glowing smartphone. Small orbit of abstract hexagons.
+- Warm aura around them. No text, just a soft blue halo.
+- FROM this figure TO the center shield: a flowing arc stream of WILL token coins (see token design below).
+  The tokens travel along a curved path from the owner toward the shield.
 
 CENTER — "WillChain smart contract":
 - A monumental glowing shield-clock hybrid, floating in the center.
@@ -67,33 +68,49 @@ CENTER — "WillChain smart contract":
 - Inside the shield: a circular clock face with glowing electric-blue hands.
 - The entire structure pulses softly, like a heartbeat.
 - A faint circular energy ring (portal-like) expands outward from it.
-- From the left figure to the shield: a flowing stream of glowing blue data particles (dashed dotted arc, like a secure connection).
-- The stream is animated-looking: dots and nodes along the arc.
+- WILL tokens flow INTO the shield from the left AND OUT of the shield to the right.
 
-RIGHT THIRD — "Heir (receives assets)":
-- A translucent human silhouette made of warm green-violet particles (#10b981, #8b5cf6).
-- Their arms are slightly open, receiving posture.
-- Flowing from the shield to this figure: golden glowing crypto coins/tokens in an arc stream.
+RIGHT THIRD — "Heir (receives WILL tokens)":
+- A translucent FEMALE human silhouette made of warm green-violet particles (#10b981, #8b5cf6).
+- She has a feminine body shape (slender shoulders, longer hair silhouette). Arms slightly open, receiving posture.
+- FROM the shield TO this figure: a flowing arc stream of WILL token coins.
+  The tokens travel along a curved path from the shield toward the heir.
 - Soft green halo around them, welcoming and warm.
 
+CRITICAL — WILL TOKEN COIN DESIGN (exact logo reference):
+- Each coin is a CIRCLE filled with a diagonal linear gradient from blue (#3b7dd8) at top-left to violet (#6366f1) at bottom-right.
+- On the coin face: a LARGE bold white letter "W" drawn as a connected zigzag stroke (like the letter W in a bold sans-serif font). The W takes up most of the coin area.
+- ABOVE the W, near the top of the coin: TWO SMALL interlocking chain links (like a short chain segment), drawn in white/light color. These chain links are small and sit above the W like a crown.
+- The overall coin design looks like: [chain links on top] + [big white W below] on a blue-violet gradient circle.
+- The coins glow with soft blue-violet light.
+- ABSOLUTELY NO Bitcoin "B" symbol, NO Ethereum diamond shape, NO dollar sign, NO any other real cryptocurrency logo.
+- Every single coin in the image must match this exact WILL token design.
+
 ATMOSPHERE:
-- Background: near-black deep space (#050810), ultra-dark indigo-black gradient that fills the ENTIRE frame edge to edge.
+- Background: pure black (#080b1c).
 - Subtle grid of glowing dots in the background (blockchain nodes).
 - Faint nebula purples and teals in the background.
 - Volumetric light rays from the center shield outward.
 - Film grain, depth of field, cinematic quality.
 - No text, no labels, no UI elements.
 
-CRITICAL COMPOSITION RULES:
-- The image must be filled edge to edge with content and atmosphere — NO black bars, NO letterbox, NO empty black bands at top or bottom.
-- The background gradient must extend fully to all four corners and edges.
-- All three figures must be fully visible and vertically centered in the frame.
-- The scene fills the entire 16:9 canvas from corner to corner.
+CRITICAL — ALL EDGES MUST FADE TO BLACK:
+- The TOP 15% of the image: must be completely pure black (#080b1c). Empty dark space — reserved for text overlay.
+- The BOTTOM 12% of the image: must be completely pure black (#080b1c). Empty dark space — reserved for text overlay.
+- The LEFT edge: the scene must gradually fade into pure black. The leftmost 5% must be pure black.
+- The RIGHT edge: the scene must gradually fade into pure black. The rightmost 5% must be pure black.
+- All four edges of the image pixel must be indistinguishable from #080b1c.
+- The three figures and central shield should be contained in the MIDDLE 70% of the image vertically.
+- Think of it as a vignette: bright center, smoothly fading to pure black on all sides.
+
+COMPOSITION RULES:
+- All three figures must be fully visible and vertically centered in the middle band.
+- Wide 16:9 canvas. The scene floats in a sea of black.
 
 STYLE:
 Concept art level quality. Blade Runner 2049 aesthetic. Painterly precision.
-Color palette: #050810 background, #3b82f6 blue, #8b5cf6 violet, #10b981 green, #f59e0b gold (coins), #ffffff for glows.
-Extremely high detail. Premium feel. Full-bleed 16:9 image, no borders, no padding.
+Color palette: #080b1c background, #3b82f6 blue, #8b5cf6 violet, #10b981 green, #f59e0b gold, #ffffff for glows.
+Extremely high detail. Premium feel.
 `.trim();
 
 async function main() {
