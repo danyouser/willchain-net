@@ -29,7 +29,7 @@ const connectors = connectorsForWallets(
     },
   ],
   {
-    appName: 'WillChain.net - Dead Man\'s Switch on Base',
+    appName: 'WillChain',
     projectId: WALLETCONNECT_PROJECT_ID,
   }
 )
