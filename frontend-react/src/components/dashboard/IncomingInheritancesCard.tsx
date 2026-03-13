@@ -5,6 +5,7 @@ import { CONTRACT_ADDRESS, WILLCHAIN_ABI } from '../../config/contract'
 import { CHAIN_ID } from '../../config/wagmi'
 import { VAULT_STATUS } from '../../utils/vaultStatus'
 import { GRACE_PERIOD_SECONDS, CLAIM_PERIOD_SECONDS } from '../../config/contract'
+import { mockNodeStatesResult } from '../../utils/devMock'
 
 const BOT_API_URL = (import.meta.env.VITE_BOT_API_URL as string | undefined) ?? '/api'
 
@@ -93,10 +94,11 @@ export function IncomingInheritancesCard() {
   const items: InheritanceItem[] = []
   if (contractData && address) {
     for (let i = 0; i < owners.length; i++) {
+      const mockResult = mockNodeStatesResult(owners[i])
       const result = contractData[i]
-      if (result?.status !== 'success') continue
+      if (!mockResult && result?.status !== 'success') continue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const nodeState = result.result as any
+      const nodeState = mockResult ?? (result!.result as any)
       const designatedSuccessor: string = nodeState?.[4] ?? nodeState?.designatedSuccessor ?? ''
       if (designatedSuccessor.toLowerCase() !== address.toLowerCase()) continue
       const lastActivityTimestamp = Number(nodeState?.[0] ?? 0)
