@@ -7,7 +7,7 @@ What is intentionally allowed, what is not protected, and what users must unders
 ## What Is Intentionally Allowed
 
 ### T-01: Owner can change treasury address (with 2-day timelock)
-The contract owner can propose a new treasury address via `proposeTreasuryChange()`. After a 2-day delay, anyone can call `executeTreasuryChange()`. This is observable on-chain before it takes effect.
+The contract owner can propose a new treasury address via `proposeTreasuryChange()`. After a 2-day delay, the owner calls `executeTreasuryChange()` to apply it. This is observable on-chain before it takes effect.
 
 **Why accepted:** Protocol needs a mechanism for treasury rotation (key compromise, migration). The 2-day delay provides transparency.
 
@@ -29,7 +29,7 @@ When Alice approves Bob, and Bob calls `transferFrom(Alice, Charlie, amount)`, *
 ### T-05: `recoverDividendDust()` is direct owner action (no timelock)
 Unlike treasury changes, dividend dust recovery has no 2-day delay.
 
-**Why accepted:** This function only transfers unclaimed fractions (<1 wei per holder) to the dividend pool. The maximum extractable value is negligible. Adding a timelock would add complexity for no security benefit.
+**Why accepted:** This function only transfers unclaimed fractions (<1 wei per holder) to the protocol treasury (or owner if treasury is unset). The maximum extractable value is capped at 0.1% of totalSupply per call. Adding a timelock would add complexity for no security benefit.
 
 ### T-06: No formal verification (Certora/Halmos)
 The contract has not been formally verified using mathematical proof tools.

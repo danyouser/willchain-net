@@ -1,732 +1,333 @@
-# Security Audit Report
+# WillChain Security Review
 
-## WillChain Smart Contract
+## Професійний аудит-звіт
 
----
-
-| Field | Value |
-|-------|-------|
-| **Client** | WillChain Team |
-| **Contract** | WillChain.sol |
-| **Language** | Solidity 0.8.24 |
-| **Platform** | EVM (Base L2) |
-| **Codebase Size** | 818 lines (37.9 KB) |
-| **Test Suite** | 2,863 lines (170+ tests) |
-| **Methods** | Manual review, line-by-line analysis, cross-function tracing, invariant verification |
-| **Audit Period** | 2026-02-27 — 2026-03-07 (5 iterations) |
-| **Report Version** | Final |
-| **Classification** | Confidential |
+| Поле | Значення |
+|---|---|
+| Замовник | WillChain |
+| Протокол | WillChain / `WILL` |
+| Тип рев'ю | Ручний security review з валідацією тестами |
+| Основний scope | `contracts/WillChain.sol` |
+| Перевірений commit | `0789e13` (last change to `contracts/WillChain.sol`) |
+| Дата рев'ю | 2026-03-14 |
+| Solidity | `0.8.24` |
+| Розмір коду | `968` LOC контракту / `4,373` LOC Hardhat-тестів / `548` LOC Foundry fuzz-тестів |
+| Класифікація | Internal independent review у форматі, наближеному до звітів провідних audit firms |
+| Важлива примітка | Цей документ не замінює зовнішній third-party audit від Trail of Bits, OpenZeppelin, Consensys Diligence, Spearbit, Cantina або Cyfrin |
 
 ---
 
-## Table of Contents
+## Зміст
 
-1. [Executive Summary](#1-executive-summary)
-2. [Scope](#2-scope)
-3. [System Overview](#3-system-overview)
-4. [Severity Classification](#4-severity-classification)
-5. [Findings Summary](#5-findings-summary)
-6. [Detailed Findings](#6-detailed-findings)
-7. [Centralization Risks](#7-centralization-risks)
-8. [Gas Analysis](#8-gas-analysis)
-9. [Mathematical Verification](#9-mathematical-verification)
-10. [Automated Analysis](#10-automated-analysis)
-11. [Test Coverage Assessment](#11-test-coverage-assessment)
-12. [Recommendations](#12-recommendations)
-13. [Conclusion](#13-conclusion)
-14. [Appendix A: Function-Level Analysis](#appendix-a-function-level-analysis)
-15. [Appendix B: Threat Model](#appendix-b-threat-model)
-16. [Appendix C: Audit Log](#appendix-c-audit-log)
-17. [Disclaimer](#disclaimer)
+1. Executive Summary
+2. Scope
+3. Methodology
+4. System Overview
+5. Severity Definitions
+6. Findings Summary
+7. Detailed Findings
+8. Security Strengths
+9. Validation Performed
+10. Recommendations
+11. Conclusion
 
 ---
 
 ## 1. Executive Summary
 
-WillChain is a single-contract ERC-20 token deployment on Base (Ethereum L2) that implements a "Dead Man's Switch" mechanism: token holders who become inactive have their balances redistributed through burning (47%), dividends to active holders (47%), protocol treasury (5%), and a caller incentive (1%).
+WillChain реалізує ERC-20 токен із dead-man's-switch state machine, successor claiming, permissionless recycling abandoned balances та pull-based dividend redistribution. Поточний дизайн виглядає суттєво сильнішим за типовий single-contract MVP: використано `Ownable2Step`, treasury timelock, explicit registration semantics, per-user flashloan guards та O(1) dividend accumulator, який коректно виключає unregistered balances із dividend eligibility.
 
-The contract was audited over **5 iterations** across 9 days. During the audit, **17 findings** were identified and remediated by the development team. The final codebase contains **zero critical or high-severity findings**.
+У перевіреному commit не виявлено critical або high severity issues. Контракт пройшов повний Hardhat suite, а Foundry fuzz suite успішно відпрацював в offline mode. Основний залишковий ризик пов'язаний не з reentrancy чи арифметикою, а з protocol-design gap: раніше видані ERC-20 allowances залишаються придатними навіть тоді, коли vault уже inactive, claimable або abandoned. На практиці це означає, що spender, якого було схвалено до настання inactivity, може все ще transfer або burn чужих токенів, послаблюючи inheritance guarantees, які користувачі логічно очікують від продукту.
 
-### Audit Outcome
+### Підсумок аудиту
 
-| Verdict | PASS — Testnet Beta Ready |
-|---------|---------------------------|
-| Critical findings | 0 |
-| High findings | 0 |
-| Medium findings | 0 (all remediated) |
-| Low findings | 2 |
-| Informational | 6 |
+| Severity | Кількість |
+|---|---:|
+| Critical | 0 |
+| High | 0 |
+| Medium | 1 |
+| Low | 1 |
+| Informational | 2 |
 
-The contract demonstrates mature security engineering: proper reentrancy protection, flash loan guards, a well-implemented dividend accumulator, and multi-step administrative controls. Code quality and NatSpec documentation are above average for DeFi protocols at this stage.
+### Загальна оцінка
+
+Поточна on-chain implementation придатна для подальшої testnet / beta експлуатації. Водночас код ще не на тому рівні, де проєкт повинен позиціонувати себе як externally audited. Відкрите medium-severity питання слід або виправити, або явно прийняти та задокументувати до mainnet.
 
 ---
 
 ## 2. Scope
 
-### 2.1 In Scope
+### In Scope
 
-| Item | Path | Lines |
-|------|------|-------|
-| Smart Contract | `contracts/WillChain.sol` | 818 |
-| Test Suite | `test/WillChain.test.js` | 2,863 |
-| Deploy Script | `scripts/deploy.js` | 144 |
-| Shared Library | `shared/vault-status.js` | 112 |
-| Shared Config | `shared/contract-config.js` | — |
+| Path | Опис |
+|---|---|
+| `contracts/WillChain.sol` | Основна protocol logic |
+| `test/WillChain.test.js` | Behavioral і regression tests |
+| `test/foundry/WillChainFuzz.t.sol` | Fuzz та invariant tests |
+| Security / protocol docs | Використані для consistency-check між документацією та реальною implementation |
 
-### 2.2 Out of Scope
+### Out of Scope
 
-| Item | Reason |
-|------|--------|
-| `frontend/` | Client-side only, no security-critical logic |
-| `bot/` | Off-chain service, no on-chain impact |
-| `frontend-react/` | Alternate frontend, no on-chain impact |
-| OpenZeppelin dependencies | Assumed audited (v5.0.1) |
-
-### 2.3 Dependencies
-
-| Dependency | Version | Role |
-|------------|---------|------|
-| `@openzeppelin/contracts` | ^5.0.1 | ERC20, ERC20Burnable, ReentrancyGuard, Ownable2Step |
-| `hardhat` | ^2.19.4 | Development & testing framework |
-| `solidity-coverage` | ^0.8.5 | Coverage reporting |
-
-### 2.4 Compiler Configuration
-
-```
-Solidity: 0.8.24 (pinned, no caret)
-EVM: Default (Paris)
-Optimizer: Not specified in scope (hardhat default)
-```
+| Область | Причина |
+|---|---|
+| `frontend-react/` | Повноцінний frontend security review у цей прохід не входив |
+| `bot/` | Off-chain service; переглянуто лише trust assumptions |
+| Deployment / infra hardening | Не перевірялися глибоко, окрім documentation consistency |
+| OpenZeppelin dependencies | Вважаються безпечними як upstream audited libraries |
 
 ---
 
-## 3. System Overview
+## 3. Methodology
 
-### 3.1 Architecture
+Рев'ю поєднувало:
 
-WillChain uses a single-contract architecture with no proxy pattern, no oracle dependencies, and no external contract calls beyond OpenZeppelin base classes.
+1. Ручний line-by-line analysis контракту та всіх ключових state transitions.
+2. Adversarial review inheritance, recycling, dividend, allowance та governance flows.
+3. Cross-check коду проти protocol/security documentation.
+4. Dynamic validation локальними test suites.
+5. Перевірку наявного Slither output.
 
-```
-                    ┌─────────────────────────┐
-                    │    WillChain.sol         │
-                    │                         │
-                    │  ERC20                  │
-                    │  ERC20Burnable          │
-                    │  ReentrancyGuard        │
-                    │  Ownable2Step           │
-                    └────────────┬────────────┘
-                                 │
-                    ┌────────────┴────────────┐
-                    │    State Machine        │
-                    │                         │
-    UNREGISTERED ──►│  ACTIVE ──► GRACE       │
-                    │  ▲           │          │
-                    │  │ confirm   ▼          │
-                    │  │        CLAIMABLE     │
-                    │  │           │          │
-                    │  │           ▼          │
-                    │  └──── ABANDONED        │
-                    │      (recyclable)       │
-                    └─────────────────────────┘
-```
+Основні фокуси:
 
-### 3.2 Key Mechanisms
-
-| Mechanism | Description |
-|-----------|-------------|
-| **Proof of Activity** | ERC-20 `_update` hook resets timer on every outgoing transfer from registered users |
-| **Registration** | Auto opt-in via any setup action (`designateSuccessor`, `setInactivityPeriod`, `updateVaultData`, or `confirmActivity`). Unregistered holders are excluded from dividend pool |
-| **Dividend Distribution** | Synthetix-pattern per-token accumulator with O(1) complexity |
-| **Vault Inheritance** | 2-phase successor claim with 30-day veto window |
-| **Recycling** | Permissionless recycle of abandoned vaults: 47% burn + 47% dividends + 5% treasury + 1% caller |
-| **Treasury Timelock** | 2-day propose → execute pattern for treasury address changes |
-
-### 3.3 Roles and Privileges
-
-| Role | Privileges | Transfer Mechanism |
-|------|-----------|-------------------|
-| **Owner** | `proposeTreasuryChange`, `executeTreasuryChange`, `cancelTreasuryChange`, `recoverDividendDust` | Ownable2Step (2-step) |
-| **Node (Registered User)** | `confirmActivity`, `setInactivityPeriod`, `designateSuccessor`, `updateVaultData`, `cancelSuccessorClaim`, `claimDividends` | Self-service |
-| **Designated Successor** | `initiateSuccessorClaim`, `completeVaultTransfer` (for specific node only) | Designated by node |
-| **Anyone** | `recycleInactiveNode` (for ABANDONED nodes only) | Permissionless |
+- State-machine integrity у `ACTIVE`, `GRACE`, `CLAIMABLE` і `ABANDONED`
+- Dividend accounting і solvency
+- Вплив `transfer`, `transferFrom`, `burn`, `burnFrom` на liveness
+- Successor timing і recycle races
+- Governance та privileged operations
 
 ---
 
-## 4. Severity Classification
+## 4. System Overview
 
-This audit uses the following severity classification, consistent with industry standards:
+WillChain поєднує чотири механізми в одному token contract:
 
-| Severity | Description |
-|----------|-------------|
-| 🔴 **Critical** | Direct loss of funds or permanent protocol lock. Exploitable with no preconditions. |
-| 🟠 **High** | Indirect loss of funds, significant protocol disruption, or bypass of key protections. |
-| 🟡 **Medium** | Limited impact but unexpected behavior, protocol invariant deviation, or missing validation. |
-| 🟢 **Low** | Minor issues, edge cases with negligible impact, or deviations from best practices. |
-| ⚪ **Informational** | Code quality, documentation, gas optimization, or design suggestions with no security impact. |
+1. Registration and liveness: holder стає active vault лише після explicit setup action або `confirmActivity()`.
+2. Inheritance flow: після inactivity designated successor може відкрити veto window і згодом завершити full-balance transfer.
+3. Recycling flow: abandoned balances можуть бути permissionlessly redistributed як 47% burn, 47% dividends, 5% treasury та 1% caller reward.
+4. Dividend accounting: recycled balances розподіляються через per-token accumulator із виключенням unregistered holders із eligibility.
 
----
-
-## 5. Findings Summary
-
-### 5.1 Findings by Severity
-
-| ID | Title | Severity | Status |
-|----|-------|----------|--------|
-| C-01 | Free-rider: unregistered holders earn dividends retroactively | 🔴 Critical | ✅ Remediated |
-| C-02 | Global `lastTransferBlock` causes network-wide DoS | 🔴 Critical | ✅ Remediated |
-| C-03 | `tx.origin` check blocks smart wallets (Safe, ERC-4337) | 🔴 Critical | ✅ Remediated |
-| H-01 | `recycleInactiveNode` — `delete nodeStates` after transfers re-creates state | 🟠 High | ✅ Remediated |
-| H-02 | Treasury fee double-counted when `protocolTreasury == address(0)` | 🟠 High | ✅ Remediated |
-| H-03 | `completeVaultTransfer` lacks flash loan guard | 🟠 High | ✅ Remediated |
-| H-04 | `deploy.js` calls removed `setProtocolTreasury()` function | 🟠 High | ✅ Remediated |
-| M-01 | Successor can `initiateSuccessorClaim` on ABANDONED vault, resetting deadline | 🟡 Medium | ✅ Remediated |
-| M-02 | `setInactivityPeriod` without timer reset → instant ABANDONED on period decrease | 🟡 Medium | ✅ Remediated |
-| M-03 | `getNodeState.isActive` returns true for UNREGISTERED, misleading off-chain consumers | 🟡 Medium | ✅ Remediated |
-| M-04 | `recoverDividendDust` missing `nonReentrant` modifier | 🟡 Medium | ✅ Remediated |
-| L-01 | `proposeTreasuryChange` overwrites pending proposal without cancellation event | 🟢 Low | Acknowledged |
-| L-02 | `getNodeState` returns `string memory serviceTier` in view function | 🟢 Low | Acknowledged |
-| I-01 | Redundant `lastDividendPerToken` assignment in `_update` (defense-in-depth) | ⚪ Info | ✅ Labeled |
-| I-02 | Circular successor check is depth-1 only (A→B, B→A); transitive chains not blocked | ⚪ Info | Acknowledged |
-| I-03 | `dividendPerToken` monotonic — theoretical overflow unreachable in practice | ⚪ Info | Acknowledged |
-| I-04 | `_addToDividendPool` precision loss recoverable via `recoverDividendDust` | ⚪ Info | Acknowledged |
-| I-05 | `renounceOwnership()` was callable — permanently disabled by override | ⚪ Info | ✅ Remediated |
-| I-06 | `ERC20Burnable.burn()` interaction with custom `_update` hook undocumented | ⚪ Info | Acknowledged |
-
-### 5.2 Remediation Statistics
-
-| Severity | Found | Remediated | Acknowledged | Open |
-|----------|-------|------------|-------------|------|
-| 🔴 Critical | 3 | 3 | 0 | 0 |
-| 🟠 High | 4 | 4 | 0 | 0 |
-| 🟡 Medium | 4 | 4 | 0 | 0 |
-| 🟢 Low | 2 | 0 | 2 | 0 |
-| ⚪ Info | 6 | 2 | 4 | 0 |
-| **Total** | **19** | **13** | **6** | **0** |
+Дизайн навмисно opinionated: direct transfers рахуються як liveness, `transferFrom` не рахуються, а abandoned wallet все ще може self-resurrect до моменту recycle, якщо owner повернувся.
 
 ---
 
-## 6. Detailed Findings
+## 5. Severity Definitions
 
-### C-01: Free-Rider — Unregistered Holders Earn Dividends Retroactively
-
-**Severity:** 🔴 Critical — **Remediated**
-
-**Description:**
-Before the fix, any address that received WILL tokens (without calling `confirmActivity()`) could accumulate dividends from the moment of token receipt. This allowed a user to:
-1. Receive tokens at time T₀
-2. Wait for recycling events to increase `dividendPerToken`
-3. Call `confirmActivity()` at time T₁
-4. Claim dividends accumulated between T₀ and T₁ without being registered
-
-**Root Cause:**
-The `_updateDividends` function did not distinguish between registered and unregistered holders. `lastDividendPerToken[user]` defaulted to 0 for new addresses, creating a large dividend debt from genesis.
-
-**Fix Applied:**
-```solidity
-// _isUnregistered() check added to _updateDividends:
-if (!_isUnregistered(_node) && balance > 0 && dividendPerToken > lastDividendPerToken[_node]) {
-
-// On registration, snapshot current dividendPerToken:
-lastDividendPerToken[node] = dividendPerToken;
-
-// Track total unregistered supply for eligibleSupply calculation:
-totalUnregisteredSupply tracking with everRegistered flag
-```
-
-**Verification:** Tests confirm unregistered users cannot accumulate dividends. `assertUnregInvariant` helper validates `totalUnregisteredSupply` consistency.
+| Severity | Опис |
+|---|---|
+| Critical | Пряма, майже гарантована втрата коштів або permanent protocol failure без значущих preconditions |
+| High | Серйозна втрата коштів, privilege compromise або invariant break у реалістичному сценарії |
+| Medium | Матеріальна security / economic weakness із preconditions, яку варто усунути до mainnet |
+| Low | Обмежений за впливом issue, liveness edge case або слабке припущення, яке треба уточнити |
+| Informational | Code-quality, specification або documentation discrepancy без значного direct security impact |
 
 ---
 
-### C-02: Global `lastTransferBlock` Causes Network-Wide DoS
+## 6. Findings Summary
 
-**Severity:** 🔴 Critical — **Remediated**
-
-**Description:**
-The original flash loan guard used a single `globalLastTransferBlock` variable. Any token transfer by any user would update this global variable, blocking all users from calling `claimDividends()` or `recycleInactiveNode()` in the same block. On a busy chain, this effectively DoS'd the protocol.
-
-**Fix Applied:**
-```solidity
-// Before: uint256 public globalLastTransferBlock;
-// After:  mapping(address => uint256) public lastTransferBlock;
-```
-
-Per-user tracking ensures one user's transfer cannot block another user's claims.
+| ID | Назва | Severity | Status |
+|---|---|---|---|
+| M-01 | Approved spenders can extract inactive vault balances through lingering allowances | Medium | Open |
+| L-01 | Successor can extend the abandonment deadline by initiating a claim late | Low | Acknowledged |
+| I-01 | Successor contract-address policy is implemented inconsistently with user-facing messaging | Informational | Open |
+| I-02 | Operational docs overstate current governance semantics in two places | Informational | Fixed |
 
 ---
 
-### C-03: `tx.origin` Check Blocks Smart Wallets
+## 7. Detailed Findings
 
-**Severity:** 🔴 Critical — **Remediated**
+### M-01: Approved spenders can extract inactive vault balances through lingering allowances
 
-**Description:**
-The original `_update` hook contained `require(tx.origin == from)`, which blocked all `transferFrom` calls originating from smart contract wallets (Gnosis Safe, ERC-4337 wallets, multisigs). This would have excluded a significant portion of DeFi users.
+| Поле | Значення |
+|---|---|
+| Severity | Medium |
+| Тип | Design / economic security |
+| Status | Open |
+| Локація | `contracts/WillChain.sol:868-883`, inherited `transferFrom` / `burnFrom` paths |
 
-**Fix Applied:** Two changes were made:
-1. The `tx.origin` check was completely removed to support smart wallets
-2. An `msg.sender == from` check was added (M-01 allowance griefing fix) to ensure only direct transfers reset the timer — `transferFrom()` by third-party spenders does NOT reset the timer
+#### Опис
 
-Smart Wallets call `transfer()` directly where `msg.sender == from`, so they work correctly. DEX users via allowances must call `confirmActivity()` separately.
+Контракт коректно закриває попередню проблему allowance-based timer keepalive, оскільки third-party `transferFrom` більше не reset'ить liveness. Проте поточна implementation усе ще дозволяє approved spenders переміщати або спалювати `WILL` користувача, поки його vault уже перебуває у `GRACE`, `CLAIMABLE` або навіть `ABANDONED`.
 
----
+Для WillChain це важливіше, ніж для звичайного ERC-20, бо core promise протоколу така:
 
-### H-01: `recycleInactiveNode` — State Re-Creation via `_update` Hook
+- inactive balance має або перейти designated successor,
+- або бути recycled протоколом.
 
-**Severity:** 🟠 High — **Remediated**
+Ця гарантія послаблюється, якщо зовнішній spender із pre-existing allowance може спершу спорожнити vault.
 
-**Description:**
-During recycling, `delete nodeStates[_abandonedNode]` was called before several `_transfer` calls. The `_transfer` calls triggered `_update`, which checked `nodeStates[from].lastActivityTimestamp > 0`. After deletion, this check was false, so no re-creation occurred via `_performActivityConfirmation`. However, internal `_transfer(address(this), _abandonedNode, ...)` (for frozen dividend recovery) did trigger `_update` with `to == _abandonedNode`, which could create unexpected state.
+Поточна поведінка прямо випливає з implementation і тестів:
 
-**Fix Applied:** A second `delete nodeStates[_abandonedNode]` was added after all transfers complete (line 424), ensuring final cleanup regardless of intermediate state mutations.
+- `transferFrom` навмисно дозволений, але не reset'ить owner timer;
+- тести явно підтверджують, що spender-driven `transferFrom` під час `GRACE` не resurrect'ить vault.
 
----
+На практиці це означає, що користувач, який колись дав allowance router'у, dApp'у або malicious contract, уже міг створити обхід inheritance model.
 
-### H-02: Treasury Fee Double-Counted When `protocolTreasury == address(0)`
+#### Вплив
 
-**Severity:** 🟠 High — **Remediated**
+Якщо користувач видав allowance до настання inactivity, approved spender може:
 
-**Description:**
-When `protocolTreasury` was `address(0)`, the fallback path added `protocolFee` to `toBurn`, but `toRecycle` was calculated as `totalAmount - maintainerReward - protocolFee - toBurn` (using the original `toBurn`, not the updated one). This meant the total distributed was still correct, but `totalRemovedFromCirculation` was understated.
+- вивести токени з vault до завершення successor claim,
+- зменшити баланс, доступний для recycling,
+- або спалити токени через `burnFrom`, якщо allowance зберігся.
 
-**Fix Applied:** `toRecycle` is now calculated using subtraction from `totalAmount` before any conditional modifications:
-```solidity
-uint256 toRecycle = totalAmount - maintainerReward - protocolFee - toBurn;
-```
-The `toBurn += protocolFee` in the fallback path correctly only affects the burn amount while `toRecycle` remains the residual.
+Для атаки не потрібен компроміс owner key. Єдина реалістична передумова - існуючий allowance, а для DEX / DeFi users це типова ситуація.
 
----
+#### Рекомендація
 
-### H-03: `completeVaultTransfer` Missing Flash Loan Guard
+До mainnet варто обрати один із підходів:
 
-**Severity:** 🟠 High — **Remediated**
+1. Консервативний: заборонити third-party `transferFrom` / `burnFrom`, щойно vault перестає бути `ACTIVE`.
+2. Вужчий: заборонити delegated spending лише у `CLAIMABLE` і `ABANDONED`.
+3. Якщо пріоритетом є composability, явно оформити це як first-class trust assumption і додати сильні UI warnings щодо unlimited approvals.
 
-**Description:**
-`recycleInactiveNode` and `claimDividends` had flash loan guards (`lastTransferBlock[x] < block.number`), but `completeVaultTransfer` did not. An attacker could theoretically:
-1. Flash-borrow WILL tokens
-2. Transfer to successor address to set `lastTransferBlock`
-3. Call `completeVaultTransfer` in same transaction
-4. Repay flash loan
-
-**Fix Applied:**
-```solidity
-require(lastTransferBlock[msg.sender] < block.number, "Flashloan prevention");
-```
-Added at line 301 of `completeVaultTransfer`.
+З product-security точки зору варіант 1 або 2 виглядає кращим. WillChain уже є спеціалізованим токеном із custom liveness semantics, тому збереження dormant-vault integrity тут важливіше за ідеальну ERC-20 composability.
 
 ---
 
-### H-04: `deploy.js` Calls Removed Function
+### L-01: Successor can extend the abandonment deadline by initiating a claim late
 
-**Severity:** 🟠 High — **Remediated**
+| Поле | Значення |
+|---|---|
+| Severity | Low |
+| Тип | Liveness / policy |
+| Status | Acknowledged |
+| Локація | `contracts/WillChain.sol:306-320`, `contracts/WillChain.sol:347-350`, `contracts/WillChain.sol:601-624` |
 
-**Description:**
-The deploy script called `willchain.setProtocolTreasury(treasuryAddress)`, but this function was removed and replaced with the 2-step `proposeTreasuryChange` / `executeTreasuryChange` pattern. Deploying to testnet or mainnet would revert.
+#### Опис
 
-**Fix Applied:** Deploy script now calls `proposeTreasuryChange()` and logs instructions for `executeTreasuryChange()` after the 2-day timelock.
+`initiateSuccessorClaim()` дозволено викликати будь-коли після завершення inactivity period і аж до natural abandoned deadline. Після цього `claimInitiationTimestamp` стає новою часовою опорою для `GRACE -> CLAIMABLE -> ABANDONED`.
 
----
+У підсумку designated successor може дочекатися самого кінця natural `CLAIMABLE` window, а потім майже ще на 60 днів відсунути final abandonment date.
 
-### M-01: Successor Claim on ABANDONED Vault Resets Deadline
+У NatSpec це прямо описано як intentional behavior, але воно все одно змінює liveness properties системи:
 
-**Severity:** 🟡 Medium — **Remediated**
+- recycling може бути відкладений;
+- economic redistribution відкладається;
+- designated successor зберігає optionality, не діючи оперативно.
 
-**Description:**
-If a vault reached ABANDONED status, the designated successor could still call `initiateSuccessorClaim()`, which set `claimInitiationTimestamp = block.timestamp`. Since `getVaultStatus` uses this timestamp to compute deadlines when `successorClaimInitiated == true`, this effectively shifted the vault out of ABANDONED back to GRACE, blocking legitimate recyclers.
+#### Вплив
 
-**Fix Applied:**
-```solidity
-require(
-    block.timestamp <= state.lastActivityTimestamp + inactivityPeriod + GRACE_PERIOD + CLAIM_PERIOD,
-    "Node already abandoned: use recycleInactiveNode"
-);
-```
+Issue не призводить до прямої крадіжки коштів, але погіршує передбачуваність timeout model і дозволяє successor суттєво відкладати finality.
 
----
+#### Рекомендація
 
-### M-02: `setInactivityPeriod` Without Timer Reset
+Якщо policy протоколу справді полягає в тому, що successor має пріоритет над recyclers, цю поведінку варто зберегти, але зробити її максимально явною в documentation. Якщо ж intended policy - fixed-time finality, тоді потрібно або:
 
-**Severity:** 🟡 Medium — **Remediated**
-
-**Description:**
-Changing from a longer inactivity period (365 days) to a shorter one (30 days) could instantly make a vault ABANDONED if more than 30 days had passed since last activity.
-
-**Fix Applied:** `_performActivityConfirmation(msg.sender)` is called inside `setInactivityPeriod`, resetting the timer on period change.
+- дозволити `initiateSuccessorClaim()` лише у `GRACE`,
+- або не змінювати original abandoned deadline після initiation.
 
 ---
 
-### M-03: `getNodeState.isActive` Returns True for UNREGISTERED
+### I-01: Successor contract-address policy is implemented inconsistently with user-facing messaging
 
-**Severity:** 🟡 Medium — **Remediated**
+| Поле | Значення |
+|---|---|
+| Severity | Informational |
+| Тип | Specification mismatch |
+| Status | Open |
+| Локація | `contracts/WillChain.sol:275-284` |
 
-**Description:**
-The `isActive` boolean in `getNodeState` return values was `true` for UNREGISTERED users, which could mislead off-chain consumers (bots, frontends) into treating unregistered holders as active participants.
+#### Опис
 
-**Fix Applied:**
-```solidity
-isActive = (status == VaultStatus.ACTIVE || status == VaultStatus.GRACE);
-```
-UNREGISTERED is explicitly excluded.
+Код revert'иться з `CannotDesignateContract()` лише тоді, коли `_successor == address(this)`. Він не блокує arbitrary contract addresses.
 
----
+Це не узгоджується ні з назвою помилки, ні з user-facing localization strings, де сказано, що contract addresses не можуть бути designated heirs. Розбіжність особливо помітна, бо в інших частинах docs окремо заявлена підтримка smart wallets, таких як Safe та ERC-4337 accounts.
 
-### M-04: `recoverDividendDust` Missing `nonReentrant`
+Фактично код наразі дозволяє contract successors, окрім самого token contract.
 
-**Severity:** 🟡 Medium — **Remediated**
+#### Рекомендація
 
-**Description:**
-The admin function `recoverDividendDust` calls `_transfer(address(this), destination, dust)`, which could theoretically be exploited in a reentrancy scenario if the destination is a contract with a fallback function (though ERC-20 transfers don't trigger receive hooks, the modifier adds defense-in-depth).
+Слід вирівняти specification з implementation. Найчистіший шлях - перейменувати error і UI copy так, щоб вони описували реальне правило:
 
-**Fix Applied:** `nonReentrant` modifier added to `recoverDividendDust`.
+- заборонений лише сам token contract,
+- smart wallets і multisigs дозволені як successors.
 
----
-
-### L-01: `proposeTreasuryChange` Overwrites Without Cancellation Event
-
-**Severity:** 🟢 Low — **Acknowledged**
-
-**Description:**
-Calling `proposeTreasuryChange(B)` while proposal `A` is pending silently replaces `A` with `B`. No `TreasuryChangeCancelled(A)` event is emitted. Off-chain monitoring tools have no explicit signal that proposal A was superseded.
-
-**Impact:** Limited — the new `TreasuryChangeProposed(B, ...)` event implicitly signals the change. Monitoring tools can detect the overwrite by comparing consecutive events.
+Запровадження generic "no contracts" rule буде конфліктувати з задекларованою smart-wallet support model.
 
 ---
 
-### L-02: `getNodeState` Returns String in View Function
+### I-02: Operational docs overstate current governance semantics in two places
 
-**Severity:** 🟢 Low — **Acknowledged**
+| Поле | Значення |
+|---|---|
+| Severity | Informational |
+| Тип | Documentation drift |
+| Status | Fixed |
+| Локація | `docs/ACCEPTED-TRADEOFFS.md:10`, `docs/ACCEPTED-TRADEOFFS.md:32` |
 
-**Description:**
-`serviceTier` is computed as a `string memory` in the `getNodeState` view function. While free for off-chain reads, this creates unnecessary gas overhead if called from another contract. The tier thresholds are available as public constants, so callers can compute tiers independently.
+#### Опис
 
-**Impact:** None for current design (view-only). Would increase gas if future contracts integrate this function.
+Два твердження в документації не збігаються з реальною implementation:
 
----
+1. `docs/ACCEPTED-TRADEOFFS.md` стверджує, що після delay будь-хто може викликати `executeTreasuryChange()`, тоді як у коді ця функція захищена `onlyOwner`.
+2. Там само сказано, що dust recovery "переносить unclaimed fractions у dividend pool", тоді як код переводить dust у `protocolTreasury` або `owner()`.
 
-## 7. Centralization Risks
+Це не direct contract vulnerability, але така розбіжність важлива для operational transparency і user expectations щодо privileged actions.
 
-### 7.1 Owner Privileges
+#### Рекомендація
 
-| Power | Risk | Mitigation |
-|-------|------|------------|
-| Change treasury address | Redirect 5% of recycled tokens | 2-day timelock + event logging |
-| Recover dividend dust | Extract rounding dust from contract | Dust amount is negligible (<1 token per 1000 recycles) |
-| Transfer ownership | New owner gains above powers | Ownable2Step requires acceptance |
-| Renounce ownership | N/A | **Disabled** via override |
-
-### 7.2 What Owner CANNOT Do
-
-- ❌ Pause or freeze the contract
-- ❌ Modify distribution percentages (hardcoded constants)
-- ❌ Access user tokens (no `transferFrom` privilege)
-- ❌ Change inactivity periods (per-user setting)
-- ❌ Block recycling or successor claims
-- ❌ Mint new tokens (fixed supply)
-- ❌ Upgrade contract logic (no proxy pattern)
-
-### 7.3 Recommendation
-
-For mainnet deployment, transfer ownership to a **Gnosis Safe (multisig)** with 2-of-3 or 3-of-5 signing threshold. This reduces single key compromise risk.
+Оновити documentation так, щоб governance і treasury behavior були описані рівно так, як вони реалізовані в коді.
 
 ---
 
-## 8. Gas Analysis
+## 8. Security Strengths
 
-### 8.1 Key Function Gas Costs
+Окрім findings, контракт має помітно сильні рішення:
 
-| Function | Estimated Gas | Notes |
-|----------|-------------|-------|
-| `transfer` (registered → registered) | ~65,000 | Includes `_updateDividends` × 2 + `_performActivityConfirmation` |
-| `transfer` (registered → unregistered) | ~70,000 | Additional `totalUnregisteredSupply` update |
-| `confirmActivity()` (first time) | ~95,000 | Registration: updates `everRegistered`, `totalUnregisteredSupply`, emits `NodeRegistered` |
-| `confirmActivity()` (subsequent) | ~35,000 | Timer reset only |
-| `claimDividends()` | ~55,000 | Checkpoint + transfer from contract |
-| `recycleInactiveNode()` | ~180,000 | Multiple transfers, burn, dividend pool update |
-| `completeVaultTransfer()` | ~130,000 | Dividend merge + token transfer + state cleanup |
-
-### 8.2 Optimization Applied
-
-`_performActivityConfirmation` uses conditional SSTORE to avoid writing claim-related fields when no pending claim exists:
-```solidity
-if (nodeStates[node].successorClaimInitiated) {
-    nodeStates[node].successorClaimInitiated = false;
-    nodeStates[node].claimInitiationTimestamp = 0;
-}
-```
-**Savings:** ~5,800 gas per transfer (99.9% of transfers have no pending claim).
+- використовується `Ownable2Step`, а не direct ownership transfer;
+- зміна treasury timelocked;
+- recycle та dividend paths захищені `nonReentrant`;
+- dividend distribution виключає unregistered balances і не допускає retroactive accrual;
+- fresh-abandoned recycling захищений commit-reveal проти простого MEV на caller reward;
+- per-user `lastTransferBlock` значно безпечніший за глобальний block-level guard;
+- контракт immutable і не залежить від upgrade proxy.
 
 ---
 
-## 9. Mathematical Verification
+## 9. Validation Performed
 
-### 9.1 Dividend Accumulator Correctness
+### Dynamic Validation
 
-The contract uses the Synthetix staking rewards pattern:
+| Перевірка | Результат |
+|---|---|
+| `npm test` | Passed: `299 passing` |
+| `forge test --match-contract WillChainFuzz --offline` | Passed: `14/14` (1,000 fuzz runs each) |
+| Slither output review | Один low-signal warning щодо sentinel equality (`period == 0`) |
 
-```
-dividendPerToken += (amount × 1e18) / eligibleSupply
-pendingDividends = balance × (dividendPerToken - lastDividendPerToken[user]) / 1e18
-```
+### Invariants, які підтверджені тестами та manual review
 
-**Property 1: Conservation**
-∀ recycle event R with pool distribution D:
-  `Σ(pendingDividends for all registered holders after R) ≤ D`
+- `dividendPool <= balanceOf(address(this))`
+- unregistered balances виключені з dividend eligibility
+- `totalSupply()` після deployment лише зменшується
+- `totalUnregisteredSupply` консистентно відстежує unregistered balances
+- fresh abandoned vaults потребують commit-reveal
+- `transferFrom` більше не reset'ить owner liveness
 
-The deficit `D - Σ(pending)` equals precision loss from integer division, recoverable via `recoverDividendDust()`.
+### Залишкові validation gaps
 
-✅ **Verified:** The `dividendPool` storage variable tracks total tokens held for dividends. `claimDividends` decrements it atomically with the transfer. `dividendPool ≥ Σ(unclaimedDividends)` holds invariantly.
+У цей прохід не входили:
 
-**Property 2: No Retroactive Earnings**
-∀ address A that first receives tokens at block B:
-  `lastDividendPerToken[A] ≥ dividendPerToken at block B`
-
-✅ **Verified:** Three independent mechanisms ensure this:
-1. `_updateDividends(to)` sets `lastDividendPerToken[to] = dividendPerToken` before balance change
-2. Defense-in-depth assignment on first receipt (line 722-724)
-3. Registration sets `lastDividendPerToken[node] = dividendPerToken` (line 622)
-
-### 9.2 Distribution Sum
-
-```
-MAINTAINER_REWARD_BPS + PROTOCOL_FEE_BPS + BURN_BPS + RECYCLE_BPS
-= 100 + 500 + 4700 + 4700
-= 10000 ✓
-```
-
-`toRecycle = totalAmount - maintainerReward - protocolFee - toBurn` ensures exact conservation — no rounding residual in the distribution itself.
-
-### 9.3 Underflow Analysis
-
-All subtractions in the contract are protected by Solidity 0.8.24's built-in overflow/underflow checks. Specific analysis:
-
-| Expression | Underflow Possible? | Why |
-|-----------|---------------------|-----|
-| `totalUnregisteredSupply -= value` (line 745) | No | Only decremented for outgoing transfers from unregistered addresses; balance ≥ value enforced by ERC20 |
-| `totalUnregisteredSupply -= bal` (line 620) | No | `bal = balanceOf(node)` which is ≥ 0; subtracted only once per registration |
-| `dividendPool -= amount` (line 456) | No | `amount = unclaimedDividends[user]` which was accumulated from `dividendPool` additions |
-| `dividendPool -= nodeDividends` (line 379) | No | `nodeDividends` derived from `dividendPool` via accumulator math |
-
-### 9.4 Overflow Analysis
-
-`dividendPerToken` is monotonically increasing. Theoretical maximum:
-
-```
-Max single increment = (1e27 × 1e18) / 1 = 1e45
-uint256 max ≈ 1.15e77
-Overflows after ≈ 1e32 recycles at maximum rate
-```
-
-With each recycle burning 47% and distributing 47%, available supply decreases exponentially. Overflow is **physically unreachable**.
+- повноцінне frontend security testing,
+- повний penetration review бота та інфраструктури,
+- formal verification,
+- зовнішній adversarial review від незалежної audit firm.
 
 ---
 
-## 10. Automated Analysis
+## 10. Recommendations
 
-### 10.1 Compiler Warnings
+До mainnet:
 
-```
-Solidity 0.8.24 — pinned version (no caret)
-```
-Zero compiler warnings on `contracts/WillChain.sol`.
-
-### 10.2 Known Static Analysis Findings
-
-The following patterns would be flagged by tools like Slither but are **intentional design decisions**:
-
-| Pattern | Slither Category | Assessment |
-|---------|-----------------|------------|
-| `block.timestamp` used for time comparisons | `timestamp` | Required — inactivity is time-based by design |
-| Multiple `_transfer` calls in `recycleInactiveNode` | `calls-loop` | Not a loop — fixed 4 transfers |
-| `delete nodeStates[x]` called twice | `redundant-statements` | Intentional — inner transfers may re-create state |
-| External call to self (`_transfer(address(this), ...)`) | `low-level-calls` | OZ ERC20 internal transfer, not external call |
-
-### 10.3 Dependency Security
-
-| Dependency | CVEs | Status |
-|-----------|------|--------|
-| OpenZeppelin Contracts v5.0.1 | None known | ✅ |
-| Hardhat v2.19.4 | Dev dependency only | N/A |
-| Node.js dependencies | 37 advisories in hardhat dev deps | Not production-facing |
+1. Усунути або явно прийняти M-01, бо він прямо впливає на inheritance promise продукту.
+2. Вирішити, чи delayed successor-initiated deadline extension є feature, чи небажаною liveness cost.
+3. Прибрати successor-policy та governance documentation drift.
+4. Перенести ownership і treasury control на Safe multisig до появи значущої economic value.
+5. Отримати реальний third-party smart-contract audit і зафіксувати audited commit hash у публічному звіті.
 
 ---
 
-## 11. Test Coverage Assessment
+## 11. Conclusion
 
-### 11.1 Coverage Statistics
+Поточна smart-contract implementation WillChain суттєво міцніша за типовий first-release inheritance token. Основний залишковий ризик у перевіреному commit - це не low-level exploit, а архітектурний конфлікт між ERC-20 allowances і dead-man's-switch guarantees протоколу. Його можна виправити, а решта contract logic демонструє дисципліновану роботу зі state transitions, dividend accounting і privileged actions.
 
-Based on last reported coverage run:
-
-| Metric | Coverage |
-|--------|----------|
-| Statements | 93.9% |
-| Branches | 87.5% |
-| Functions | 100% |
-| Lines | 95.5% |
-
-### 11.2 Test Categories
-
-| Category | Tests | Description |
-|----------|-------|-------------|
-| Deployment | ~5 | Constructor, initial state, supply |
-| Core Functions | ~30 | confirmActivity, setInactivityPeriod, designateSuccessor, updateVaultData |
-| Successor Flow | ~25 | initiateSuccessorClaim, completeVaultTransfer, cancelSuccessorClaim, full lifecycle |
-| Recycling | ~20 | recycleInactiveNode, distribution math, edge cases |
-| Dividends | ~20 | claimDividends, pendingDividends, accumulator math, precision |
-| Status Machine | ~15 | getVaultStatus transitions, boundary timestamps |
-| Security (Adversarial) | ~25 | Flashloan, race conditions, circular successor, DoS attempts, free-rider |
-| Admin Functions | ~15 | Treasury timelock, Ownable2Step, recoverDividendDust |
-| Registration | ~10 | UNREGISTERED logic, totalUnregisteredSupply invariant, everRegistered |
-| Edge Cases | ~10 | 1 wei balance, zero-value transfers, resurrection from ABANDONED |
-
-### 11.3 Invariant Tests
-
-The test suite includes a reusable invariant helper:
-```javascript
-async function assertUnregInvariant(contract, signers) {
-  // Verifies totalUnregisteredSupply == Σ(balanceOf(unregistered))
-}
-```
-This is called at critical points to validate state consistency.
-
-### 11.4 Coverage Gaps
-
-| Area | Gap | Risk |
-|------|-----|------|
-| `FrozenDividendsRecovered` event emission | No test verifying event args | Low — functionality tested implicitly via recycle tests |
-| `DividendsBurnedNoEligibleHolders` actual emission | ABI check only, no emission test | Low — difficult to construct scenario where deployer has 0 balance |
-| `burn()` / `burnFrom()` interaction with `_update` | No explicit test | Low — verified safe via code analysis |
-| Same-block flashloan attack via contract | Storage-level test only | Low — full exploit requires custom attacker contract |
-
----
-
-## 12. Recommendations
-
-### 12.1 Pre-Mainnet
-
-| Priority | Recommendation | Effort |
-|----------|----------------|--------|
-| 🟡 | Add test: `burn()` interaction with `_update` (timer reset + `totalUnregisteredSupply`) | 30 min |
-| 🟡 | Add test: `FrozenDividendsRecovered` event emission with correct args | 30 min |
-| 🟡 | Run Slither static analysis and document false positives | 1 hr |
-| 🟡 | Update `WHITEPAPER.md` to reflect current architecture (still references "Phoenix Protocol", "ALIVE") | 3 hrs |
-| 🟡 | Update `MAINNET_CHECKLIST.md` — test count, coverage numbers, remediated findings | 30 min |
-| 🟢 | Transfer ownership to Gnosis Safe multisig before or immediately after deployment | 1 hr |
-| 🟢 | Consider `proposeTreasuryChange` emitting `TreasuryChangeCancelled` on overwrite | 10 min |
-
-### 12.2 Post-Launch
-
-| Priority | Recommendation |
-|----------|----------------|
-| 🟢 | Launch bug bounty program (Immunefi recommended) |
-| 🟢 | Set up on-chain monitoring for `TreasuryChangeProposed`, `InactiveNodeRecycled` events |
-| 🟢 | Consider formal verification of dividend accumulator invariants (Certora/Halmos) |
-| ⚪ | Gas profiling with `hardhat-gas-reporter` to establish baselines |
-
----
-
-## 13. Conclusion
-
-WillChain demonstrates security engineering maturity that exceeds the typical project at pre-testnet stage. The single-contract architecture eliminates upgrade risk and inter-contract interaction complexity. The dividend accumulator is mathematically sound. The state machine has well-defined transitions with no unintended paths.
-
-**All 11 critical, high, and medium findings have been remediated.** The remaining 8 low and informational findings are documented design decisions or minor gaps that do not affect protocol security.
-
-The contract is ready for **testnet beta deployment** with high confidence. A dedicated professional external audit by a firm such as Trail of Bits, OpenZeppelin Security, or Cyfrin is recommended before mainnet deployment, and would likely confirm these findings with minimal additional issues.
-
----
-
-## Appendix A: Function-Level Analysis
-
-### External / Public Functions
-
-| Function | Modifiers | Reentrancy | Flash Loan Guard | State Changes |
-|----------|-----------|------------|-----------------|---------------|
-| `confirmActivity()` | — | N/A (no external calls) | — | `nodeStates`, `everRegistered`, `totalUnregisteredSupply`, `lastDividendPerToken` |
-| `setInactivityPeriod(uint256)` | — (auto-registers via `_performActivityConfirmation`) | N/A | — | `nodeStates.inactivityPeriod`, timer reset |
-| `designateSuccessor(address)` | — (auto-registers via `_performActivityConfirmation`) | N/A | — | `nodeStates.designatedSuccessor`, timer reset |
-| `updateVaultData(bytes32)` | — (auto-registers via `_performActivityConfirmation`) | N/A | — | `nodeStates.vaultDataHash`, timer reset |
-| `initiateSuccessorClaim(address)` | `onlyDesignatedSuccessor`, `nonReentrant` | ✅ | — | `nodeStates.successorClaimInitiated`, `claimInitiationTimestamp` |
-| `cancelSuccessorClaim()` | — | N/A | — | Timer reset, clears claim fields |
-| `completeVaultTransfer(address)` | `onlyDesignatedSuccessor`, `nonReentrant` | ✅ | ✅ `lastTransferBlock[msg.sender]` | Token transfer, state deletion, dividend merge |
-| `recycleInactiveNode(address)` | `nonReentrant` | ✅ | ✅ `lastTransferBlock[_abandonedNode]` | Multiple transfers, burn, dividend pool, state deletion |
-| `claimDividends()` | `nonReentrant` | ✅ | ✅ `lastTransferBlock[msg.sender]` | `unclaimedDividends`, `dividendPool`, token transfer |
-| `burn(uint256)` | — (inherited) | N/A | — | Balance reduction, `totalSupply` |
-| `burnFrom(address, uint256)` | — (inherited) | N/A | — | Balance reduction, `totalSupply`, allowance |
-| `proposeTreasuryChange(address)` | `onlyOwner` | N/A | — | `pendingTreasury`, `pendingTreasuryEffectiveAt` |
-| `executeTreasuryChange()` | `onlyOwner` | N/A | — | `protocolTreasury`, clears pending |
-| `cancelTreasuryChange()` | `onlyOwner` | N/A | — | Clears pending |
-| `recoverDividendDust()` | `onlyOwner`, `nonReentrant` | ✅ | — | Token transfer from contract |
-| `renounceOwnership()` | — | — | — | **Reverts always** (disabled) |
-
----
-
-## Appendix B: Threat Model
-
-### B.1 Attack Surfaces
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    WILLCHAIN THREAT MODEL                     │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│  Flash Loan Attacks ──────────────────── MITIGATED          │
-│    ├─ Borrow → Recycle → Repay          lastTransferBlock   │
-│    ├─ Borrow → Claim Dividends → Repay  lastTransferBlock   │
-│    └─ Borrow → CompleteVault → Repay    lastTransferBlock   │
-│                                                              │
-│  Free-Rider / Retroactive Dividends ─── MITIGATED          │
-│    ├─ Unregistered holder claims         totalUnregSupply   │
-│    ├─ Recycled node re-registers         everRegistered     │
-│    └─ Late registration claims past      lastDividendPT     │
-│                                                              │
-│  State Manipulation ─────────────────── MITIGATED           │
-│    ├─ Circular successor (A↔B)           Depth-1 check     │
-│    ├─ Successor claim on ABANDONED       Explicit require   │
-│    ├─ Timer bypass via period change     Timer reset on set │
-│    └─ nodeStates re-creation on recycle  Double delete      │
-│                                                              │
-│  Admin Key Compromise ───────────────── MITIGATED           │
-│    ├─ Instant treasury redirect          2-day timelock     │
-│    ├─ Ownership theft                    Ownable2Step       │
-│    └─ Ownership accident                renounce disabled   │
-│                                                              │
-│  DoS / Griefing ─────────────────────── MITIGATED           │
-│    ├─ Global flash lock via transfer     Per-user tracking  │
-│    ├─ Dividend pool gas attack           O(1) accumulator   │
-│    └─ Mass recycle spam                  1% reward balance  │
-│                                                              │
-│  ERC-20 Compliance ──────────────────── VERIFIED            │
-│    ├─ Non-standard _update hook          OpenZeppelin base  │
-│    ├─ burn() / burnFrom() interaction    Verified safe      │
-│    └─ approve/transferFrom flow          Standard OZ impl   │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### B.2 Trust Assumptions
-
-1. **Block timestamps are reasonably accurate** (EVM provides no guarantees beyond ±15s for PoS)
-2. **OpenZeppelin v5.0.1 is correct** (widely audited and battle-tested)
-3. **Base L2 operates correctly** (sequencer liveness, no reorgs, no censorship)
-4. **Users understand the Dead Man's Switch mechanism** (unintentional inactivity leads to token loss)
-
----
-
-## Appendix C: Audit Log
-
-| Date | Iteration | Findings | Key Changes |
-|------|-----------|----------|-------------|
-| 2026-02-27 | #1 Initial | 3 critical, 2 high | `tx.origin` removal, per-user `lastTransferBlock`, `totalUnregisteredSupply` |
-| 2026-03-01 | #2 Registration | 2 medium | `confirmActivity()` as explicit registration, `UNREGISTERED` status added |
-| 2026-03-06 | #3 Post-fix | 2 high, 2 medium | `deploy.js` fix, `Ownable2Step`, treasury timelock, `recoverDividendDust` `nonReentrant` |
-| 2026-03-07 | #4 Assessment | 0 new critical | `renounceOwnership` disabled, gas optimization, NatSpec |
-| 2026-03-07 | #5 Deep | 0 new critical | Cross-function verification, mathematical invariant proofs, threat model |
-
----
-
-## Disclaimer
-
-This audit report is provided "as is" and for informational purposes only. It does not constitute financial, legal, or investment advice. While every effort was made to identify security vulnerabilities, this report does not guarantee the absence of bugs or exploits. Smart contracts are experimental technology — users interact with them at their own risk.
-
-The audit was conducted through manual code review, logical reasoning, and cross-function analysis. No formal verification tools (Certora, Halmos) or fuzz testing frameworks (Echidna, Foundry) were used in this engagement. The findings and recommendations reflect the auditor's professional judgment at the time of review.
-
----
-
-*End of Report*
+Якщо medium finding буде закрито, а documentation drift прибрано, кодова база виглядатиме як хороший кандидат на зовнішній аудит. До цього моменту цей документ слід трактувати як internal professional-style review, а не як заміну незалежному third-party assurance.
