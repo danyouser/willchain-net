@@ -161,7 +161,7 @@ export function TgLinkModal() {
                 className="btn btn-primary"
                 onClick={() => openConnectModal?.()}
               >
-                {t('header.connect_wallet')}
+                {t('nav.connect_wallet')}
               </button>
             )}
           </div>
