@@ -790,9 +790,11 @@ contract WillChain is ERC20, ERC20Burnable, ReentrancyGuard, Ownable2Step {
      */
     function _addToDividendPool(address _from, uint256 _amount) internal {
         // Eligible supply = registered holders only (excludes sender, contract, and unregistered).
-        // _from (abandoned node) has its state deleted before this call, so _isUnregistered(_from)
-        // returns true — its balance is already counted in totalUnregisteredSupply.
-        // Subtract it separately to avoid double-counting with the balanceOf(_from) exclusion.
+        // When called during recycling, everRegistered[_from] is still true at this point
+        // (cleared in "Final cleanup" after all transfers), so _isUnregistered(_from) returns false
+        // and fromInUnreg is 0. The _from balance is excluded via the balanceOf(_from) term below.
+        // For any other caller where _isUnregistered(_from) is true, subtract their balance
+        // from totalUnregisteredSupply to avoid double-counting with the balanceOf(_from) exclusion.
         uint256 fromInUnreg = _isUnregistered(_from) ? balanceOf(_from) : 0;
         uint256 eligibleSupply = totalSupply()
             - balanceOf(_from)
