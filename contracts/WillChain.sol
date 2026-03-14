@@ -67,6 +67,7 @@ contract WillChain is ERC20, ERC20Burnable, ReentrancyGuard, Ownable2Step {
     error TimelockActive();
     error NoDustAvailable();
     error OwnershipRenouncementDisabled();
+    error DelegatedSpendingBlocked();
 
     // ============ Constants ============
 
@@ -834,6 +835,32 @@ contract WillChain is ERC20, ERC20Burnable, ReentrancyGuard, Ownable2Step {
      * Also updates dividend checkpoints before balance changes to ensure
      * accurate proportional dividend calculations.
      */
+
+    // ── M-01 fix: State-aware delegated spending lock ──────────────
+    // Block transferFrom/burnFrom by third-party spenders when vault is
+    // not ACTIVE. This protects the inheritance guarantee: inactive vault
+    // balances can only go to the designated successor or be recycled.
+    // UNREGISTERED addresses are excluded (normal ERC-20 behavior).
+    // Internal protocol operations (completeVaultTransfer, recycleInactiveNode)
+    // use _transfer directly and bypass these overrides.
+
+    function transferFrom(address from, address to, uint256 value) public virtual override returns (bool) {
+        _enforceDelegatedSpendingLock(from);
+        return super.transferFrom(from, to, value);
+    }
+
+    function burnFrom(address account, uint256 value) public virtual override {
+        _enforceDelegatedSpendingLock(account);
+        super.burnFrom(account, value);
+    }
+
+    function _enforceDelegatedSpendingLock(address from) private view {
+        VaultStatus status = getVaultStatus(from);
+        if (status != VaultStatus.ACTIVE && status != VaultStatus.UNREGISTERED) {
+            revert DelegatedSpendingBlocked();
+        }
+    }
+
     function _update(address from, address to, uint256 value) internal virtual override {
         // Update dividend checkpoints BEFORE balance changes
         if (from != address(0) && from != address(this)) {

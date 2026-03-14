@@ -19,7 +19,7 @@ const NETWORKS = Object.freeze({
     name: 'Base Sepolia',
     rpcUrl: 'https://sepolia.base.org',
     blockExplorer: 'https://sepolia.basescan.org',
-    contractAddress: '0x5f89852D3a2457a5C4FDA64b783DF1e040D696F8',
+    contractAddress: '0x13533F30aFbF35C30d02021303d231299c440FB3',
   },
   BASE: {
     chainId: 8453,

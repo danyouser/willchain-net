@@ -38,6 +38,7 @@ describe("WillChain", function () {
   const RECYCLE_TIMEOUT = TOTAL_TIMEOUT + COMMIT_REVEAL_WINDOW; // 151 days — past fresh window
 
   // VaultStatus enum values
+  const STATUS_UNREGISTERED = 0n;
   const STATUS_ACTIVE    = 1n;
   const STATUS_GRACE     = 2n;
   const STATUS_CLAIMABLE = 3n;
@@ -2159,7 +2160,7 @@ describe("WillChain", function () {
       expect(after.lastActivityTimestamp).to.equal(before.lastActivityTimestamp);
     });
 
-    it("transferFrom by spender during GRACE does NOT resurrect vault", async function () {
+    it("transferFrom by spender reverts in GRACE (delegated spending lock)", async function () {
       await phoenix.transfer(node1.address, ethers.parseEther("10000"));
       await phoenix.connect(node1).confirmActivity();
       await phoenix.connect(node1).designateSuccessor(successor.address);
@@ -2169,9 +2170,66 @@ describe("WillChain", function () {
       await time.increase(DEFAULT_INACTIVITY_PERIOD + 1);
       expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_GRACE);
 
-      // Spender transferFrom — should NOT resurrect
-      await phoenix.connect(node2).transferFrom(node1.address, maintainer.address, ethers.parseEther("1"));
+      // Spender transferFrom — must revert
+      await expect(
+        phoenix.connect(node2).transferFrom(node1.address, maintainer.address, ethers.parseEther("1"))
+      ).to.be.revertedWithCustomError(phoenix, "DelegatedSpendingBlocked");
+    });
+
+    it("transferFrom by spender reverts in CLAIMABLE", async function () {
+      await phoenix.transfer(node1.address, ethers.parseEther("10000"));
+      await phoenix.connect(node1).confirmActivity();
+      await phoenix.connect(node1).designateSuccessor(successor.address);
+      await phoenix.connect(node1).approve(node2.address, ethers.parseEther("10000"));
+
+      // Advance past GRACE into natural CLAIMABLE
+      await time.increase(DEFAULT_INACTIVITY_PERIOD + GRACE_PERIOD + 1);
+      expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_CLAIMABLE);
+
+      await expect(
+        phoenix.connect(node2).transferFrom(node1.address, maintainer.address, ethers.parseEther("1"))
+      ).to.be.revertedWithCustomError(phoenix, "DelegatedSpendingBlocked");
+    });
+
+    it("transferFrom by spender reverts in ABANDONED", async function () {
+      await phoenix.transfer(node1.address, ethers.parseEther("10000"));
+      await phoenix.connect(node1).confirmActivity();
+      await phoenix.connect(node1).designateSuccessor(successor.address);
+      await phoenix.connect(node1).approve(node2.address, ethers.parseEther("10000"));
+
+      // Advance past ABANDONED
+      await time.increase(DEFAULT_INACTIVITY_PERIOD + GRACE_PERIOD + CLAIM_PERIOD + 1);
+      expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_ABANDONED);
+
+      await expect(
+        phoenix.connect(node2).transferFrom(node1.address, maintainer.address, ethers.parseEther("1"))
+      ).to.be.revertedWithCustomError(phoenix, "DelegatedSpendingBlocked");
+    });
+
+    it("burnFrom by spender reverts in GRACE (delegated spending lock)", async function () {
+      await phoenix.transfer(node1.address, ethers.parseEther("10000"));
+      await phoenix.connect(node1).confirmActivity();
+      await phoenix.connect(node1).designateSuccessor(successor.address);
+      await phoenix.connect(node1).approve(node2.address, ethers.parseEther("10000"));
+
+      await time.increase(DEFAULT_INACTIVITY_PERIOD + 1);
       expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_GRACE);
+
+      await expect(
+        phoenix.connect(node2).burnFrom(node1.address, ethers.parseEther("1"))
+      ).to.be.revertedWithCustomError(phoenix, "DelegatedSpendingBlocked");
+    });
+
+    it("transferFrom still works for UNREGISTERED addresses", async function () {
+      // node1 has tokens but never called confirmActivity — UNREGISTERED
+      await phoenix.transfer(node1.address, ethers.parseEther("10000"));
+      await phoenix.connect(node1).approve(node2.address, ethers.parseEther("10000"));
+
+      expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_UNREGISTERED);
+
+      // Spender transferFrom — should work for UNREGISTERED (normal ERC-20)
+      await phoenix.connect(node2).transferFrom(node1.address, maintainer.address, ethers.parseEther("1"));
+      expect(await phoenix.balanceOf(maintainer.address)).to.be.gt(0);
     });
 
     it("direct transfer during GRACE DOES resurrect vault to ACTIVE", async function () {
@@ -2198,7 +2256,7 @@ describe("WillChain", function () {
       expect(after.lastActivityTimestamp).to.be.gt(before.lastActivityTimestamp);
     });
 
-    it("allowance griefing attack is blocked: spender cannot keep vault alive", async function () {
+    it("allowance griefing attack is blocked: spender transferFrom reverts once vault leaves ACTIVE", async function () {
       await phoenix.transfer(node1.address, ethers.parseEther("50000"));
       await phoenix.connect(node1).confirmActivity();
       await phoenix.connect(node1).designateSuccessor(successor.address);
@@ -2206,15 +2264,16 @@ describe("WillChain", function () {
       // node1 gives unlimited allowance to attacker (node2)
       await phoenix.connect(node1).approve(node2.address, ethers.MaxUint256);
 
-      // Simulate attacker periodically calling transferFrom to keep vault alive
-      for (let i = 0; i < 3; i++) {
-        await time.increase(DEFAULT_INACTIVITY_PERIOD - 100);
-        // Attacker tries to reset timer via transferFrom
-        await phoenix.connect(node2).transferFrom(node1.address, node2.address, 1n);
-      }
+      // First transferFrom while ACTIVE — works but doesn't reset timer
+      await time.increase(DEFAULT_INACTIVITY_PERIOD - 100);
+      await phoenix.connect(node2).transferFrom(node1.address, node2.address, 1n);
 
-      // After 3 inactivity periods, vault should be in ABANDONED (timer was never reset by attacker)
-      expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_ABANDONED);
+      // Second attempt after vault enters GRACE — must revert
+      await time.increase(200); // now past inactivity period
+      expect(await phoenix.getVaultStatus(node1.address)).to.equal(STATUS_GRACE);
+      await expect(
+        phoenix.connect(node2).transferFrom(node1.address, node2.address, 1n)
+      ).to.be.revertedWithCustomError(phoenix, "DelegatedSpendingBlocked");
     });
 
     it("self-transferFrom (msg.sender == from) DOES reset timer", async function () {

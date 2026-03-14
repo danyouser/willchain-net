@@ -21,10 +21,10 @@ After the 24-hour commit-reveal window expires, `recycleInactiveNode()` is calla
 
 **Why accepted:** The 1% reward is an incentive, not a prize. The commit-reveal window protects the first 24 hours. After that, any caller is fine — the protocol benefits regardless of who triggers recycling.
 
-### T-04: `transferFrom()` does not reset any timer (M-01 fix)
-When Alice approves Bob, and Bob calls `transferFrom(Alice, Charlie, amount)`, **neither** Alice's nor Bob's timer resets. Only direct transfers where `msg.sender == from` count as activity.
+### T-04: `transferFrom()` does not reset any timer + blocked on non-ACTIVE vaults (M-01 fix)
+When Alice approves Bob, and Bob calls `transferFrom(Alice, Charlie, amount)`, **neither** Alice's nor Bob's timer resets. Only direct transfers where `msg.sender == from` count as activity. Additionally, delegated spending (`transferFrom`/`burnFrom` by third-party spenders) is completely blocked when the vault is not ACTIVE — reverts with `DelegatedSpendingBlocked()` in GRACE, CLAIMABLE, and ABANDONED states. UNREGISTERED addresses are not affected (normal ERC-20 behavior).
 
-**Why accepted:** This is the M-01 fix — prevents allowance-based timer griefing where a third party could keep a vault "alive" indefinitely via approved `transferFrom()`. Users who trade via DEX (which uses allowance/transferFrom) should call `confirmActivity()` explicitly to prove liveness.
+**Why accepted:** This is the M-01 fix — prevents allowance-based timer griefing and protects inactive vault balances from being drained by pre-existing allowances. The inheritance promise (inactive balance → successor or recycle) is now enforced at the contract level. Users who trade via DEX (which uses allowance/transferFrom) should call `confirmActivity()` explicitly to prove liveness.
 
 ### T-05: `recoverDividendDust()` is direct owner action (no timelock)
 Unlike treasury changes, dividend dust recovery has no 2-day delay.

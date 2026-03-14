@@ -514,6 +514,50 @@ contract WillChainFuzz is Test {
     // INVARIANT: fresh ABANDONED blocks direct recycle
     // ──────────────────────────────────────────────────────────────
 
+    function testFuzz_delegatedSpendBlockedWhenNotActive(
+        uint8 userIdx,
+        uint8 spenderIdx,
+        uint256 extraTime
+    ) public {
+        userIdx = uint8(bound(userIdx, 0, NUM_USERS - 1));
+        spenderIdx = uint8(bound(spenderIdx, 0, NUM_USERS - 1));
+        vm.assume(userIdx != spenderIdx);
+        address user = users[userIdx];
+        address spender = users[spenderIdx];
+
+        // Register user and set up vault
+        vm.prank(user);
+        token.confirmActivity();
+        vm.prank(user);
+        token.designateSuccessor(deployer);
+
+        // Approve spender
+        vm.prank(user);
+        token.approve(spender, type(uint256).max);
+
+        // Advance past inactivity period into GRACE
+        uint256 inactPeriod = token.getInactivityPeriod(user);
+        extraTime = bound(extraTime, 1, 365 days);
+        vm.warp(block.timestamp + inactPeriod + extraTime);
+        vm.roll(block.number + 1);
+
+        // Vault must NOT be ACTIVE or UNREGISTERED
+        WillChain.VaultStatus status = token.getVaultStatus(user);
+        assertTrue(
+            status != WillChain.VaultStatus.ACTIVE && status != WillChain.VaultStatus.UNREGISTERED,
+            "vault should be non-ACTIVE after inactivity"
+        );
+
+        // Delegated spend must revert
+        vm.prank(spender);
+        vm.expectRevert(abi.encodeWithSelector(WillChain.DelegatedSpendingBlocked.selector));
+        token.transferFrom(user, spender, 1);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // INVARIANT: fresh ABANDONED blocks direct recycle
+    // ──────────────────────────────────────────────────────────────
+
     function testFuzz_freshAbandonedBlocksDirectRecycle(
         uint8 userIdx,
         uint256 freshOffset

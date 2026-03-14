@@ -126,7 +126,7 @@ WillChain поєднує чотири механізми в одному token c
 
 | ID | Назва | Severity | Status |
 |---|---|---|---|
-| M-01 | Approved spenders can extract inactive vault balances through lingering allowances | Medium | Open |
+| M-01 | Approved spenders can extract inactive vault balances through lingering allowances | Medium | Fixed |
 | L-01 | Successor can extend the abandonment deadline by initiating a claim late | Low | Acknowledged |
 | I-01 | Successor contract-address policy is implemented inconsistently with user-facing messaging | Informational | Open |
 | I-02 | Operational docs overstate current governance semantics in two places | Informational | Fixed |
@@ -141,8 +141,9 @@ WillChain поєднує чотири механізми в одному token c
 |---|---|
 | Severity | Medium |
 | Тип | Design / economic security |
-| Status | Open |
-| Локація | `contracts/WillChain.sol:868-883`, inherited `transferFrom` / `burnFrom` paths |
+| Status | Fixed |
+| Локація | `contracts/WillChain.sol:_update()` |
+| Resolution | Added state-aware delegated spending lock: `transferFrom`/`burnFrom` by third-party spenders revert with `DelegatedSpendingBlocked()` when vault is not ACTIVE. UNREGISTERED addresses are excluded (normal ERC-20 behavior). |
 
 #### Опис
 

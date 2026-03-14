@@ -45,9 +45,11 @@ Any of `designateSuccessor()`, `setInactivityPeriod()`, `updateVaultData()`, or 
 ## Allowance and DEX usage
 
 If you grant an allowance (approve) to a DEX, protocol, or any address:
-- That spender can call `transferFrom` on your tokens
+- That spender can call `transferFrom` on your tokens **only while your vault is ACTIVE**
 - This does **NOT** reset your inactivity timer (the contract checks `msg.sender == from`)
 - A third party with an allowance **cannot** keep your vault alive on your behalf
+- Once your vault enters GRACE, CLAIMABLE, or ABANDONED, all delegated spending (`transferFrom`/`burnFrom` by third parties) is **blocked** — the contract reverts with `DelegatedSpendingBlocked()`
+- This protects your inheritance guarantee: inactive vault balances can only go to the designated successor or be recycled by the protocol
 
 **Important for DEX users:** If your only on-chain activity is trading via DEX allowances (`approve` + `transferFrom`), your activity timer will NOT be reset. You must call `confirmActivity()` periodically to prove you are alive.
 
