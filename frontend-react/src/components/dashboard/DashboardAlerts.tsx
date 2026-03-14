@@ -133,8 +133,21 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   })
   const pendingDividends = (pendingRaw as bigint | undefined) ?? 0n
 
-  // --- Transfer event watcher ---
-  const [txAlerts, setTxAlerts] = useState<AlertItem[]>([])
+  // --- Transfer event watcher (persisted in sessionStorage) ---
+  const txStorageKey = `dashboard-tx-alerts:${address?.toLowerCase() ?? 'none'}`
+  const [txAlerts, setTxAlertsRaw] = useState<AlertItem[]>(() => {
+    try {
+      const raw = sessionStorage.getItem(txStorageKey)
+      return raw ? JSON.parse(raw) : []
+    } catch { return [] }
+  })
+  const setTxAlerts: typeof setTxAlertsRaw = (updater) => {
+    setTxAlertsRaw(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      sessionStorage.setItem(txStorageKey, JSON.stringify(next))
+      return next
+    })
+  }
   const txIdCounter = useRef(0)
 
   // Pick up alerts injected by parent (e.g. confirmActivity success)
@@ -184,7 +197,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   })
 
   const dismissTxAlert = (id: string) => {
-    setTxAlerts(prev => prev.filter(a => a.id !== id))
+    setTxAlerts((prev: AlertItem[]) => prev.filter(a => a.id !== id))
   }
 
   // --- Successor change event watcher ---
