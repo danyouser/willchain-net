@@ -17,13 +17,13 @@ const STORAGE_KEY = 'phoenix_disclaimer_accepted'
 
 export function DisclaimerProvider({ children }: { children: ReactNode }) {
   const [hasAccepted, setHasAccepted] = useState(() => {
-    return localStorage.getItem(STORAGE_KEY) === 'true'
+    try { return localStorage.getItem(STORAGE_KEY) === 'true' } catch { return false }
   })
   const [showModal, setShowModal] = useState(false)
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null)
 
   const acceptDisclaimer = useCallback(() => {
-    localStorage.setItem(STORAGE_KEY, 'true')
+    try { localStorage.setItem(STORAGE_KEY, 'true') } catch { /* private browsing */ }
     setHasAccepted(true)
     setShowModal(false)
     if (pendingAction) {

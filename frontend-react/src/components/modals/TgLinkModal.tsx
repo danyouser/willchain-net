@@ -37,13 +37,16 @@ export function TgLinkModal() {
   const handleClose = useCallback(() => setIsOpen(false), [])
   const modalRef = useModalA11y(isOpen, handleClose)
 
-  // Parse URL params on mount
+  // Parse and validate URL params on mount
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search)
     const tgid  = sp.get('tgid')
     const addr  = sp.get('addr')
     const nonce = sp.get('nonce')
     if (tgid && addr && nonce) {
+      // Validate: tgid must be a valid integer, nonce must be 0x-prefixed hex
+      try { BigInt(tgid) } catch { return }
+      if (!/^0x[0-9a-fA-F]{64}$/.test(nonce)) return
       setParams({ tgid, addr, nonce })
       setIsOpen(true)
     }

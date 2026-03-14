@@ -9,6 +9,7 @@ const db = require('./database');
 const email = require('./email');
 const { t } = require('./i18n');
 const { deriveVaultStatus, needsCriticalAlert, approachingInactivity } = require('../../shared/vault-status');
+const recycle = require('./recycle');
 const { log } = require('./utils');
 
 let bot;
