@@ -100,7 +100,7 @@ function register() {
     }
 
     const nonce = ethers.hexlify(ethers.randomBytes(32));
-    db.saveChallenge(userId, address, nonce);
+    db.saveChallenge(userId, address, nonce, lang);
     log('INFO', `User ${userId} requested link challenge for ${address}`);
 
     const linkUrl = `${CONFIG.frontendUrl}?tgid=${userId}&addr=${address}&nonce=${nonce}`;
@@ -178,25 +178,48 @@ function register() {
       }
 
       const explorerLink = `${CONFIG.explorerUrl}/address/${userData.walletAddress}`;
-      const keyboard = new InlineKeyboard()
-        .url(t(lang, 'status.btn_confirm'), CONFIG.frontendUrl)
-        .row()
-        .url(t(lang, 'status.btn_explorer'), explorerLink);
+      let keyboard;
+      if (vaultStatus.isUnregistered) {
+        keyboard = new InlineKeyboard()
+          .url(t(lang, 'status.btn_activate'), CONFIG.frontendUrl)
+          .row()
+          .url(t(lang, 'status.btn_explorer'), explorerLink);
+      } else {
+        keyboard = new InlineKeyboard()
+          .url(t(lang, 'status.btn_confirm'), CONFIG.frontendUrl)
+          .row()
+          .url(t(lang, 'status.btn_explorer'), explorerLink);
+      }
 
-      const daysText = state.lastActivityTimestamp === 0n
-        ? '*—*'
-        : `*${t(lang, 'status.days', { days: daysUntilInactive })}*`;
+      let body;
+      if (vaultStatus.isUnregistered) {
+        body = t(lang, 'status.body_unregistered', {
+          emoji: statusEmoji,
+          status: statusText,
+          address: formatAddress(userData.walletAddress),
+        });
+      } else {
+        const daysText = state.lastActivityTimestamp === 0n
+          ? '*—*'
+          : `*${t(lang, 'status.days', { days: daysUntilInactive })}*`;
 
-      await ctx.reply(
-        t(lang, 'status.body', {
+        body = t(lang, 'status.body', {
           emoji: statusEmoji,
           status: statusText,
           address: formatAddress(userData.walletAddress),
           daysInactive: daysText,
           periodDays: inactivityPeriodDays,
           successor: hasSuccessor ? `\`${formatAddress(successor)}\`` : t(lang, 'status.not_set'),
-          tier: state.serviceTier,
-        }) + urgency,
+          tier: ({
+            'Legacy Vault': t(lang, 'status.tier_legacy'),
+            'Family Vault': t(lang, 'status.tier_family'),
+            'Basic Vault':  t(lang, 'status.tier_basic'),
+          })[state.serviceTier] || t(lang, 'status.tier_none'),
+        });
+      }
+
+      await ctx.reply(
+        body + urgency,
         { parse_mode: 'Markdown', reply_markup: keyboard }
       );
 

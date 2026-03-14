@@ -84,9 +84,15 @@ db.exec(`
     telegram_id INTEGER PRIMARY KEY,
     wallet_address TEXT NOT NULL,
     nonce TEXT NOT NULL,
-    expires_at INTEGER NOT NULL
+    expires_at INTEGER NOT NULL,
+    lang TEXT NOT NULL DEFAULT 'en'
   )
 `);
+
+// Add lang column to challenges if it doesn't exist (migration for existing DBs)
+try {
+  db.exec(`ALTER TABLE link_challenges ADD COLUMN lang TEXT NOT NULL DEFAULT 'en'`);
+} catch { /* column already exists */ }
 
 // Clean up expired challenges on startup
 db.exec(`DELETE FROM link_challenges WHERE expires_at < strftime('%s', 'now')`);
@@ -327,12 +333,13 @@ function markEventProcessed(txHash, logIndex, eventType) {
 
 const challengeStatements = {
   upsert: db.prepare(`
-    INSERT INTO link_challenges (telegram_id, wallet_address, nonce, expires_at)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO link_challenges (telegram_id, wallet_address, nonce, expires_at, lang)
+    VALUES (?, ?, ?, ?, ?)
     ON CONFLICT(telegram_id) DO UPDATE SET
       wallet_address = ?,
       nonce = ?,
-      expires_at = ?
+      expires_at = ?,
+      lang = ?
   `),
   get: db.prepare('SELECT * FROM link_challenges WHERE telegram_id = ?'),
   delete: db.prepare('DELETE FROM link_challenges WHERE telegram_id = ?'),
@@ -340,11 +347,11 @@ const challengeStatements = {
 
 const CHALLENGE_TTL_SECONDS = 5 * 60; // 5 minutes
 
-function saveChallenge(telegramId, walletAddress, nonce) {
+function saveChallenge(telegramId, walletAddress, nonce, lang = 'en') {
   const expiresAt = Math.floor(Date.now() / 1000) + CHALLENGE_TTL_SECONDS;
   challengeStatements.upsert.run(
-    telegramId, walletAddress, nonce, expiresAt,
-    walletAddress, nonce, expiresAt
+    telegramId, walletAddress, nonce, expiresAt, lang,
+    walletAddress, nonce, expiresAt, lang
   );
 }
 
@@ -355,7 +362,7 @@ function getChallenge(telegramId) {
     challengeStatements.delete.run(telegramId);
     return null;
   }
-  return { walletAddress: row.wallet_address, nonce: row.nonce };
+  return { walletAddress: row.wallet_address, nonce: row.nonce, lang: row.lang || 'en' };
 }
 
 function deleteChallenge(telegramId) {

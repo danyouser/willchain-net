@@ -167,9 +167,8 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 400, { error: result.reason });
     }
 
-    // Read existing user lang or default to 'en'
-    const existingUser = db.getUser(tgid);
-    const lang = existingUser?.lang || 'en';
+    // Use lang saved with the challenge (from /link command context)
+    const lang = challenge.lang || 'en';
     db.deleteChallenge(tgid);
     db.saveUser(tgid, addr, true, lang);
     console.log(`[API] verify-link: success tgid=${tgid} addr=${addr.slice(0, 10)}...`);
