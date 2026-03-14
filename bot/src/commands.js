@@ -8,6 +8,7 @@ const { ethers } = require('ethers');
 const { deriveVaultStatus, approachingInactivity } = require('../../shared/vault-status');
 const db = require('./database');
 const { verifyWalletLinkSignature } = require('./eip712');
+const { t, getLang } = require('./i18n');
 const { log, formatAddress, formatTokenAmount } = require('./utils');
 
 const RATE_LIMIT_MAX = 10; // max 10 commands/minute per user
@@ -30,56 +31,33 @@ function init(botInstance, contractInstance, config) {
 // ---- Shared renderers (used by both commands and callbacks) ----
 
 async function sendStats(ctx) {
+  const lang = getLang(ctx);
   if (!contract) {
-    return ctx.reply('⚠️ Contract not configured. Please wait for mainnet launch.');
+    return ctx.reply(t(lang, 'contract_not_configured'));
   }
   try {
     const stats = await contract.getNetworkStatistics();
     const botStats = db.getStats();
     await ctx.reply(
-      `📊 *WillChain Network Statistics*\n\n` +
-      `💰 Total Supply: ${formatTokenAmount(stats.totalSupply_)} WILL\n` +
-      `🔥 Burned: ${formatTokenAmount(stats.removedFromCirculation)} WILL\n` +
-      `♻️ Recycled: ${formatTokenAmount(stats.recycledToNetwork)} WILL\n` +
-      `✅ Successful Transfers: ${stats.successfulTransfers.toString()}\n\n` +
-      `🤖 *Bot Statistics*\n` +
-      `• Registered users: ${botStats.totalUsers}\n` +
-      `• Active notifications: ${botStats.usersWithNotifications}`,
+      t(lang, 'stats.title', {
+        totalSupply: formatTokenAmount(stats.totalSupply_),
+        burned: formatTokenAmount(stats.removedFromCirculation),
+        recycled: formatTokenAmount(stats.recycledToNetwork),
+        transfers: stats.successfulTransfers.toString(),
+        users: botStats.totalUsers,
+        notifications: botStats.usersWithNotifications,
+      }),
       { parse_mode: 'Markdown' }
     );
   } catch (error) {
     log('ERROR', 'Stats fetch failed', error.message);
-    await ctx.reply('❌ Failed to fetch statistics. Please try again later.');
+    await ctx.reply(t(lang, 'stats.fetch_failed'));
   }
 }
 
 async function sendHelp(ctx) {
-  await ctx.reply(
-    `❓ *How WillChain Works*\n\n` +
-    `*Proof of Activity:*\n` +
-    `• Any on-chain activity (transfers, swaps, mints) automatically confirms you're alive\n` +
-    `• Manual check-in only needed if your wallet is completely dormant\n` +
-    `• Choose your inactivity period: 30, 90, 180, or 365 days\n\n` +
-    `*Timeline after your period expires:*\n` +
-    `1️⃣ Grace Period (30 days) - Warnings sent\n` +
-    `2️⃣ Claim Period (30 days) - Successor can claim\n` +
-    `3️⃣ Only if unclaimed - Assets recycled\n\n` +
-    `*What happens to recycled assets:*\n` +
-    `🔥 47% burned permanently\n` +
-    `👥 47% distributed to active holders\n` +
-    `🏛 5% protocol treasury\n` +
-    `🦅 1% to whoever triggered recycling\n\n` +
-    `*Bot Commands:*\n` +
-    `/link <address> - Start wallet link (issues a sign challenge)\n` +
-    `/verify <sig> - Complete wallet link (submit signature)\n` +
-    `/unlink - Remove wallet link\n` +
-    `/email <address> - Set email notifications\n` +
-    `/status - Check vault status\n` +
-    `/stats - Network statistics\n` +
-    `/notifications - Toggle reminders\n\n` +
-    `Stay active, stay protected! 🔒`,
-    { parse_mode: 'Markdown' }
-  );
+  const lang = getLang(ctx);
+  await ctx.reply(t(lang, 'help.text'), { parse_mode: 'Markdown' });
 }
 
 // ---- Command registrations ----
@@ -87,40 +65,29 @@ async function sendHelp(ctx) {
 function register() {
   // /start
   bot.command('start', async (ctx) => {
+    const lang = getLang(ctx);
     log('INFO', `User ${ctx.from.id} started bot`);
     const keyboard = new InlineKeyboard()
-      .text('🔗 Link Wallet', 'link_wallet')
+      .text(t(lang, 'start.btn_link'), 'link_wallet')
       .row()
-      .text('📊 Network Stats', 'stats')
-      .text('❓ How it Works', 'help');
+      .text(t(lang, 'start.btn_stats'), 'stats')
+      .text(t(lang, 'start.btn_help'), 'help');
 
-    await ctx.reply(
-      `🔒 *Welcome to WillChain Bot*\n\n` +
-      `I'll monitor your wallet activity and keep your vault protected.\n\n` +
-      `*What I do:*\n` +
-      `• Automatic Proof of Activity tracking\n` +
-      `• Status alerts when you enter grace period\n` +
-      `• Network statistics updates\n\n` +
-      `*Note:* If you're actively using your wallet, activity is tracked automatically. Manual check-in is only needed for dormant wallets.\n\n` +
-      `Link your wallet to get started!`,
-      { parse_mode: 'Markdown', reply_markup: keyboard }
-    );
+    await ctx.reply(t(lang, 'start.welcome'), { parse_mode: 'Markdown', reply_markup: keyboard });
   });
 
   // /link <address>
   bot.command('link', async (ctx) => {
     const userId = ctx.from.id;
-    if (isRateLimited(userId)) return ctx.reply('⏳ Too many requests. Please wait a minute and try again.');
+    const lang = getLang(ctx);
+    if (isRateLimited(userId)) return ctx.reply(t(lang, 'rate_limited'));
 
     const address = ctx.match?.trim();
     if (!address) {
-      return ctx.reply(
-        '⚠️ Please provide your wallet address:\n\n`/link 0x1234...abcd`',
-        { parse_mode: 'Markdown' }
-      );
+      return ctx.reply(t(lang, 'link.provide_address'), { parse_mode: 'Markdown' });
     }
     if (!ethers.isAddress(address)) {
-      return ctx.reply('❌ Invalid Ethereum address. Please check and try again.');
+      return ctx.reply(t(lang, 'link.invalid_address'));
     }
 
     const existingUser = db.getUser(userId);
@@ -128,7 +95,7 @@ function register() {
       const linkedAt = new Date(existingUser.linkedAt).getTime();
       if (Date.now() - linkedAt < LINK_COOLDOWN_MS) {
         const hoursLeft = Math.ceil((LINK_COOLDOWN_MS - (Date.now() - linkedAt)) / 3600000);
-        return ctx.reply(`⏳ You can change your linked wallet in ${hoursLeft}h. This prevents address hijacking.`);
+        return ctx.reply(t(lang, 'link.cooldown', { hours: hoursLeft }));
       }
     }
 
@@ -137,29 +104,21 @@ function register() {
     log('INFO', `User ${userId} requested link challenge for ${address}`);
 
     const linkUrl = `${CONFIG.frontendUrl}?tgid=${userId}&addr=${address}&nonce=${nonce}`;
-    await ctx.reply(
-      `🔐 *Підтвердіть право власності на гаманець*\n\n` +
-      `Відкрийте посилання у браузері та підпишіть запит своїм гаманцем:\n\n` +
-      `${linkUrl}\n\n` +
-      `_Посилання дійсне 5 хвилин._`,
-      { parse_mode: 'Markdown' }
-    );
+    await ctx.reply(t(lang, 'link.challenge', { url: linkUrl }), { parse_mode: 'Markdown' });
   });
 
   // /verify <signature>
   bot.command('verify', async (ctx) => {
     const userId = ctx.from.id;
-    if (isRateLimited(userId)) return ctx.reply('⏳ Too many requests. Please wait a minute and try again.');
+    const lang = getLang(ctx);
+    if (isRateLimited(userId)) return ctx.reply(t(lang, 'rate_limited'));
 
     const sig = ctx.match?.trim();
-    if (!sig) return ctx.reply('⚠️ Please provide the signature:\n\n`/verify 0x...`', { parse_mode: 'Markdown' });
+    if (!sig) return ctx.reply(t(lang, 'verify.provide_signature'), { parse_mode: 'Markdown' });
 
     const challenge = db.getChallenge(userId);
     if (!challenge) {
-      return ctx.reply(
-        '❌ No pending challenge found or it has expired.\n\nStart again with `/link 0xYourAddress`',
-        { parse_mode: 'Markdown' }
-      );
+      return ctx.reply(t(lang, 'verify.no_challenge'), { parse_mode: 'Markdown' });
     }
 
     const { walletAddress, nonce } = challenge;
@@ -167,27 +126,17 @@ function register() {
     if (!result.ok) {
       if (result.reason === 'address_mismatch') {
         log('WARN', `User ${userId} failed ownership proof for ${walletAddress}`);
-        return ctx.reply(
-          '❌ Signature does not match the requested address.\n\n' +
-          'Make sure you signed with the correct wallet and try `/link` again.',
-          { parse_mode: 'Markdown' }
-        );
+        return ctx.reply(t(lang, 'verify.address_mismatch'), { parse_mode: 'Markdown' });
       }
-      return ctx.reply('❌ Invalid signature format. Please try again.');
+      return ctx.reply(t(lang, 'verify.invalid_signature'));
     }
 
     db.deleteChallenge(userId);
-    db.saveUser(userId, walletAddress, true);
+    db.saveUser(userId, walletAddress, true, lang);
     log('SUCCESS', `User ${userId} verified ownership and linked wallet ${walletAddress}`);
 
     await ctx.reply(
-      `✅ *Wallet Linked Successfully*\n\n` +
-      `Address: \`${formatAddress(walletAddress)}\`\n\n` +
-      `You'll now receive:\n` +
-      `• Weekly activity reminders\n` +
-      `• Grace period alerts\n` +
-      `• Status updates\n\n` +
-      `Use /status to check your vault status anytime.`,
+      t(lang, 'verify.success', { address: formatAddress(walletAddress) }),
       { parse_mode: 'Markdown' }
     );
   });
@@ -195,121 +144,124 @@ function register() {
   // /status
   bot.command('status', async (ctx) => {
     const userId = ctx.from.id;
-    if (isRateLimited(userId)) return ctx.reply('⏳ Too many requests. Please wait a minute.');
+    const lang = getLang(ctx);
+    if (isRateLimited(userId)) return ctx.reply(t(lang, 'rate_limited'));
 
     const userData = db.getUser(userId);
-    if (!userData) return ctx.reply('⚠️ No wallet linked. Use /link <address> first.', { parse_mode: 'Markdown' });
-    if (!contract) return ctx.reply('⚠️ Contract not configured. Please wait for mainnet launch.');
+    if (!userData) return ctx.reply(t(lang, 'status.not_linked'), { parse_mode: 'Markdown' });
+    if (!contract) return ctx.reply(t(lang, 'contract_not_configured'));
 
     try {
       const state = await contract.getNodeState(userData.walletAddress);
       const daysUntilInactive  = Math.floor(Number(state.timeUntilInactive)  / 86400);
-      const daysUntilAbandoned = Math.floor(Number(state.timeUntilAbandoned) / 86400);
       const successor = state.designatedSuccessor;
       const hasSuccessor = successor !== ethers.ZeroAddress;
       const inactivityPeriodDays = Math.floor(Number(state.inactivityPeriod) / 86400);
       const vaultStatus = deriveVaultStatus(state);
 
       let statusEmoji = '🟢';
-      let statusText = 'Active';
+      let statusText = t(lang, 'status.active');
       let urgency = '';
 
       if (vaultStatus.isUnregistered) {
         statusEmoji = '⚪️';
-        statusText = 'Not registered';
-        urgency = '\n\nℹ️ *Your wallet is not registered yet. Call confirmActivity() on the dApp to activate your vault.*';
+        statusText = t(lang, 'status.not_registered');
+        urgency = t(lang, 'status.unregistered_hint');
       } else if (vaultStatus.isAbandoned || vaultStatus.inGrace) {
         statusEmoji = '🔴';
-        statusText = vaultStatus.inGrace ? 'Grace Period' : 'Abandoned';
-        urgency = '\n\n⚠️ *URGENT: Confirm activity NOW to prevent asset loss!*';
+        statusText = vaultStatus.inGrace ? t(lang, 'status.grace_period') : t(lang, 'status.abandoned');
+        urgency = t(lang, 'status.urgent_hint');
       } else if (approachingInactivity(state, 7)) {
         statusEmoji = '🟡';
-        statusText = 'Warning';
-        urgency = '\n\n⚠️ *Activity confirmation needed within 7 days!*';
+        statusText = t(lang, 'status.warning');
+        urgency = t(lang, 'status.warning_hint');
       }
 
       const explorerLink = `${CONFIG.explorerUrl}/address/${userData.walletAddress}`;
       const keyboard = new InlineKeyboard()
-        .url('✅ Confirm Activity', CONFIG.frontendUrl)
+        .url(t(lang, 'status.btn_confirm'), CONFIG.frontendUrl)
         .row()
-        .url('🔍 View on Explorer', explorerLink);
+        .url(t(lang, 'status.btn_explorer'), explorerLink);
+
+      const daysText = state.lastActivityTimestamp === 0n
+        ? '*—*'
+        : `*${t(lang, 'status.days', { days: daysUntilInactive })}*`;
 
       await ctx.reply(
-        `${statusEmoji} *Vault Status: ${statusText}*\n\n` +
-        `📍 Address: \`${formatAddress(userData.walletAddress)}\`\n` +
-        (state.lastActivityTimestamp === 0n
-          ? `⏱ Time until inactive: *—*\n`
-          : `⏱ Time until inactive: *${daysUntilInactive} days*\n`) +
-        `📅 Inactivity period: *${inactivityPeriodDays} days*\n` +
-        `👤 Successor: ${hasSuccessor ? `\`${formatAddress(successor)}\`` : 'Not set'}\n` +
-        `🏷 Tier: ${state.serviceTier}\n\n` +
-        `_Tip: Any on-chain activity auto-confirms your presence._` +
-        urgency,
+        t(lang, 'status.body', {
+          emoji: statusEmoji,
+          status: statusText,
+          address: formatAddress(userData.walletAddress),
+          daysInactive: daysText,
+          periodDays: inactivityPeriodDays,
+          successor: hasSuccessor ? `\`${formatAddress(successor)}\`` : t(lang, 'status.not_set'),
+          tier: state.serviceTier,
+        }) + urgency,
         { parse_mode: 'Markdown', reply_markup: keyboard }
       );
 
     } catch (error) {
       log('ERROR', `Status check failed for user ${userId}`, error.message);
-      await ctx.reply('❌ Failed to fetch status. Please try again later.');
+      await ctx.reply(t(lang, 'status.fetch_failed'));
     }
   });
 
   // /stats
   bot.command('stats', async (ctx) => {
-    if (isRateLimited(ctx.from.id)) return ctx.reply('⏳ Too many requests. Please wait a minute.');
+    const lang = getLang(ctx);
+    if (isRateLimited(ctx.from.id)) return ctx.reply(t(lang, 'rate_limited'));
     await sendStats(ctx);
   });
 
   // /notifications
   bot.command('notifications', async (ctx) => {
     const userId = ctx.from.id;
-    if (isRateLimited(userId)) return ctx.reply('⏳ Too many requests. Please wait a minute.');
+    const lang = getLang(ctx);
+    if (isRateLimited(userId)) return ctx.reply(t(lang, 'rate_limited'));
     const userData = db.getUser(userId);
-    if (!userData) return ctx.reply('⚠️ No wallet linked. Use /link <address> first.');
+    if (!userData) return ctx.reply(t(lang, 'status.not_linked'));
     const newValue = db.toggleNotifications(userId);
-    const status = newValue ? 'enabled ✅' : 'disabled ❌';
+    const status = newValue ? t(lang, 'notifications.enabled') : t(lang, 'notifications.disabled');
     log('INFO', `User ${userId} toggled notifications: ${status}`);
-    await ctx.reply(`🔔 Notifications ${status}`);
+    await ctx.reply(t(lang, 'notifications.toggled', { status }));
   });
 
   // /unlink
   bot.command('unlink', async (ctx) => {
     const userId = ctx.from.id;
-    if (isRateLimited(userId)) return ctx.reply('⏳ Too many requests. Please wait a minute.');
-    if (!db.getUser(userId)) return ctx.reply('⚠️ No wallet linked.');
+    const lang = getLang(ctx);
+    if (isRateLimited(userId)) return ctx.reply(t(lang, 'rate_limited'));
+    if (!db.getUser(userId)) return ctx.reply(t(lang, 'unlink.no_wallet'));
     db.deleteUser(userId);
     log('INFO', `User ${userId} unlinked wallet`);
-    await ctx.reply('✅ Wallet unlinked. You will no longer receive notifications.');
+    await ctx.reply(t(lang, 'unlink.success'));
   });
 
   // /email [address|remove]
   bot.command('email', async (ctx) => {
     const userId = ctx.from.id;
-    if (isRateLimited(userId)) return ctx.reply('⏳ Too many requests. Please wait a minute.');
+    const lang = getLang(ctx);
+    if (isRateLimited(userId)) return ctx.reply(t(lang, 'rate_limited'));
     const userData = db.getUser(userId);
-    if (!userData) return ctx.reply('⚠️ No wallet linked. Use /link <address> first.');
+    if (!userData) return ctx.reply(t(lang, 'status.not_linked'));
 
     const emailAddr = ctx.match?.trim();
     if (!emailAddr) {
-      const current = userData.email ? `Current: \`${userData.email}\`` : 'No email set yet.';
-      return ctx.reply(
-        `📧 *Email Notifications*\n\n${current}\n\nTo set or update your email:\n\`/email your@email.com\`\n\nYou'll receive alerts for:\n• Successor designated\n• Claim initiated\n• Grace period warnings`,
-        { parse_mode: 'Markdown' }
-      );
+      const current = userData.email
+        ? t(lang, 'email.current', { email: userData.email })
+        : t(lang, 'email.not_set');
+      return ctx.reply(t(lang, 'email.info', { current }), { parse_mode: 'Markdown' });
     }
     if (emailAddr === 'remove') {
       db.setUserEmail(userId, null);
-      return ctx.reply('✅ Email notifications removed.');
+      return ctx.reply(t(lang, 'email.removed'));
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddr)) {
-      return ctx.reply('❌ Invalid email address. Please check and try again.');
+      return ctx.reply(t(lang, 'email.invalid'));
     }
     db.setUserEmail(userId, emailAddr);
     log('SUCCESS', `User ${userId} set email`);
-    await ctx.reply(
-      `✅ *Email saved*\n\nYou'll receive notifications at: \`${emailAddr}\`\n\nTo remove email notifications, use \`/email remove\`.`,
-      { parse_mode: 'Markdown' }
-    );
+    await ctx.reply(t(lang, 'email.saved', { email: emailAddr }), { parse_mode: 'Markdown' });
   });
 
   // /help
@@ -318,15 +270,9 @@ function register() {
   // ---- Callback queries ----
 
   bot.callbackQuery('link_wallet', async (ctx) => {
+    const lang = getLang(ctx);
     await ctx.answerCallbackQuery();
-    await ctx.reply(
-      '🔗 *Link Your Wallet*\n\n' +
-      'Step 1 — request a sign challenge:\n' +
-      '`/link 0xYourWalletAddress`\n\n' +
-      'Step 2 — sign the message shown and submit:\n' +
-      '`/verify 0xSignature`',
-      { parse_mode: 'Markdown' }
-    );
+    await ctx.reply(t(lang, 'callback.link_wallet'), { parse_mode: 'Markdown' });
   });
 
   bot.callbackQuery('stats', async (ctx) => {

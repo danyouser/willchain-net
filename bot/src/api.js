@@ -7,6 +7,7 @@ const http = require('http');
 const { ethers } = require('ethers');
 const db = require('./database');
 const { verifyWalletLinkSignature } = require('./eip712');
+const { t } = require('./i18n');
 
 const PORT = process.env.API_PORT || 3001;
 const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'https://willchain.net';
@@ -166,17 +167,18 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 400, { error: result.reason });
     }
 
+    // Read existing user lang or default to 'en'
+    const existingUser = db.getUser(tgid);
+    const lang = existingUser?.lang || 'en';
     db.deleteChallenge(tgid);
-    db.saveUser(tgid, addr, true);
+    db.saveUser(tgid, addr, true, lang);
     console.log(`[API] verify-link: success tgid=${tgid} addr=${addr.slice(0, 10)}...`);
 
     if (_bot) {
       try {
+        const shortAddr = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
         await _bot.api.sendMessage(tgid,
-          `✅ *Гаманець успішно прив'язано!*\n\n` +
-          `Адреса: \`${addr.slice(0, 6)}...${addr.slice(-4)}\`\n\n` +
-          `Тепер ви отримуватимете сповіщення про стан вашого заповіту.\n` +
-          `Використовуйте /status для перевірки.`,
+          t(lang, 'api.verify_success', { address: shortAddr }),
           { parse_mode: 'Markdown' }
         );
       } catch { /* Telegram notification failure is non-fatal */ }

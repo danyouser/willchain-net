@@ -45,6 +45,13 @@ try {
   // Column already exists — ignore
 }
 
+// Add lang column if it doesn't exist (migration for i18n)
+try {
+  db.exec(`ALTER TABLE users ADD COLUMN lang TEXT DEFAULT 'en'`);
+} catch (e) {
+  // Column already exists — ignore
+}
+
 // Create index for wallet lookups
 db.exec(`
   CREATE INDEX IF NOT EXISTS idx_wallet_address
@@ -153,11 +160,12 @@ const userStatements = {
   getAll: db.prepare('SELECT * FROM users'),
 
   upsert: db.prepare(`
-    INSERT INTO users (telegram_id, wallet_address, notifications_enabled, last_reminder, linked_at, updated_at)
-    VALUES (@telegram_id, @wallet_address, @notifications_enabled, @last_reminder, @linked_at, @updated_at)
+    INSERT INTO users (telegram_id, wallet_address, notifications_enabled, last_reminder, linked_at, updated_at, lang)
+    VALUES (@telegram_id, @wallet_address, @notifications_enabled, @last_reminder, @linked_at, @updated_at, @lang)
     ON CONFLICT(telegram_id) DO UPDATE SET
       wallet_address = @wallet_address,
       notifications_enabled = @notifications_enabled,
+      lang = @lang,
       updated_at = @updated_at
   `),
 
@@ -187,6 +195,7 @@ function getUser(telegramId) {
     lastReminder: row.last_reminder,
     linkedAt: row.linked_at,
     email: row.email || null,
+    lang: row.lang || 'en',
   };
 }
 
@@ -201,6 +210,7 @@ function getUserByWallet(walletAddress) {
     lastReminder: row.last_reminder,
     linkedAt: row.linked_at,
     email: row.email || null,
+    lang: row.lang || 'en',
   };
 }
 
@@ -213,6 +223,7 @@ function getAllUsersWithNotifications() {
     lastReminder: row.last_reminder,
     linkedAt: row.linked_at,
     email: row.email || null,
+    lang: row.lang || 'en',
   }));
 }
 
@@ -225,6 +236,7 @@ function getAllUsers() {
     lastReminder: row.last_reminder,
     linkedAt: row.linked_at,
     email: row.email || null,
+    lang: row.lang || 'en',
   }));
 }
 
@@ -232,11 +244,12 @@ function setUserEmail(telegramId, email) {
   userStatements.updateEmail.run(email, new Date().toISOString(), telegramId);
 }
 
-function saveUser(telegramId, walletAddress, notificationsEnabled = true) {
+function saveUser(telegramId, walletAddress, notificationsEnabled = true, lang = 'en') {
   const now = new Date().toISOString();
   userStatements.upsert.run({
     telegram_id: telegramId,
     wallet_address: walletAddress,
+    lang,
     notifications_enabled: notificationsEnabled ? 1 : 0,
     last_reminder: null,
     linked_at: now,

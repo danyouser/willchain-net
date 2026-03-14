@@ -8,6 +8,7 @@ const { InlineKeyboard } = require('grammy');
 const { ethers } = require('ethers');
 const db = require('./database');
 const email = require('./email');
+const { t } = require('./i18n');
 const { log, formatAddress, formatTokenAmount } = require('./utils');
 
 let bot;
@@ -30,18 +31,17 @@ async function notifySuccessorClaimInitiated(node, successor, timestamp, txHash,
 
   const userData = db.getUserByWallet(node);
   if (userData) {
+    const lang = userData.lang || 'en';
     try {
       await bot.api.sendMessage(userData.telegramId,
-        `🚨 *CRITICAL ALERT: Successor Claim Initiated!*\n\n` +
-        `Someone is trying to claim your vault!\n\n` +
-        `📍 Your wallet: \`${formatAddress(node)}\`\n` +
-        `👤 Claimant: \`${formatAddress(successor)}\`\n` +
-        `⏱ Time: ${new Date(Number(timestamp) * 1000).toUTCString()}\n\n` +
-        `*You have 30 days to veto this claim!*\n` +
-        `Confirm your activity NOW to cancel the claim.`,
+        t(lang, 'notify.claim_initiated', {
+          owner: formatAddress(node),
+          successor: formatAddress(successor),
+          time: new Date(Number(timestamp) * 1000).toUTCString(),
+        }),
         {
           parse_mode: 'Markdown',
-          reply_markup: new InlineKeyboard().url('🆘 VETO CLAIM NOW', CONFIG.frontendUrl),
+          reply_markup: new InlineKeyboard().url(t(lang, 'notify.btn_veto'), CONFIG.frontendUrl),
         }
       );
       log('SUCCESS', `Notified user ${userData.telegramId} about successor claim`);
@@ -67,6 +67,7 @@ async function notifyActivityConfirmed(node, timestamp, txHash, logIndex) {
 
   const userData = db.getUserByWallet(node);
   if (userData) {
+    const lang = userData.lang || 'en';
     try {
       let periodDays = 90; // default
       if (contract) {
@@ -79,11 +80,10 @@ async function notifyActivityConfirmed(node, timestamp, txHash, logIndex) {
       const nextDeadline = new Date(Number(timestamp) * 1000 + periodDays * 24 * 60 * 60 * 1000);
 
       await bot.api.sendMessage(userData.telegramId,
-        `✅ *Activity Confirmed!*\n\n` +
-        `Your vault timer has been reset.\n` +
-        `Inactivity period: ${periodDays} days\n` +
-        `Next deadline: ${nextDeadline.toLocaleDateString()}\n\n` +
-        `_Tip: Any on-chain activity will auto-confirm your presence._`,
+        t(lang, 'notify.activity_confirmed', {
+          periodDays,
+          nextDeadline: nextDeadline.toLocaleDateString(),
+        }),
         { parse_mode: 'Markdown' }
       );
     } catch (error) {
@@ -101,13 +101,14 @@ async function notifyVaultAccessTransferred(fromNode, toNode, accessUnits, txHas
 
   const oldOwner = db.getUserByWallet(fromNode);
   if (oldOwner) {
+    const lang = oldOwner.lang || 'en';
     try {
       await bot.api.sendMessage(oldOwner.telegramId,
-        `⚠️ *Vault Transfer Completed*\n\n` +
-        `Your vault access has been transferred to your designated successor.\n\n` +
-        `From: \`${formatAddress(fromNode)}\`\n` +
-        `To: \`${formatAddress(toNode)}\`\n` +
-        `Amount: ${formatTokenAmount(accessUnits)} WILL`,
+        t(lang, 'notify.vault_transferred_from', {
+          from: formatAddress(fromNode),
+          to: formatAddress(toNode),
+          amount: formatTokenAmount(accessUnits),
+        }),
         { parse_mode: 'Markdown' }
       );
     } catch (error) {
@@ -117,16 +118,16 @@ async function notifyVaultAccessTransferred(fromNode, toNode, accessUnits, txHas
 
   const newOwner = db.getUserByWallet(toNode);
   if (newOwner) {
+    const lang = newOwner.lang || 'en';
     try {
       await bot.api.sendMessage(newOwner.telegramId,
-        `🎉 *You Received Vault Access!*\n\n` +
-        `A vault has been transferred to you as designated successor.\n\n` +
-        `From: \`${formatAddress(fromNode)}\`\n` +
-        `Amount: ${formatTokenAmount(accessUnits)} WILL\n\n` +
-        `Remember to confirm activity monthly to keep your vault active!`,
+        t(lang, 'notify.vault_transferred_to', {
+          from: formatAddress(fromNode),
+          amount: formatTokenAmount(accessUnits),
+        }),
         {
           parse_mode: 'Markdown',
-          reply_markup: new InlineKeyboard().url('✅ Confirm Activity', CONFIG.frontendUrl),
+          reply_markup: new InlineKeyboard().url(t(lang, 'notify.btn_confirm_activity'), CONFIG.frontendUrl),
         }
       );
     } catch (error) {
@@ -163,12 +164,13 @@ async function notifySuccessorDesignated(node, successor, txHash, logIndex) {
 
   const userData = db.getUserByWallet(node);
   if (userData) {
+    const lang = userData.lang || 'en';
     try {
       await bot.api.sendMessage(userData.telegramId,
-        `✅ *Successor Updated*\n\n` +
-        `Your designated successor has been set to:\n` +
-        `\`${formatAddress(successor)}\`\n\n` +
-        `They can claim your vault after ${periodDays} days of inactivity + 30 day grace period.`,
+        t(lang, 'notify.successor_updated', {
+          successor: formatAddress(successor),
+          periodDays,
+        }),
         { parse_mode: 'Markdown' }
       );
     } catch (error) {
@@ -187,14 +189,10 @@ async function notifySuccessorDesignated(node, successor, txHash, logIndex) {
   // Notify the successor (if they have the bot linked)
   const successorData = db.getUserByWallet(successor);
   if (successorData) {
+    const lang = successorData.lang || 'en';
     try {
       await bot.api.sendMessage(successorData.telegramId,
-        `📋 *You've Been Named as a Successor*\n\n` +
-        `Wallet \`${formatAddress(node)}\` has designated you as their successor.\n\n` +
-        `*What this means:*\n` +
-        `• If they become inactive, you'll be able to claim their vault\n` +
-        `• You'll receive notifications when a claim becomes available\n\n` +
-        `_No action required from you right now._`,
+        t(lang, 'notify.successor_named', { owner: formatAddress(node) }),
         { parse_mode: 'Markdown' }
       );
       log('SUCCESS', `Notified successor ${successorData.telegramId} about designation`);
@@ -217,18 +215,13 @@ async function notifyNodeRegistered(node, timestamp, txHash, logIndex) {
 
   const userData = db.getUserByWallet(node);
   if (userData) {
+    const lang = userData.lang || 'en';
     try {
       await bot.api.sendMessage(userData.telegramId,
-        `🎉 *Vault Registered!*\n\n` +
-        `Your wallet has been registered in the WillChain protocol.\n\n` +
-        `📍 Address: \`${formatAddress(node)}\`\n\n` +
-        `*What's next:*\n` +
-        `• Use /status to see your vault state\n` +
-        `• Designate a successor in the dashboard\n` +
-        `• Any outgoing transfer will auto-confirm your activity`,
+        t(lang, 'notify.vault_registered', { address: formatAddress(node) }),
         {
           parse_mode: 'Markdown',
-          reply_markup: new InlineKeyboard().url('📊 Open Dashboard', CONFIG.frontendUrl),
+          reply_markup: new InlineKeyboard().url(t(lang, 'notify.btn_dashboard'), CONFIG.frontendUrl),
         }
       );
       log('SUCCESS', `Sent registration welcome to ${userData.telegramId}`);

@@ -7,6 +7,7 @@ const { InlineKeyboard } = require('grammy');
 const cron = require('node-cron');
 const db = require('./database');
 const email = require('./email');
+const { t } = require('./i18n');
 const { deriveVaultStatus, needsCriticalAlert, approachingInactivity } = require('../../shared/vault-status');
 const { log } = require('./utils');
 
@@ -42,34 +43,21 @@ function scheduleWeeklyReminder() {
         const daysUntilInactive = Math.floor(Number(state.timeUntilInactive) / 86400);
         const inactivityPeriodDays = Math.floor(Number(state.inactivityPeriod) / 86400);
         const urgentThreshold = Math.min(7, inactivityPeriodDays / 4);
+        const lang = userData.lang || 'en';
 
         let message = '';
-        const keyboard = new InlineKeyboard().url('✅ Check In Now', CONFIG.frontendUrl);
+        const keyboard = new InlineKeyboard().url(t(lang, 'cron.btn_checkin'), CONFIG.frontendUrl);
 
         if (daysUntilInactive <= urgentThreshold) {
-          message =
-            `🚨 *URGENT: ${daysUntilInactive} days until inactive!*\n\n` +
-            `Your WillChain vault needs attention.\n` +
-            `Period: ${inactivityPeriodDays} days\n\n` +
-            `_Tip: Any on-chain activity will auto-confirm._\n` +
-            `Or click below for manual check-in.`;
+          message = t(lang, 'cron.urgent', { days: daysUntilInactive, period: inactivityPeriodDays });
         } else if (daysUntilInactive <= 14) {
-          message =
-            `⚠️ *Reminder: ${daysUntilInactive} days remaining*\n\n` +
-            `Your vault is active.\n` +
-            `Period setting: ${inactivityPeriodDays} days\n\n` +
-            `_If you're actively using your wallet, no action needed!_`;
+          message = t(lang, 'cron.warning', { days: daysUntilInactive, period: inactivityPeriodDays });
         } else {
           if (inactivityPeriodDays >= 180) {
             log('INFO', `Skipping weekly reminder for ${userData.telegramId} (${inactivityPeriodDays} day period)`);
             continue;
           }
-          message =
-            `👋 *Weekly Status Update*\n\n` +
-            `Your vault: Active ✅\n` +
-            `Days remaining: ${daysUntilInactive}\n` +
-            `Period: ${inactivityPeriodDays} days\n\n` +
-            `_Using your wallet? Activity is tracked automatically._`;
+          message = t(lang, 'cron.weekly', { days: daysUntilInactive, period: inactivityPeriodDays });
         }
 
         await bot.api.sendMessage(userData.telegramId, message, {
@@ -108,26 +96,21 @@ function scheduleDailyCriticalCheck() {
         if (state.lastActivityTimestamp === 0n) continue;
 
         const inactivityPeriodDays = Math.floor(Number(state.inactivityPeriod) / 86400);
+        const lang = userData.lang || 'en';
 
         if (needsCriticalAlert(state)) {
           const daysUntilAbandoned = Math.floor(Number(state.timeUntilAbandoned) / 86400);
           const totalTimeoutDays = inactivityPeriodDays + 30 + 30; // inactivity + grace + claim
 
           await bot.api.sendMessage(userData.telegramId,
-            `🔴 *CRITICAL: Your vault has entered GRACE PERIOD!*\n\n` +
-            `You have *${daysUntilAbandoned} days* before your successor can claim your assets.\n\n` +
-            `Your settings: ${inactivityPeriodDays} day inactivity period\n` +
-            `Total timeout: ${totalTimeoutDays} days\n\n` +
-            `If unclaimed, assets will be recycled:\n` +
-            `• 47% burned\n` +
-            `• 47% to active holders\n` +
-            `• 5% protocol treasury\n` +
-            `• 1% to recycler\n\n` +
-            `*ACT NOW to save your vault!*\n` +
-            `_Any transaction from your wallet will auto-confirm activity._`,
+            t(lang, 'cron.grace_alert', {
+              daysAbandoned: daysUntilAbandoned,
+              periodDays: inactivityPeriodDays,
+              totalDays: totalTimeoutDays,
+            }),
             {
               parse_mode: 'Markdown',
-              reply_markup: new InlineKeyboard().url('🆘 CONFIRM ACTIVITY NOW', CONFIG.frontendUrl),
+              reply_markup: new InlineKeyboard().url(t(lang, 'cron.btn_confirm_now'), CONFIG.frontendUrl),
             }
           );
 
