@@ -154,9 +154,28 @@ async function main() {
         for (const lang of locales) {
           await bot.api.setMyCommands(buildCommands(lang), { language_code: lang });
         }
-        log('INFO', 'Bot command menus registered (11 languages)');
+        // Set bot description (About) — localized
+        const descriptions = {
+          en: 'WillChain — protect your crypto assets with a blockchain will. Activity tracking, successor alerts, network stats.',
+          uk: 'WillChain — захистіть ваші крипто-активи цифровим заповітом. Відстеження активності, сповіщення про спадкоємця, статистика мережі.',
+          ru: 'WillChain — защитите ваши крипто-активы цифровым завещанием. Отслеживание активности, уведомления о наследнике, статистика сети.',
+          de: 'WillChain — schützen Sie Ihre Krypto-Assets mit einem Blockchain-Testament. Aktivitätsverfolgung, Nachfolger-Benachrichtigungen, Netzwerkstatistik.',
+          fr: 'WillChain — protégez vos crypto-actifs avec un testament blockchain. Suivi d\'activité, alertes successeur, statistiques réseau.',
+          es: 'WillChain — proteja sus cripto-activos con un testamento blockchain. Seguimiento de actividad, alertas de sucesor, estadísticas de red.',
+          pt: 'WillChain — proteja seus cripto-ativos com um testamento blockchain. Rastreamento de atividade, alertas de sucessor, estatísticas de rede.',
+          pl: 'WillChain — chroń swoje krypto-aktywa testamentem na blockchainie. Śledzenie aktywności, powiadomienia o spadkobiercy, statystyki sieci.',
+          it: 'WillChain — proteggi i tuoi cripto-asset con un testamento blockchain. Monitoraggio attività, avvisi successore, statistiche rete.',
+          nl: 'WillChain — bescherm uw crypto-assets met een blockchain-testament. Activiteitstracking, opvolgermeldingen, netwerkstatistieken.',
+          tr: 'WillChain — kripto varlıklarınızı blockchain vasiyetiyle koruyun. Aktivite takibi, halef uyarıları, ağ istatistikleri.',
+        };
+        await bot.api.setMyDescription(descriptions.en);
+        for (const lang of locales) {
+          await bot.api.setMyDescription(descriptions[lang], { language_code: lang });
+        }
+
+        log('INFO', 'Bot command menus and descriptions registered (11 languages)');
       } catch (err) {
-        log('WARN', 'Failed to set bot commands', err.message);
+        log('WARN', 'Failed to set bot commands/description', err.message);
       }
     },
   });
