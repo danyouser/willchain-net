@@ -436,21 +436,14 @@ body.preloading {
 }
 
 /* Telegram Wallet Link Modal */
-.modal-box {
-  background: var(--abyss);
-  border: 1px solid var(--b2);
-  border-radius: var(--r4);
-  width: 100%; max-width: 480px;
-  padding: 24px;
-  box-shadow: var(--s3);
-  animation: modalIn .25s var(--ease) both;
-}
-.modal-title { font-size: 1rem; font-weight: 600; margin: 0 0 12px; }
+.modal-tglink { max-width: 480px; text-align: center; padding: 36px 28px; }
+.modal-tglink h3 { font-size: 1.2rem; margin-bottom: 10px; }
 .tg-link-address { color: var(--t2); font-size: 0.85rem; margin-bottom: 8px; font-family: monospace; }
 .tg-link-hint { color: var(--t3); font-size: 0.8rem; line-height: 1.5; margin-bottom: 16px; }
 .tg-link-success { color: var(--success, #4ade80); font-size: 0.9rem; padding: 12px 0; }
 .tg-link-error { color: var(--danger, #f87171); font-size: 0.85rem; margin-bottom: 12px; }
-.modal-box .modal-footer { flex-direction: row; justify-content: center; gap: 8px; background: none; border-top: none; padding: 16px 0 0; }
+.modal-tglink .modal-buttons { justify-content: center; margin-top: 8px; }
+.notification-icon.tglink { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.3); color: var(--accent); }
 
 .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
 

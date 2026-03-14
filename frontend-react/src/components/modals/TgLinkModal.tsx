@@ -115,18 +115,16 @@ export function TgLinkModal() {
   const shortAddr = `${params.addr.slice(0, 6)}...${params.addr.slice(-4)}`
 
   return (
-    <div
-      className="modal"
-      ref={modalRef}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="tglink-modal-title"
-      style={{ alignItems: 'center', padding: '0 16px' }}
-      onClick={(e) => { if (e.target === e.currentTarget) setIsOpen(false) }}
-    >
+    <div className="modal" ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="tglink-modal-title">
       <div className="modal-overlay" onClick={() => setIsOpen(false)} aria-hidden="true" />
-      <div className="modal-box" style={{ position: 'relative', zIndex: 1 }}>
-        <p className="modal-title" id="tglink-modal-title">{t('telegram.link_modal_title')}</p>
+      <div className="modal-content modal-tglink">
+        <div className="notification-icon tglink" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+        </div>
+        <h3 id="tglink-modal-title">{t('telegram.link_modal_title')}</h3>
         <p className="tg-link-address">
           {t('telegram.link_modal_address')}: <strong>{shortAddr}</strong>
         </p>
@@ -137,11 +135,11 @@ export function TgLinkModal() {
         )}
 
         {status === 'success' ? (
-          <p className="tg-link-success">✓ {t('telegram.link_modal_success')}</p>
+          <p className="tg-link-success">{t('telegram.link_modal_success')}</p>
         ) : (
-          <div className="modal-footer">
+          <div className="modal-buttons">
             <button
-              className="btn btn-ghost"
+              className="btn btn-secondary"
               onClick={() => setIsOpen(false)}
             >
               {t('telegram.link_modal_cancel_btn')}
