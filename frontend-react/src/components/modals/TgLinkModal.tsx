@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAccount, useSignTypedData } from 'wagmi'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { CHAIN_ID } from '../../config/wagmi'
 import { useModalA11y } from '../../hooks/useModalA11y'
 
@@ -27,6 +28,7 @@ const BOT_API_URL = (import.meta.env.VITE_BOT_API_URL as string | undefined) ?? 
 export function TgLinkModal() {
   const { t } = useTranslation()
   const { address } = useAccount()
+  const { openConnectModal } = useConnectModal()
 
   const [params, setParams] = useState<{ tgid: string; addr: string; nonce: string } | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -144,15 +146,24 @@ export function TgLinkModal() {
             >
               {t('telegram.link_modal_cancel_btn')}
             </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleSign}
-              disabled={isSigning || status === 'signing' || !address}
-            >
-              {isSigning || status === 'signing'
-                ? t('telegram.link_modal_signing')
-                : t('telegram.link_modal_sign_btn')}
-            </button>
+            {address ? (
+              <button
+                className="btn btn-primary"
+                onClick={handleSign}
+                disabled={isSigning || status === 'signing'}
+              >
+                {isSigning || status === 'signing'
+                  ? t('telegram.link_modal_signing')
+                  : t('telegram.link_modal_sign_btn')}
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary"
+                onClick={() => openConnectModal?.()}
+              >
+                {t('header.connect_wallet')}
+              </button>
+            )}
           </div>
         )}
       </div>
