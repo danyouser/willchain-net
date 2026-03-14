@@ -2164,62 +2164,62 @@ body.preloading {
 /* Glow keyframe: active during 1/4 of cycle, off the rest.
    Sharp transitions via X% / X.01% pairs. */
 @keyframes demoGlow1 {
-  0%      { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7); box-shadow: 0 0 24px rgba(59,130,246,0.3); filter: grayscale(0); }
-  24.99%  { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7); box-shadow: 0 0 24px rgba(59,130,246,0.3); filter: grayscale(0); }
-  25%     { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  100%    { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
+  0%      { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7); box-shadow: 0 0 24px rgba(59,130,246,0.3); opacity: 1; }
+  24.99%  { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7); box-shadow: 0 0 24px rgba(59,130,246,0.3); opacity: 1; }
+  25%     { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  100%    { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
 }
 @keyframes demoGlow2 {
-  0%      { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  24.99%  { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  25%     { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.7);  box-shadow: 0 0 24px rgba(139,92,246,0.3); filter: grayscale(0); }
-  49.99%  { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.7);  box-shadow: 0 0 24px rgba(139,92,246,0.3); filter: grayscale(0); }
-  50%     { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  100%    { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
+  0%      { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  24.99%  { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  25%     { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.7);  box-shadow: 0 0 24px rgba(139,92,246,0.3); opacity: 1; }
+  49.99%  { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.7);  box-shadow: 0 0 24px rgba(139,92,246,0.3); opacity: 1; }
+  50%     { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  100%    { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
 }
 @keyframes demoGlow3 {
-  0%      { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  49.99%  { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  50%     { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7);  box-shadow: 0 0 24px rgba(59,130,246,0.25); filter: grayscale(0); }
-  74.99%  { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7);  box-shadow: 0 0 24px rgba(59,130,246,0.25); filter: grayscale(0); }
-  75%     { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
-  100%    { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; filter: grayscale(1); }
+  0%      { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  49.99%  { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  50%     { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7);  box-shadow: 0 0 24px rgba(59,130,246,0.25); opacity: 1; }
+  74.99%  { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.7);  box-shadow: 0 0 24px rgba(59,130,246,0.25); opacity: 1; }
+  75%     { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
+  100%    { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); box-shadow: none; opacity: 0.45; }
 }
 @keyframes demoGlow4 {
-  0%      { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2);  box-shadow: none; filter: grayscale(1); }
-  74.99%  { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2);  box-shadow: none; filter: grayscale(1); }
-  75%     { background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.8);  box-shadow: 0 0 24px rgba(16,185,129,0.3); filter: grayscale(0); }
-  99.99%  { background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.8);  box-shadow: 0 0 24px rgba(16,185,129,0.3); filter: grayscale(0); }
-  100%    { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2);  box-shadow: none; filter: grayscale(1); }
+  0%      { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2);  box-shadow: none; opacity: 0.45; }
+  74.99%  { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2);  box-shadow: none; opacity: 0.45; }
+  75%     { background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.8);  box-shadow: 0 0 24px rgba(16,185,129,0.3); opacity: 1; }
+  99.99%  { background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.8);  box-shadow: 0 0 24px rgba(16,185,129,0.3); opacity: 1; }
+  100%    { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2);  box-shadow: none; opacity: 0.45; }
 }
 
 /* Arrow N lights up together with card N+1 (right card) */
 @keyframes demoArrowGlow1 {
-  0%      { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  24.99%  { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  25%     { color: rgba(139,92,246,0.9);  filter: grayscale(0); }
-  49.99%  { color: rgba(139,92,246,0.9);  filter: grayscale(0); }
-  50%     { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  100%    { color: rgba(255,255,255,0.2); filter: grayscale(1); }
+  0%      { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  24.99%  { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  25%     { color: rgba(139,92,246,0.9);  opacity: 1; }
+  49.99%  { color: rgba(139,92,246,0.9);  opacity: 1; }
+  50%     { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  100%    { color: rgba(255,255,255,0.2); opacity: 0.45; }
 }
 @keyframes demoArrowGlow2 {
-  0%      { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  49.99%  { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  50%     { color: rgba(59,130,246,0.9);  filter: grayscale(0); }
-  74.99%  { color: rgba(59,130,246,0.9);  filter: grayscale(0); }
-  75%     { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  100%    { color: rgba(255,255,255,0.2); filter: grayscale(1); }
+  0%      { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  49.99%  { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  50%     { color: rgba(59,130,246,0.9);  opacity: 1; }
+  74.99%  { color: rgba(59,130,246,0.9);  opacity: 1; }
+  75%     { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  100%    { color: rgba(255,255,255,0.2); opacity: 0.45; }
 }
 @keyframes demoArrowGlow3 {
-  0%      { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  74.99%  { color: rgba(255,255,255,0.2); filter: grayscale(1); }
-  75%     { color: rgba(16,185,129,0.9);  filter: grayscale(0); }
-  99.99%  { color: rgba(16,185,129,0.9);  filter: grayscale(0); }
-  100%    { color: rgba(255,255,255,0.2); filter: grayscale(1); }
+  0%      { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  74.99%  { color: rgba(255,255,255,0.2); opacity: 0.45; }
+  75%     { color: rgba(16,185,129,0.9);  opacity: 1; }
+  99.99%  { color: rgba(16,185,129,0.9);  opacity: 1; }
+  100%    { color: rgba(255,255,255,0.2); opacity: 0.45; }
 }
 
-.demo-step    { opacity: 1; filter: grayscale(1); }
-.demo-arrow-h { opacity: 1; color: rgba(255,255,255,0.2); filter: grayscale(1); }
+.demo-step    { opacity: 0.45; }
+.demo-arrow-h { opacity: 0.45; color: rgba(255,255,255,0.2); }
 
 .demo-step:nth-child(1)    { animation: demoGlow1  8s linear infinite; }
 .demo-arrow-h:nth-child(2) { animation: demoArrowGlow1 8s linear infinite; }
