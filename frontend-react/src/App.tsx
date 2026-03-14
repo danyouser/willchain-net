@@ -1,11 +1,26 @@
 import { lazy, Suspense } from 'react'
 import { useAccount } from 'wagmi'
+import { useTranslation } from 'react-i18next'
+import { RainbowKitProvider, darkTheme, type Locale } from '@rainbow-me/rainbowkit'
+import { CustomAvatar } from './components/CustomAvatar'
 import { DisclaimerProvider } from './context/DisclaimerContext'
 import { NotificationProvider } from './context/NotificationContext'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { NotificationModal } from './components/modals/NotificationModal'
+
+// Map app languages → RainbowKit locale codes
+const rainbowKitLocale: Record<string, Locale> = {
+  en: 'en-US', es: 'es-419', pt: 'pt-BR', ru: 'ru-RU',
+  de: 'de-DE', fr: 'fr-FR', tr: 'tr-TR', uk: 'uk-UA',
+}
+
+const rainbowTheme = darkTheme({
+  accentColor: '#ff6400',
+  accentColorForeground: 'white',
+  borderRadius: 'medium',
+})
 
 // Lazy-loaded: dashboard and landing sections are mutually exclusive paths
 const Dashboard = lazy(() => import('./components/dashboard/Dashboard').then(m => ({ default: m.Dashboard })))
@@ -55,12 +70,17 @@ function AppContent() {
 }
 
 function App() {
+  const { i18n } = useTranslation()
+  const locale = rainbowKitLocale[i18n.language] ?? 'en-US'
+
   return (
-    <DisclaimerProvider>
-      <NotificationProvider>
-        <AppContent />
-      </NotificationProvider>
-    </DisclaimerProvider>
+    <RainbowKitProvider avatar={CustomAvatar} theme={rainbowTheme} locale={locale}>
+      <DisclaimerProvider>
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
+      </DisclaimerProvider>
+    </RainbowKitProvider>
   )
 }
 

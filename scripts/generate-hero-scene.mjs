@@ -65,7 +65,7 @@ LEFT THIRD — "You (the wallet owner)":
 CENTER — "WillChain smart contract":
 - A monumental glowing shield-clock hybrid, floating in the center.
 - The shield is geometric, faceted like a cut diamond, made of deep blue-indigo crystalline energy.
-- Inside the shield: a circular clock face with glowing electric-blue hands.
+- Inside the shield: a circular clock face with EXACTLY TWO glowing electric-blue hands (hour hand and minute hand ONLY — absolutely NO third hand, NO second hand, NO extra lines through the center).
 - The entire structure pulses softly, like a heartbeat.
 - A faint circular energy ring (portal-like) expands outward from it.
 - WILL tokens flow INTO the shield from the left AND OUT of the shield to the right.

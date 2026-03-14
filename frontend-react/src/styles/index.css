@@ -2617,16 +2617,34 @@ body.preloading {
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════════ */
-@media (min-width: 861px) and (max-width: 1100px) {
-  .stat { padding: 12px 16px; }
-  .stat-value { font-size: 1.3rem; }
-  .stat-label { font-size: 0.68rem; }
-  .trust-item { padding: 4px 10px; }
-  .trust-label { font-size: 0.62rem; }
-}
-
 @media (max-width: 1100px) {
   .hero-trust { display: none; }
+
+  /* Hero stats — card layout when trust bar is hidden */
+  .hero-stats {
+    position: relative;
+    top: auto; bottom: auto; left: auto; right: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "total total"
+      "burn recv";
+    background: var(--panel-2);
+    border: 1px solid var(--b);
+    border-radius: var(--r3);
+    margin-top: 16px;
+    padding: 0;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .stat { width: auto; padding: 18px 12px; align-items: center; justify-content: center; }
+  .stat:nth-child(1) { grid-area: total; border-bottom: 1px solid var(--b); padding: 24px 16px; }
+  .stat:nth-child(3) { grid-area: burn; border-right: 1px solid var(--b); }
+  .stat:nth-child(5) { grid-area: recv; }
+  .stat-divider { display: none; }
+  .stat-value { font-size: 1.35rem; }
+  .stat:nth-child(1) .stat-value { font-size: 1.65rem; }
+  .stat-label { font-size: 0.62rem; text-align: center; margin-top: 4px; }
+
   .hiw-scene { border-radius: var(--r3); }
   .hiw-grid   { grid-template-columns: repeat(2,1fr); position: static; padding: 16px; }
   .problem-cards { grid-template-columns: 1fr; }
@@ -2691,30 +2709,6 @@ body.preloading {
   .hero-scene-img {
     border-radius: var(--r3);
   }
-  .hero-stats {
-    position: relative;
-    top: auto; bottom: auto; left: auto; right: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "total total"
-      "burn recv";
-    background: var(--panel-2);
-    border: 1px solid var(--b);
-    border-radius: var(--r3);
-    margin-top: 16px;
-    padding: 0;
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  }
-  .stat { width: auto; padding: 18px 12px; align-items: center; justify-content: center; }
-  .stat:nth-child(1) { grid-area: total; border-bottom: 1px solid var(--b); padding: 24px 16px; }
-  .stat:nth-child(3) { grid-area: burn; border-right: 1px solid var(--b); }
-  .stat:nth-child(5) { grid-area: recv; }
-  .stat-divider { display: none; }
-
-  .stat-value { font-size: 1.35rem; }
-  .stat:nth-child(1) .stat-value { font-size: 1.65rem; }
-  .stat-label { font-size: 0.62rem; text-align: center; margin-top: 4px; }
 }
 
 @media (max-width: 600px) {
