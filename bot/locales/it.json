@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Troppe richieste. Attendere un minuto e riprovare.",
   "contract_not_configured": "⚠️ Contratto non configurato. Attendere il lancio della mainnet.",
-  "start.welcome": "🔒 *Benvenuto/a sul Bot WillChain*\n\nMonitorerò l'attività del tuo portafoglio e proteggerò il tuo vault.\n\n*Cosa faccio:*\n• Monitoraggio automatico dell'attività\n• Notifiche all'ingresso nel periodo di grazia\n• Aggiornamenti delle statistiche di rete\n\n*Nota:* Se utilizzi attivamente il portafoglio, l'attività viene monitorata automaticamente. La conferma manuale è necessaria solo per i portafogli inattivi.\n\nCollega un portafoglio per iniziare!",
+  "start.welcome": "📜 *Benvenuto/a sul Bot WillChain*\n\nMonitorerò l'attività del tuo portafoglio e proteggerò il tuo vault.\n\n*Cosa faccio:*\n• Monitoraggio automatico dell'attività\n• Notifiche all'ingresso nel periodo di grazia\n• Aggiornamenti delle statistiche di rete\n\n*Nota:* Se utilizzi attivamente il portafoglio, l'attività viene monitorata automaticamente. La conferma manuale è necessaria solo per i portafogli inattivi.\n\nCollega un portafoglio per iniziare!",
   "start.btn_link": "🔗 Collega portafoglio",
   "start.btn_stats": "📊 Statistiche di rete",
   "start.btn_help": "❓ Come funziona",

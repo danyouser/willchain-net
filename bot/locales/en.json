@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Too many requests. Please wait a minute and try again.",
   "contract_not_configured": "⚠️ Contract not configured. Please wait for mainnet launch.",
-  "start.welcome": "🔒 *Welcome to WillChain Bot*\n\nI will monitor your wallet activity and protect your vault.\n\n*What I do:*\n• Automatic activity tracking\n• Notifications for entering the grace period\n• Network statistics updates\n\n*Note:* If you are actively using your wallet, activity is tracked automatically. Manual confirmation is only needed for inactive wallets.\n\nLink your wallet to get started!",
+  "start.welcome": "📜 *Welcome to WillChain Bot*\n\nI will monitor your wallet activity and protect your vault.\n\n*What I do:*\n• Automatic activity tracking\n• Notifications for entering the grace period\n• Network statistics updates\n\n*Note:* If you are actively using your wallet, activity is tracked automatically. Manual confirmation is only needed for inactive wallets.\n\nLink your wallet to get started!",
   "start.btn_link": "🔗 Link Wallet",
   "start.btn_stats": "📊 Network Stats",
   "start.btn_help": "❓ How it works",

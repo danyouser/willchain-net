@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Muitos pedidos. Aguarde um minuto e tente novamente.",
   "contract_not_configured": "⚠️ Contrato não configurado. Aguarde o lançamento da mainnet.",
-  "start.welcome": "🔒 *Bem-vindo ao Bot WillChain*\n\nEu monitorarei a atividade da sua carteira e protegerei seu cofre.\n\n*O que eu faço:*\n• Monitoramento automático de atividade\n• Notificações ao entrar no período de carência\n• Atualizações de estatísticas da rede\n\n*Nota:* Se você estiver usando ativamente sua carteira, a atividade será monitorada automaticamente. Uma confirmação manual é necessária apenas para carteiras inativas.\n\nVincule sua carteira para começar!",
+  "start.welcome": "📜 *Bem-vindo ao Bot WillChain*\n\nEu monitorarei a atividade da sua carteira e protegerei seu cofre.\n\n*O que eu faço:*\n• Monitoramento automático de atividade\n• Notificações ao entrar no período de carência\n• Atualizações de estatísticas da rede\n\n*Nota:* Se você estiver usando ativamente sua carteira, a atividade será monitorada automaticamente. Uma confirmação manual é necessária apenas para carteiras inativas.\n\nVincule sua carteira para começar!",
   "start.btn_link": "🔗 Vincular Carteira",
   "start.btn_stats": "📊 Estatísticas da Rede",
   "start.btn_help": "❓ Como Funciona",

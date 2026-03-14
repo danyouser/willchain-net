@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Demasiadas solicitudes. Espere un minuto e inténtelo de nuevo.",
   "contract_not_configured": "⚠️ Contrato no configurado. Espere al lanzamiento de mainnet.",
-  "start.welcome": "🔒 *Bienvenido al Bot de WillChain*\n\nRastrearé la actividad de su billetera y protegeré su bóveda.\n\n*Lo que hago:*\n• Rastreo automático de actividad\n• Notificaciones al ingresar al período de gracia\n• Actualizaciones de estadísticas de la red\n\n*Nota:* Si utiliza activamente su billetera, la actividad se rastrea automáticamente. Solo se requiere confirmación manual para billeteras inactivas.\n\n¡Vincule su billetera para comenzar!",
+  "start.welcome": "📜 *Bienvenido al Bot de WillChain*\n\nRastrearé la actividad de su billetera y protegeré su bóveda.\n\n*Lo que hago:*\n• Rastreo automático de actividad\n• Notificaciones al ingresar al período de gracia\n• Actualizaciones de estadísticas de la red\n\n*Nota:* Si utiliza activamente su billetera, la actividad se rastrea automáticamente. Solo se requiere confirmación manual para billeteras inactivas.\n\n¡Vincule su billetera para comenzar!",
   "start.btn_link": "🔗 Vincular billetera",
   "start.btn_stats": "📊 Estadísticas de la red",
   "start.btn_help": "❓ Cómo funciona",

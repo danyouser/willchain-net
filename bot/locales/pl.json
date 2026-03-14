@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Zbyt wiele żądań. Poczekaj minutę i spróbuj ponownie.",
   "contract_not_configured": "⚠️ Kontrakt nie został skonfigurowany. Poczekaj na uruchomienie mainnet.",
-  "start.welcome": "🔒 *Witamy w WillChain Bot*\n\nBędę monitorować aktywność Twojego portfela i chronić Twoje sejf.\n\n*Co robię:*\n• Automatyczne śledzenie aktywności\n• Powiadomienia o wejściu w okres karencji\n• Aktualizacje statystyk sieci\n\n*Uwaga:* Jeśli aktywnie korzystasz z portfela, aktywność jest śledzona automatycznie. Ręczne potwierdzenie jest wymagane tylko dla nieaktywnych portfeli.\n\nPołącz swój portfel, aby rozpocząć!",
+  "start.welcome": "📜 *Witamy w WillChain Bot*\n\nBędę monitorować aktywność Twojego portfela i chronić Twoje sejf.\n\n*Co robię:*\n• Automatyczne śledzenie aktywności\n• Powiadomienia o wejściu w okres karencji\n• Aktualizacje statystyk sieci\n\n*Uwaga:* Jeśli aktywnie korzystasz z portfela, aktywność jest śledzona automatycznie. Ręczne potwierdzenie jest wymagane tylko dla nieaktywnych portfeli.\n\nPołącz swój portfel, aby rozpocząć!",
   "start.btn_link": "🔗 Połącz portfel",
   "start.btn_stats": "📊 Statystyki sieci",
   "start.btn_help": "❓ Jak to działa",

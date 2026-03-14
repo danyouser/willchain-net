@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Zu viele Anfragen. Bitte warten Sie eine Minute und versuchen Sie es erneut.",
   "contract_not_configured": "⚠️ Vertrag nicht konfiguriert. Bitte warten Sie auf den Start des Mainnets.",
-  "start.welcome": "🔒 *Willkommen beim WillChain Bot*\n\nIch werde die Aktivität Ihrer Wallet verfolgen und Ihr Safe schützen.\n\n*Was ich tue:*\n• Automatische Aktivitätsverfolgung\n• Benachrichtigungen beim Eintritt in die Nachfrist\n• Aktualisierung der Netzwerkstatistiken\n\n*Hinweis:* Wenn Sie Ihre Wallet aktiv nutzen, wird die Aktivität automatisch erfasst. Eine manuelle Bestätigung ist nur für inaktive Wallets erforderlich.\n\nVerknüpfen Sie Ihre Wallet, um loszulegen!",
+  "start.welcome": "📜 *Willkommen beim WillChain Bot*\n\nIch werde die Aktivität Ihrer Wallet verfolgen und Ihr Safe schützen.\n\n*Was ich tue:*\n• Automatische Aktivitätsverfolgung\n• Benachrichtigungen beim Eintritt in die Nachfrist\n• Aktualisierung der Netzwerkstatistiken\n\n*Hinweis:* Wenn Sie Ihre Wallet aktiv nutzen, wird die Aktivität automatisch erfasst. Eine manuelle Bestätigung ist nur für inaktive Wallets erforderlich.\n\nVerknüpfen Sie Ihre Wallet, um loszulegen!",
   "start.btn_link": "🔗 Wallet verknüpfen",
   "start.btn_stats": "📊 Netzwerkstatistiken",
   "start.btn_help": "❓ Wie es funktioniert",

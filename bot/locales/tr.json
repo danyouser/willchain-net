@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Çok fazla istek. Lütfen bir dakika bekleyip tekrar deneyin.",
   "contract_not_configured": "⚠️ Sözleşme yapılandırılmamış. Lütfen ana ağın başlamasını bekleyin.",
-  "start.welcome": "🔒 *WillChain Bot'a Hoş Geldiniz*\n\nCüzdanınızın aktivitesini izleyecek ve emanetinizi güvende tutacağım.\n\n*Neler Yapıyorum:*\n• Otomatik aktivite takibi\n• İzin süresi uyarısı\n• Ağ istatistikleri güncellemesi\n\n*Not:* Cüzdanınızı aktif olarak kullanıyorsanız, aktiviteniz otomatik olarak takip edilir. Manuel onay yalnızca hareketsiz cüzdanlar için gereklidir.\n\nBaşlamak için cüzdanınızı bağlayın!",
+  "start.welcome": "📜 *WillChain Bot'a Hoş Geldiniz*\n\nCüzdanınızın aktivitesini izleyecek ve emanetinizi güvende tutacağım.\n\n*Neler Yapıyorum:*\n• Otomatik aktivite takibi\n• İzin süresi uyarısı\n• Ağ istatistikleri güncellemesi\n\n*Not:* Cüzdanınızı aktif olarak kullanıyorsanız, aktiviteniz otomatik olarak takip edilir. Manuel onay yalnızca hareketsiz cüzdanlar için gereklidir.\n\nBaşlamak için cüzdanınızı bağlayın!",
   "start.btn_link": "🔗 Cüzdanı Bağla",
   "start.btn_stats": "📊 Ağ İstatistikleri",
   "start.btn_help": "❓ Nasıl Çalışır",

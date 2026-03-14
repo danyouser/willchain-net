@@ -1,7 +1,7 @@
 {
   "rate_limited": "⏳ Te veel verzoeken. Wacht een minuut en probeer het opnieuw.",
   "contract_not_configured": "⚠️ Contract is niet geconfigureerd. Wacht op de lancering van het mainnet.",
-  "start.welcome": "🔒 *Welkom bij WillChain Bot*\n\nIk bewaak de activiteit van uw portemonnee en bescherm uw kluis.\n\n*Wat ik doe:*\n• Automatische activiteitstracking\n• Meldingen bij het ingaan van de respijtperiode\n• Updates van netwerkstatistieken\n\n*Opmerking:* Als u uw portemonnee actief gebruikt, wordt de activiteit automatisch gevolgd. Handmatige bevestiging is alleen nodig voor inactieve portemonnees.\n\nKoppel uw portemonnee om te beginnen!",
+  "start.welcome": "📜 *Welkom bij WillChain Bot*\n\nIk bewaak de activiteit van uw portemonnee en bescherm uw kluis.\n\n*Wat ik doe:*\n• Automatische activiteitstracking\n• Meldingen bij het ingaan van de respijtperiode\n• Updates van netwerkstatistieken\n\n*Opmerking:* Als u uw portemonnee actief gebruikt, wordt de activiteit automatisch gevolgd. Handmatige bevestiging is alleen nodig voor inactieve portemonnees.\n\nKoppel uw portemonnee om te beginnen!",
   "start.btn_link": "🔗 Koppel portemonnee",
   "start.btn_stats": "📊 Netwerkstatistieken",
   "start.btn_help": "❓ Hoe het werkt",
