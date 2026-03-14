@@ -123,11 +123,41 @@ async function main() {
   // Scheduled jobs
   cron.startAll();
 
+  // Set bot command menus — localized for all 11 supported languages
+  // Keys: start, link, status, stats, notifications, email, unlink, help
+  const menuDescriptions = {
+    en: ['Start the bot', 'Link your wallet', 'Check your will status', 'Network statistics', 'Toggle reminders', 'Email notifications', 'Unlink wallet', 'How it works'],
+    uk: ['Запустити бота', 'Підключити гаманець', 'Перевірити статус заповіту', 'Статистика мережі', 'Увімкнути/вимкнути нагадування', 'Email-сповіщення', 'Відключити гаманець', 'Як це працює'],
+    ru: ['Запустить бота', 'Подключить кошелёк', 'Проверить статус завещания', 'Статистика сети', 'Вкл/выкл напоминания', 'Email-уведомления', 'Отключить кошелёк', 'Как это работает'],
+    de: ['Bot starten', 'Wallet verbinden', 'Testament-Status prüfen', 'Netzwerkstatistik', 'Erinnerungen ein/aus', 'E-Mail-Benachrichtigungen', 'Wallet trennen', 'So funktioniert es'],
+    fr: ['Démarrer le bot', 'Lier le portefeuille', 'Vérifier le statut du testament', 'Statistiques du réseau', 'Activer/désactiver les rappels', 'Notifications par e-mail', 'Délier le portefeuille', 'Comment ça marche'],
+    es: ['Iniciar el bot', 'Vincular billetera', 'Ver estado del testamento', 'Estadísticas de la red', 'Activar/desactivar avisos', 'Notificaciones por email', 'Desvincular billetera', 'Cómo funciona'],
+    pt: ['Iniciar o bot', 'Vincular carteira', 'Ver estado do testamento', 'Estatísticas da rede', 'Ativar/desativar lembretes', 'Notificações por email', 'Desvincular carteira', 'Como funciona'],
+    pl: ['Uruchom bota', 'Podłącz portfel', 'Sprawdź status testamentu', 'Statystyki sieci', 'Włącz/wyłącz przypomnienia', 'Powiadomienia email', 'Odłącz portfel', 'Jak to działa'],
+    it: ['Avvia il bot', 'Collega il portafoglio', 'Controlla stato del testamento', 'Statistiche della rete', 'Attiva/disattiva promemoria', 'Notifiche email', 'Scollega il portafoglio', 'Come funziona'],
+    nl: ['Start de bot', 'Koppel portemonnee', 'Controleer testamentstatus', 'Netwerkstatistieken', 'Herinneringen aan/uit', 'E-mailmeldingen', 'Ontkoppel portemonnee', 'Hoe het werkt'],
+    tr: ['Botu başlat', 'Cüzdan bağla', 'Vasiyet durumunu kontrol et', 'Ağ istatistikleri', 'Hatırlatıcıları aç/kapat', 'E-posta bildirimleri', 'Cüzdan bağlantısını kes', 'Nasıl çalışır'],
+  };
+  const cmdNames = ['start', 'link', 'status', 'stats', 'notifications', 'email', 'unlink', 'help'];
+  const buildCommands = (lang) => cmdNames.map((c, i) => ({ command: c, description: menuDescriptions[lang][i] }));
+
   await bot.start({
-    onStart: (botInfo) => {
+    onStart: async (botInfo) => {
       log('SUCCESS', `Bot @${botInfo.username} is running!`);
       log('INFO', `Contract: ${CONFIG.contractAddress || 'Not configured'}`);
       log('INFO', `RPC: ${CONFIG.rpcUrl}`);
+
+      // Register command menus with Telegram
+      try {
+        await bot.api.setMyCommands(buildCommands('en')); // default
+        const locales = ['uk', 'ru', 'de', 'fr', 'es', 'pt', 'pl', 'it', 'nl', 'tr'];
+        for (const lang of locales) {
+          await bot.api.setMyCommands(buildCommands(lang), { language_code: lang });
+        }
+        log('INFO', 'Bot command menus registered (11 languages)');
+      } catch (err) {
+        log('WARN', 'Failed to set bot commands', err.message);
+      }
     },
   });
 }

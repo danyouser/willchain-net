@@ -25,7 +25,7 @@
   "status.not_registered": "Не активовано",
   "status.grace_period": "Пільговий період",
   "status.abandoned": "Покинуто",
-  "status.unregistered_hint": "\n\nℹ️ *Ваш заповіт ще не активовано. Активуйте на [willchain.net](https://willchain.net).*",
+  "status.unregistered_hint": "\n\nℹ️ *Ваш заповіт ще не активовано.*\nНатисніть кнопку нижче, щоб активувати.",
   "status.urgent_hint": "\n\n⚠️ *ТЕРМІНОВО: Підтвердіть активність ЗАРАЗ, щоб запобігти втраті активів!*",
   "status.warning_hint": "\n\n⚠️ *Потрібне підтвердження активності протягом 7 днів!*",
   "status.body": "{{emoji}} *Статус заповіту: {{status}}*\n\n📍 Адреса: `{{address}}`\n⏱ Часу до неактивності: *{{daysInactive}}*\n📅 Період неактивності: *{{periodDays}} днів*\n👤 Спадкоємець: {{successor}}\n🏷 Тариф: {{tier}}\n\n_Підказка: Будь-яка on-chain активність автоматично підтверджує вашу присутність._",

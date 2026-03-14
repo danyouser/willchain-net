@@ -21,7 +21,7 @@
   "status.not_registered": "Not Registered",
   "status.grace_period": "Grace Period",
   "status.abandoned": "Abandoned",
-  "status.unregistered_hint": "\n\nℹ️ *Your will is not yet activated. Activate at [willchain.net](https://willchain.net).*",
+  "status.unregistered_hint": "\n\nℹ️ *Your will is not yet activated.*\nPress the button below to activate.",
   "status.urgent_hint": "\n\n⚠️ *URGENT: Confirm activity NOW to prevent asset loss!*",
   "status.warning_hint": "\n\n⚠️ *Activity confirmation required within 7 days!*",
   "status.body": "{{emoji}} *Will Status: {{status}}*\n\n📍 Address: `{{address}}`\n⏱ Time until inactivity: *{{daysInactive}}*\n📅 Inactivity period: *{{periodDays}} days*\n👤 Successor: {{successor}}\n🏷 Tier: {{tier}}\n\n_Hint: Any on-chain activity will automatically confirm your presence._",
