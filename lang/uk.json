@@ -185,8 +185,8 @@
     "link_modal_title": "Підключити гаманець до Telegram",
     "link_modal_address": "Гаманець",
     "link_modal_hint": "Підпишіть запит своїм гаманцем, щоб підтвердити право власності. Підпис буде автоматично відправлено боту.",
-    "link_modal_sign_btn": "Підписати",
-    "link_modal_signing": "Підписую...",
+    "link_modal_sign_btn": "Підтвердити",
+    "link_modal_signing": "Підтвердження...",
     "link_modal_cancel_btn": "Скасувати",
     "link_modal_success": "Гаманець підключено! Поверніться в Telegram бот.",
     "link_modal_cancelled": "Підпис скасовано."
