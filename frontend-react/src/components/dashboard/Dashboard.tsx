@@ -26,7 +26,6 @@ export function Dashboard() {
   const { nodeState, isLoading: isNodeLoading, refetch: refetchNode } = useNodeState(address)
   const isSmartWallet = useIsSmartWallet(address)
   const [showTransfer, setShowTransfer] = useState(false)
-  const [incomingData, setIncomingData] = useState({ count: 0, hasClaimable: false })
   const [allowanceWarningDismissed, setAllowanceWarningDismissed] = useState(() =>
     localStorage.getItem('allowance-warning-dismissed') === '1'
   )
@@ -108,7 +107,6 @@ export function Dashboard() {
               : (nodeState?.timeUntilAbandoned ?? 0) > 0 ? 2
               : 4
           }
-          onIncomingData={(count, claimable) => setIncomingData({ count, hasClaimable: claimable })}
         />
 
         {/* ── SIDEBAR (Core Status & Action) ────────────────────── */}
@@ -268,12 +266,11 @@ export function Dashboard() {
 
           <div className="dash-section-label" style={{ marginTop: '12px' }}>{t('dashboard.heir_section')}</div>
           <div className="dash-grid-1">
-            <IncomingInheritancesCard />
+            <IncomingInheritancesCard onSuccess={handleRefresh} />
             <ClaimVaultCard
               mySuccessorClaimInitiated={nodeState?.successorClaimInitiated ?? false}
               myClaimInitiationTimestamp={nodeState?.claimInitiationTimestamp ?? 0}
               onSuccess={handleRefresh}
-              disabled={incomingData.count > 0 && !incomingData.hasClaimable}
             />
           </div>
 

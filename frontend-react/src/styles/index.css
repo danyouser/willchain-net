@@ -450,7 +450,7 @@ body.preloading {
 .tg-link-hint { color: var(--t3); font-size: 0.8rem; line-height: 1.5; margin-bottom: 16px; }
 .tg-link-success { color: var(--success, #4ade80); font-size: 0.9rem; padding: 12px 0; }
 .tg-link-error { color: var(--danger, #f87171); font-size: 0.85rem; margin-bottom: 12px; }
-.modal-box .modal-footer { flex-direction: row; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--b); padding-top: 16px; }
+.modal-box .modal-footer { flex-direction: row; justify-content: center; gap: 8px; background: none; border-top: none; padding: 16px 0 0; }
 
 .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
 
@@ -1790,6 +1790,34 @@ body.preloading {
   color: var(--t3); font-size: 0.82rem; padding: 8px 0;
   display: flex; align-items: center; gap: 8px;
 }
+
+/* Claim action button inside inheritance row */
+.inheritance-claim-action {
+  display: flex; align-items: center; gap: 6px; margin-left: auto;
+}
+.inheritance-claim-btn {
+  font-size: 0.72rem; padding: 4px 12px; white-space: nowrap;
+  border-radius: var(--rp);
+}
+.inheritance-sim-error {
+  color: var(--red); font-weight: 700; font-size: 0.85rem;
+  cursor: help;
+}
+.inheritance-veto-hint {
+  color: var(--yellow); font-weight: 500;
+}
+.inheritance-claim-confirm {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-left: auto; align-items: flex-end;
+}
+.inheritance-confirm-warning {
+  font-size: 0.72rem; color: var(--red); font-weight: 500;
+  white-space: nowrap;
+}
+.inheritance-confirm-btns {
+  display: flex; gap: 4px;
+}
+.inheritance-confirm-btns .btn { font-size: 0.7rem; padding: 3px 10px; }
 
 .timeline-card {
   background: var(--panel); border: 1px solid var(--b);
