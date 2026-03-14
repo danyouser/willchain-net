@@ -17,6 +17,8 @@ interface DashboardAlertsProps {
   isRegistered: boolean
   vaultStatus: number
   onIncomingData?: (count: number, hasClaimable: boolean) => void
+  /** Injected alert from parent (e.g. after confirmActivity TX) */
+  externalAlert?: AlertItem | null
 }
 
 interface AlertItem {
@@ -40,7 +42,7 @@ function saveDismissed(addr: string | undefined, set: Set<string>) {
   sessionStorage.setItem(storageKey(addr), JSON.stringify([...set]))
 }
 
-export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive, hasSuccessor, successorAddress, isRegistered, vaultStatus, onIncomingData }: DashboardAlertsProps) {
+export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive, hasSuccessor, successorAddress, isRegistered, vaultStatus, onIncomingData, externalAlert }: DashboardAlertsProps) {
   const { t } = useTranslation()
   const { address } = useAccount()
   const [dismissed, setDismissed] = useState(() => loadDismissed(address))
@@ -134,6 +136,15 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   // --- Transfer event watcher ---
   const [txAlerts, setTxAlerts] = useState<AlertItem[]>([])
   const txIdCounter = useRef(0)
+
+  // Pick up alerts injected by parent (e.g. confirmActivity success)
+  const lastExternalId = useRef<string | null>(null)
+  useEffect(() => {
+    if (externalAlert && externalAlert.id !== lastExternalId.current) {
+      lastExternalId.current = externalAlert.id
+      setTxAlerts(prev => [...prev, externalAlert])
+    }
+  }, [externalAlert])
 
   useWatchContractEvent({
     address: CONTRACT_ADDRESS,

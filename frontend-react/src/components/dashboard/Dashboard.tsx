@@ -26,6 +26,7 @@ export function Dashboard() {
   const { nodeState, isLoading: isNodeLoading, refetch: refetchNode } = useNodeState(address)
   const isSmartWallet = useIsSmartWallet(address)
   const [showTransfer, setShowTransfer] = useState(false)
+  const [checkinAlert, setCheckinAlert] = useState<{ id: string; type: 'success'; text: string } | null>(null)
   const [allowanceWarningDismissed, setAllowanceWarningDismissed] = useState(() =>
     localStorage.getItem('allowance-warning-dismissed') === '1'
   )
@@ -51,6 +52,11 @@ export function Dashboard() {
     refetchNode()
     // RPC may return stale data right after tx confirmation; refetch again after short delay
     setTimeout(() => { refetchBalance(); refetchNode() }, 2000)
+  }
+
+  const handleCheckinSuccess = () => {
+    setCheckinAlert({ id: `checkin-${Date.now()}`, type: 'success', text: t('dashboard.alert_activity_confirmed') })
+    handleRefresh()
   }
 
   const handleAddToken = async () => {
@@ -101,6 +107,7 @@ export function Dashboard() {
           hasSuccessor={hasSuccessor}
           successorAddress={nodeState?.designatedSuccessor ?? ''}
           isRegistered={!isUnregistered}
+          externalAlert={checkinAlert}
           vaultStatus={
             isUnregistered ? 0
               : (nodeState?.timeUntilInactive ?? 0) > 0 ? 1
@@ -115,7 +122,7 @@ export function Dashboard() {
             <TimeCard
               timeUntilInactive={nodeState?.timeUntilInactive || 0}
               inactivityPeriod={nodeState?.inactivityPeriod || 90 * 24 * 60 * 60}
-              onSuccess={handleRefresh}
+              onSuccess={handleCheckinSuccess}
             />
           </aside>
         )}
