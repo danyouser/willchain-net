@@ -148,7 +148,17 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       return next
     })
   }
+  // Use timestamp-based IDs to avoid collisions across mounts/reloads
   const txIdCounter = useRef(0)
+  const nextTxId = () => `tx-${Date.now()}-${++txIdCounter.current}`
+
+  // Reload txAlerts from sessionStorage when wallet address changes
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(txStorageKey)
+      setTxAlertsRaw(raw ? JSON.parse(raw) : [])
+    } catch { setTxAlertsRaw([]) }
+  }, [txStorageKey])
 
   // Pick up alerts injected by parent (e.g. confirmActivity success)
   const lastExternalId = useRef<string | null>(null)
@@ -172,7 +182,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
         const fromLower = from.toLowerCase()
         const toLower = to.toLowerCase()
         const amount = formatTokenAmount(value)
-        const id = `tx-${++txIdCounter.current}`
+        const id = nextTxId()
 
         if (toLower === addrLower && fromLower !== addrLower) {
           const shortFrom = `${from.slice(0, 6)}...${from.slice(-4)}`
@@ -211,7 +221,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       for (const log of logs) {
         const { node, successor } = log.args as { node: string; successor: string }
         if (!node || !successor) continue
-        const id = `tx-${++txIdCounter.current}`
+        const id = nextTxId()
 
         if (node.toLowerCase() === addrLower) {
           const shortSuccessor = `${successor.slice(0, 6)}...${successor.slice(-4)}`
@@ -244,7 +254,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       for (const log of logs) {
         const { node, successor } = log.args as { node: string; successor: string }
         if (!node || !successor) continue
-        const id = `tx-${++txIdCounter.current}`
+        const id = nextTxId()
         if (node.toLowerCase() === addrLower) {
           const short = `${successor.slice(0, 6)}...${successor.slice(-4)}`
           setTxAlerts(prev => [...prev, { id, type: 'danger', text: t('dashboard.alert_claim_initiated_owner', { successor: short }) }])
@@ -264,7 +274,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       for (const log of logs) {
         const { node } = log.args as { node: string }
         if (node?.toLowerCase() === address.toLowerCase()) {
-          const id = `tx-${++txIdCounter.current}`
+          const id = nextTxId()
           setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_claim_cancelled') }])
         }
       }
@@ -280,7 +290,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       for (const log of logs) {
         const { fromNode, toNode, amount } = log.args as { fromNode: string; toNode: string; amount: bigint }
         if (!fromNode || !toNode) continue
-        const id = `tx-${++txIdCounter.current}`
+        const id = nextTxId()
         const amt = formatTokenAmount(amount)
         if (toNode.toLowerCase() === addrLower) {
           const short = `${fromNode.slice(0, 6)}...${fromNode.slice(-4)}`
@@ -301,7 +311,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       for (const log of logs) {
         const { node } = log.args as { node: string }
         if (node?.toLowerCase() === address.toLowerCase()) {
-          const id = `tx-${++txIdCounter.current}`
+          const id = nextTxId()
           setTxAlerts(prev => [...prev, { id, type: 'danger', text: t('dashboard.alert_recycled') }])
         }
       }
@@ -316,7 +326,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
       for (const log of logs) {
         const { node, amount } = log.args as { node: string; amount: bigint }
         if (node?.toLowerCase() === address.toLowerCase()) {
-          const id = `tx-${++txIdCounter.current}`
+          const id = nextTxId()
           setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_dividends_claimed', { amount: formatTokenAmount(amount) }) }])
         }
       }
@@ -324,20 +334,7 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
     poll: true, pollingInterval: 4_000, enabled: !!address,
   })
 
-  useWatchContractEvent({
-    address: CONTRACT_ADDRESS, abi: WILLCHAIN_ABI, eventName: 'ActivityConfirmed',
-    onLogs(logs) {
-      if (!address) return
-      for (const log of logs) {
-        const { node } = log.args as { node: string }
-        if (node?.toLowerCase() === address.toLowerCase()) {
-          const id = `tx-${++txIdCounter.current}`
-          setTxAlerts(prev => [...prev, { id, type: 'success', text: t('dashboard.alert_activity_confirmed') }])
-        }
-      }
-    },
-    poll: true, pollingInterval: 4_000, enabled: !!address,
-  })
+  // ActivityConfirmed is handled via externalAlert from parent (instant feedback)
 
   // --- Build alerts ---
   const alerts: AlertItem[] = []
@@ -384,7 +381,8 @@ export function DashboardAlerts({ ethBalance, claimInProgress, timeUntilInactive
   const visible = [...txAlerts, ...staticVisible]
 
   const handleDismiss = (id: string) => {
-    if (id.startsWith('tx-')) {
+    // If the alert lives in txAlerts (event-based or external), remove it from there
+    if (txAlerts.some(a => a.id === id)) {
       dismissTxAlert(id)
     } else {
       setDismissed(prev => {
