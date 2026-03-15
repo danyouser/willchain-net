@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Varis Olarak Atandınız*\n\n`{{owner}}` cüzdanı sizi varis olarak atadı.\n\n*Bu Ne Anlama Geliyor:*\n• Sahip inaktif hale gelirse, vasiyetini alabileceksiniz.\n• Talep mevcut olduğunda bildirim alacaksınız.\n\n_Şu anda herhangi bir işlem yapmanız gerekmiyor._",
   "notify.vault_registered": "🎉 *Vasiyet Kaydedildi!*\n\nCüzdanınız WillChain protokolüne kaydedildi.\n\n📍 Adres: `{{address}}`\n\n*Sıradaki Adımlar:*\n• Durumu kontrol etmek için /status komutunu kullanın\n• Vasi atamak için kontrol panelini kullanın\n• Herhangi bir giden transfer, aktiviteyi otomatik olarak onaylayacaktır",
   "notify.btn_dashboard": "📊 Kontrol Panelini Aç",
-  "api.verify_success": "✅ *Cüzdan başarıyla bağlandı!*\n\nAdres: `{{address}}`\n\nArtık vasiyetinizin durumu hakkında bildirim alacaksınız.\nKontrol etmek için /status komutunu kullanın."
+  "api.verify_success": "✅ *Cüzdan başarıyla bağlandı!*\n\nAdres: `{{address}}`\n\nArtık vasiyetinizin durumu hakkında bildirim alacaksınız.\nKontrol etmek için /status komutunu kullanın.",
+  "link.open_link": "🔗 WillChain aç"
 }

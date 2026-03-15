@@ -66,5 +66,6 @@
   "notify.successor_named": "📋 *You have been named a successor*\n\nWallet `{{owner}}` has designated you as their successor.\n\n*What this means:*\n• If the owner becomes inactive, you can claim their will\n• You will be notified when the claim becomes available\n\n_No action is required from you at this time._",
   "notify.vault_registered": "🎉 *Will Registered!*\n\nYour wallet has been registered with the WillChain protocol.\n\n📍 Address: `{{address}}`\n\n*What's next:*\n• Use /status to check your status\n• Assign a successor via the dashboard\n• Any outgoing transfer will automatically confirm activity",
   "notify.btn_dashboard": "📊 Open Dashboard",
-  "api.verify_success": "✅ *Wallet linked successfully!*\n\nAddress: `{{address}}`\n\nYou will now receive notifications about your will's status.\nUse /status to check."
+  "api.verify_success": "✅ *Wallet linked successfully!*\n\nAddress: `{{address}}`\n\nYou will now receive notifications about your will's status.\nUse /status to check.",
+  "link.open_link": "🔗 Open WillChain"
 }

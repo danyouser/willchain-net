@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Ha sido designado como heredero*\n\nLa billetera `{{owner}}` lo ha designado como su heredero.\n\n*Lo que esto significa:*\n• Si el propietario se vuelve inactivo, podrá reclamar su testamento\n• Recibirá notificaciones cuando el reclamo esté disponible\n\n_Actualmente no se requieren acciones._",
   "notify.vault_registered": "🎉 *¡Testamento registrado!*\n\nSu billetera ha sido registrada en el protocolo WillChain.\n\n📍 Dirección: `{{address}}`\n\n*Próximos pasos:*\n• Use /status para verificar el estado\n• Designe un heredero a través del panel de control\n• Cualquier transferencia saliente confirmará automáticamente la actividad",
   "notify.btn_dashboard": "📊 Abrir panel de control",
-  "api.verify_success": "✅ *¡Billetera conectada exitosamente!*\n\nDirección: `{{address}}`\n\nAhora recibirá notificaciones sobre el estado de su testamento.\nUse /status para verificar."
+  "api.verify_success": "✅ *¡Billetera conectada exitosamente!*\n\nDirección: `{{address}}`\n\nAhora recibirá notificaciones sobre el estado de su testamento.\nUse /status para verificar.",
+  "link.open_link": "🔗 Abrir WillChain"
 }

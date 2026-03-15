@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Você foi nomeado sucessor*\n\nA carteira `{{owner}}` o nomeou como sucessor.\n\n*O que isso significa:*\n• Se o proprietário ficar inativo, você poderá reivindicar o testamento dele\n• Você receberá notificações quando a solicitação estiver disponível\n\n_Nenhuma ação é necessária no momento._",
   "notify.vault_registered": "🎉 *Testamento registrado!*\n\nSua carteira foi registrada no protocolo WillChain.\n\n📍 Endereço: `{{address}}`\n\n*Próximos passos:*\n• Use /status para verificar o status\n• Nomeie um sucessor através do dashboard\n• Qualquer transferência de saída confirmará automaticamente a atividade",
   "notify.btn_dashboard": "📊 Abrir Dashboard",
-  "api.verify_success": "✅ *Carteira conectada com sucesso!*\n\nEndereço: `{{address}}`\n\nAgora você receberá notificações sobre o status do seu testamento.\nUse /status para verificar."
+  "api.verify_success": "✅ *Carteira conectada com sucesso!*\n\nEndereço: `{{address}}`\n\nAgora você receberá notificações sobre o status do seu testamento.\nUse /status para verificar.",
+  "link.open_link": "🔗 Abrir WillChain"
 }

@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Zostałeś wyznaczony spadkobiercą*\n\nPortfel `{{owner}}` wyznaczył Cię spadkobiercą.\n\n*Co to oznacza:*\n• Jeśli właściciel stanie się nieaktywny, będziesz mógł odebrać jego testament\n• Będziesz otrzymywać powiadomienia, gdy żądanie stanie się dostępne\n\n_Obecnie nie są wymagane żadne działania._",
   "notify.vault_registered": "🎉 *Testament zarejestrowany!*\n\nTwój portfel został zarejestrowany w protokole WillChain.\n\n📍 Adres: `{{address}}`\n\n*Co dalej:*\n• Użyj /status, aby sprawdzić stan\n• Wyznacz spadkobiercę przez dashboard\n• Każdy wychodzący transfer automatycznie potwierdzi aktywność",
   "notify.btn_dashboard": "📊 Otwórz dashboard",
-  "api.verify_success": "✅ *Portfel pomyślnie połączony!*\n\nAdres: `{{address}}`\n\nTeraz będziesz otrzymywać powiadomienia o statusie Twojego testamentu.\nUżyj /status, aby sprawdzić."
+  "api.verify_success": "✅ *Portfel pomyślnie połączony!*\n\nAdres: `{{address}}`\n\nTeraz będziesz otrzymywać powiadomienia o statusie Twojego testamentu.\nUżyj /status, aby sprawdzić.",
+  "link.open_link": "🔗 Otwórz WillChain"
 }

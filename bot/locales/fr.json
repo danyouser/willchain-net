@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Vous avez été désigné comme héritier*\n\nLe portefeuille `{{owner}}` vous a désigné comme héritier.\n\n*Ce que cela signifie :*\n• Si le propriétaire devient inactif, vous pourrez réclamer son testament\n• Vous recevrez une notification lorsque la réclamation deviendra disponible\n\n_Aucune action n'est requise de votre part pour le moment._",
   "notify.vault_registered": "🎉 *Testament enregistré!*\n\nVotre portefeuille est maintenant enregistré auprès du protocole WillChain.\n\n📍 Adresse : `{{address}}`\n\n*Prochaines étapes :*\n• Utilisez /status pour vérifier l'état\n• Désignez un héritier via le tableau de bord\n• Tout transfert sortant confirmera automatiquement votre activité",
   "notify.btn_dashboard": "📊 Ouvrir le tableau de bord",
-  "api.verify_success": "✅ *Portefeuille connecté avec succès!*\n\nAdresse : `{{address}}`\n\nVous recevrez maintenant des notifications sur le statut de votre testament.\nUtilisez /status pour vérifier."
+  "api.verify_success": "✅ *Portefeuille connecté avec succès!*\n\nAdresse : `{{address}}`\n\nVous recevrez maintenant des notifications sur le statut de votre testament.\nUtilisez /status pour vérifier.",
+  "link.open_link": "🔗 Ouvrir WillChain"
 }

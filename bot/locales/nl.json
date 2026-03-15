@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Je bent aangewezen als erfgenaam*\n\nWallet `{{owner}}` heeft je aangewezen als erfgenaam.\n\n*Wat dit betekent:*\n• Als de eigenaar inactief wordt, kun je zijn/haar nalatenschap opeisen\n• Je ontvangt meldingen wanneer een verzoek beschikbaar wordt\n\n_Momenteel zijn er geen acties vereist._",
   "notify.vault_registered": "🎉 *Nalatenschap geregistreerd!*\n\nJe wallet is geregistreerd in het WillChain protocol.\n\n📍 Adres: `{{address}}`\n\n*Wat nu:*\n• Gebruik /status om de status te controleren\n• Wijs een erfgenaam aan via het dashboard\n• Elke uitgaande transfer bevestigt automatisch activiteit",
   "notify.btn_dashboard": "📊 Open dashboard",
-  "api.verify_success": "✅ *Wallet succesvol gekoppeld!*\n\nAdres: `{{address}}`\n\nJe ontvangt nu meldingen over de status van je nalatenschap.\nGebruik /status om te controleren."
+  "api.verify_success": "✅ *Wallet succesvol gekoppeld!*\n\nAdres: `{{address}}`\n\nJe ontvangt nu meldingen over de status van je nalatenschap.\nGebruik /status om te controleren.",
+  "link.open_link": "🔗 Open WillChain"
 }

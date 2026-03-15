@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Sie wurden als Erbe benannt*\n\nDie Wallet `{{owner}}` hat Sie als Erben bestimmt.\n\n*Was das bedeutet:*\n• Wenn der Inhaber inaktiv wird, können Sie auf sein Vermächtnis zugreifen.\n• Sie erhalten Benachrichtigungen, wenn die Anfrage verfügbar wird.\n\n_Derzeit sind keine Aktionen erforderlich._",
   "notify.vault_registered": "🎉 *Vermächtnis registriert!*\n\nIhre Wallet wurde im WillChain-Protokoll registriert.\n\n📍 Adresse: `{{address}}`\n\n*Nächste Schritte:*\n• Verwenden Sie /status, um den Status zu überprüfen.\n• Benennen Sie einen Erben über das Dashboard.\n• Jeder ausgehende Transfer bestätigt automatisch die Aktivität.",
   "notify.btn_dashboard": "📊 Dashboard öffnen",
-  "api.verify_success": "✅ *Wallet erfolgreich verbunden!*\n\nAdresse: `{{address}}`\n\nSie erhalten nun Benachrichtigungen über den Status Ihres Vermächtnisses.\nVerwenden Sie /status, um dies zu überprüfen."
+  "api.verify_success": "✅ *Wallet erfolgreich verbunden!*\n\nAdresse: `{{address}}`\n\nSie erhalten nun Benachrichtigungen über den Status Ihres Vermächtnisses.\nVerwenden Sie /status, um dies zu überprüfen.",
+  "link.open_link": "🔗 WillChain öffnen"
 }

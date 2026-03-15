@@ -60,5 +60,6 @@
   "notify.successor_named": "📋 *Sei Stato Nominato Erede*\n\nIl wallet `{{owner}}` ti ha designato come suo erede.\n\n*Cosa Significa:*\n• Se il proprietario diventa inattivo, potrai rivendicare il suo testamento\n• Riceverai notifiche quando la richiesta sarà disponibile\n\n_Al momento non sono richieste azioni._",
   "notify.vault_registered": "🎉 *Testamento Registrato!*\n\nIl tuo wallet è stato registrato nel protocollo WillChain.\n\n📍 Indirizzo: `{{address}}`\n\n*Prossimi Passi:*\n• Usa /status per controllare il tuo stato\n• Nomina un erede tramite la dashboard\n• Qualsiasi trasferimento in uscita confermerà automaticamente l'attività",
   "notify.btn_dashboard": "📊 Apri Dashboard",
-  "api.verify_success": "✅ *Wallet collegato con successo!*\n\nIndirizzo: `{{address}}`\n\nOra riceverai notifiche sullo stato del tuo testamento.\nUsa /status per controllare."
+  "api.verify_success": "✅ *Wallet collegato con successo!*\n\nIndirizzo: `{{address}}`\n\nOra riceverai notifiche sullo stato del tuo testamento.\nUsa /status per controllare.",
+  "link.open_link": "🔗 Apri WillChain"
 }

@@ -104,7 +104,8 @@ function register() {
     log('INFO', `User ${userId} requested link challenge for ${address}`);
 
     const linkUrl = `${CONFIG.frontendUrl}?tgid=${userId}&addr=${address}&nonce=${nonce}`;
-    await ctx.reply(t(lang, 'link.challenge', { url: linkUrl }), { parse_mode: 'Markdown' });
+    const linkMarkdown = `[${t(lang, 'link.open_link')}](${linkUrl})`;
+    await ctx.reply(t(lang, 'link.challenge', { url: linkMarkdown }), { parse_mode: 'Markdown' });
   });
 
   // /verify <signature>
