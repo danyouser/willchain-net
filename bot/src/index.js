@@ -173,6 +173,25 @@ async function main() {
           await bot.api.setMyDescription(descriptions[lang], { language_code: lang });
         }
 
+        // Set bot short description (profile card) — localized
+        const shortDescriptions = {
+          en: 'WillChain notifications — check-in reminders, successor alerts, vault status updates.',
+          uk: 'WillChain сповіщення — нагадування про активність, повідомлення спадкоємцю, статус заповіту.',
+          ru: 'WillChain уведомления — напоминания об активности, оповещения наследнику, статус завещания.',
+          de: 'WillChain Benachrichtigungen — Aktivitätserinnerungen, Nachfolger-Warnungen, Testament-Status.',
+          fr: 'WillChain notifications — rappels d\'activité, alertes successeur, statut du testament.',
+          es: 'WillChain notificaciones — recordatorios de actividad, alertas de sucesor, estado del testamento.',
+          pt: 'WillChain notificações — lembretes de atividade, alertas de sucessor, status do testamento.',
+          pl: 'WillChain powiadomienia — przypomnienia o aktywności, alerty spadkobiercy, status testamentu.',
+          it: 'WillChain notifiche — promemoria attività, avvisi successore, stato del testamento.',
+          nl: 'WillChain meldingen — activiteitsherinneringen, opvolgerwaarschuwingen, testamentstatus.',
+          tr: 'WillChain bildirimler — aktivite hatırlatıcıları, halef uyarıları, vasiyet durumu.',
+        };
+        await bot.api.setMyShortDescription(shortDescriptions.en);
+        for (const lang of locales) {
+          await bot.api.setMyShortDescription(shortDescriptions[lang], { language_code: lang });
+        }
+
         log('INFO', 'Bot command menus and descriptions registered (11 languages)');
       } catch (err) {
         log('WARN', 'Failed to set bot commands/description', err.message);
