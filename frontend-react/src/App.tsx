@@ -74,7 +74,7 @@ function App() {
   const locale = rainbowKitLocale[i18n.language] ?? 'en-US'
 
   return (
-    <RainbowKitProvider avatar={CustomAvatar} theme={rainbowTheme} locale={locale}>
+    <RainbowKitProvider avatar={CustomAvatar} theme={rainbowTheme} locale={locale} modalSize="compact">
       <DisclaimerProvider>
         <NotificationProvider>
           <AppContent />

@@ -79,14 +79,7 @@ body {
 .header {
   position: sticky; top: 0; z-index: 200;
   --nav-scroll: 0;
-  background: transparent;
-}
-.header::before {
-  content: '';
-  position: absolute; inset: 0; z-index: -1;
-  background: rgba(3,5,13,0.75);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(3,5,13,0.92);
 }
 
 .header-inner {
@@ -145,6 +138,7 @@ body {
 .nav-overlay { display: none; }
 
 .wallet-buttons { display: flex; align-items: center; gap: 10px; }
+.connect-icon { display: none; }
 
 /* Language dropdown */
 .lang-dropdown { position: relative; }
@@ -651,8 +645,8 @@ body.preloading {
 }
 
 @keyframes blinkPulse {
-  0%,100% { opacity: 1; box-shadow: 0 0 10px var(--blue); }
-  50%      { opacity: 0.3; box-shadow: 0 0 4px var(--blue); }
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
 }
 
 /* Hero headline */
@@ -707,49 +701,6 @@ body.preloading {
     linear-gradient(to bottom, transparent, black 16%, black 84%, transparent),
     linear-gradient(to right, transparent, black 12%, black 88%, transparent);
   mask-composite: intersect;
-}
-
-/* float nodes */
-.hs-float   { animation: hsFloat  6s ease-in-out       infinite; }
-.hs-float-d { animation: hsFloat  6s ease-in-out 3s    infinite; }
-/* dashed arrows */
-.hs-dash-fwd { animation: hsDashFwd 1.4s linear infinite; }
-.hs-dash-rev { animation: hsDashRev 1.4s linear infinite; }
-/* orbit ring */
-.hs-orbit { animation: hsOrbit 28s linear infinite; transform-origin: 430px 130px; }
-/* clock hands — pivot = (430, 130) */
-.hs-hand-h { animation: hsHandH 60s steps(60) infinite; transform-origin: 430px 130px; }
-.hs-hand-m { animation: hsHandM 10s steps(10) infinite; transform-origin: 430px 130px; }
-/* token dots */
-.hs-tok-1 { animation: hsTok 2s linear       infinite; }
-.hs-tok-2 { animation: hsTok 2s linear 0.5s  infinite; }
-.hs-tok-3 { animation: hsTok 2s linear 1.0s  infinite; }
-.hs-tok-4 { animation: hsTok 2s linear 1.5s  infinite; }
-
-@keyframes hsFloat {
-  0%,100% { transform: translateY(0);    }
-  50%     { transform: translateY(-7px); }
-}
-@keyframes hsDashFwd {
-  to { stroke-dashoffset: -18; }
-}
-@keyframes hsDashRev {
-  to { stroke-dashoffset:  18; }
-}
-@keyframes hsOrbit {
-  to { transform: rotate(360deg); }
-}
-@keyframes hsHandH {
-  to { transform: rotate(360deg); }
-}
-@keyframes hsHandM {
-  to { transform: rotate(360deg); }
-}
-@keyframes hsTok {
-  0%   { cx: 528px; cy: 130px; opacity: 0;   }
-  8%   { opacity: 1; }
-  88%  { opacity: 1; }
-  100% { cx: 652px; cy: 130px; opacity: 0;   }
 }
 
 /* ── Hero Stats ───────────────────────────────────────────────── */
@@ -2276,21 +2227,7 @@ body.preloading {
 }
 
 @media (max-width: 800px) {
-  .demo-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    align-items: start;
-  }
-  .demo-arrow-h { display: none; }
-  .demo-card { max-width: none; }
-  .dc-label { white-space: normal; }
-}
-
-@media (max-width: 420px) {
-  .demo-cards {
-    grid-template-columns: 1fr;
-  }
+  .demo-section { display: none; }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2708,6 +2645,8 @@ body.preloading {
   }
   .hero-scene-img {
     border-radius: var(--r3);
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 
@@ -2741,6 +2680,9 @@ body.preloading {
   .footer-left { flex-direction: column; align-items: center; gap: 16px; }
   .footer-links  { flex-wrap: wrap; justify-content: center; gap: 14px; }
   .footer-copyright { max-width: 100%; text-align: center; }
+
+  .connect-icon { display: block; }
+  .connect-label { display: none; }
 
   .disclaimer-inner { padding: 28px 20px; }
   .modal-content { max-width: calc(100vw - 16px); max-height: calc(100dvh - 24px); }

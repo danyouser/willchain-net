@@ -19,12 +19,12 @@ const connectors = connectorsForWallets(
     {
       groupName: 'Popular',
       wallets: [
+        walletConnectWallet,
         metaMaskWallet,
-        braveWallet,
         coinbaseWallet,
         ledgerWallet,
+        braveWallet,
         rainbowWallet,
-        walletConnectWallet,
       ],
     },
   ],

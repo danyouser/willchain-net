@@ -116,7 +116,8 @@ export function Header() {
                 <div {...(!ready && { 'aria-hidden': true, style: { opacity: 0, pointerEvents: 'none', userSelect: 'none' } })}>
                   {!connected ? (
                     <button className="btn btn-primary" onClick={() => requireDisclaimer(openConnectModal)}>
-                      {t('nav.connect_wallet')}
+                      <svg className="connect-icon" viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M18 12a1 1 0 1 0 2 0 1 1 0 0 0-2 0" fill="currentColor"/></svg>
+                      <span className="connect-label">{t('nav.connect_wallet')}</span>
                     </button>
                   ) : chain.unsupported ? (
                     <button className="btn btn-danger" onClick={openChainModal}>
